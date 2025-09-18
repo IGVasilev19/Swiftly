@@ -12,10 +12,6 @@ import java.sql.Date;
 
 public class VehicleEntity {
     private Integer id;
-    private String brand;
-    private String model;
-    private Date yearOfManufacture;
     private String VIN;
     private String color;
-    private Integer ownerId;
 }

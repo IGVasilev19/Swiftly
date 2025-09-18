@@ -1,9 +1,6 @@
 package com.vehiclerental.business.impl;
 
 import com.vehiclerental.business.VehicleService;
-import com.vehiclerental.controllers.dto.VehicleRequest;
-import com.vehiclerental.controllers.dto.VehicleResponse;
-import com.vehiclerental.controllers.mapper.VehicleDtoMapper;
 import com.vehiclerental.persistence.VehicleRepository;
 import com.vehiclerental.persistence.entity.VehicleEntity;
 import lombok.RequiredArgsConstructor;
@@ -16,42 +13,35 @@ import java.util.List;
 public class VehicleServiceImpl implements VehicleService
 {
     private final VehicleRepository repo;
-    private final VehicleDtoMapper mapper;
 
-    public VehicleResponse create(VehicleRequest req)
+    public void create(VehicleEntity v)
     {
         VehicleEntity entity = new VehicleEntity();
-        entity.setVIN(req.vin());
-        entity.setColor(req.color());
+        entity.setVIN(v.getVIN());
+        entity.setColor(v.getColor());
 
         VehicleEntity saved = repo.save(entity);
-        return mapper.toResponse(saved);
     }
 
-    public VehicleResponse update(Integer id, VehicleRequest req)
+    public void update(Integer id, VehicleEntity entity)
     {
-        VehicleEntity entity = repo.findById(id);
+        VehicleEntity vehicle = repo.findById(id);
 
         if(entity == null)
         {
             throw new IllegalArgumentException("Vehicle not found: " + id);
         }
 
-        entity.setVIN(req.vin());
-        entity.setColor(req.color());
+        vehicle.setVIN(entity.getVIN());
+        vehicle.setColor(entity.getColor());
 
-        VehicleEntity saved = repo.update(entity);
-        return mapper.toResponse(saved);
+        VehicleEntity saved = repo.update(vehicle);
     }
 
-    public List<VehicleResponse> listAll()
-    {
-        return repo.getAll().stream()
-                .map(mapper::toResponse)
-                .toList();
+    public List<VehicleEntity> listAll() {
+        return repo.getAll();
     }
-
-    public VehicleResponse getById(Integer id)
+    public VehicleEntity getById(Integer id)
     {
         VehicleEntity vehicle = repo.findById(id);
 
@@ -60,7 +50,7 @@ public class VehicleServiceImpl implements VehicleService
            throw new IllegalArgumentException("Vehicle not found: " + id);
         }
 
-        return mapper.toResponse(vehicle);
+        return vehicle;
     }
 
     public void delete(Integer id)
