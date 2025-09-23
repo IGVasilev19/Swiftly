@@ -1,0 +1,17 @@
+ 
+build
+test
+
+job_build:
+  stage: build
+  script:
+    - cd backend    
+    - cd VehiclRental
+    - .\gradlew assemble --no-daemon
+
+job_test:
+  stage: test
+  script:
+    - cd backend 
+    - cd VehiclRental
+    - .\gradlew test --no-daemon
