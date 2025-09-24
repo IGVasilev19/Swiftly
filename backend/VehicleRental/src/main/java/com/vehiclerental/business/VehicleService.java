@@ -1,7 +1,6 @@
 package com.vehiclerental.business;
 
-import com.vehiclerental.controllers.dto.VehicleRequest;
-import com.vehiclerental.controllers.dto.VehicleResponse;
+
 import com.vehiclerental.persistence.entity.VehicleEntity;
 
 import java.util.List;
