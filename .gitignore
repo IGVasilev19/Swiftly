@@ -1,0 +1,77 @@
+### Java / Spring Boot ###
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+replay_pid*
+
+# IntelliJ / Eclipse / VSCode
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.project
+.classpath
+.settings/
+out/
+bin/
+target/
+build/
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Logs
+*.log
+*.out
+*.err
+logs/
+*/logs/
+
+# Spring Boot specific
+application-*.yml
+application-*.properties
+!application-example.yml
+!application-example.properties
+
+### Node / React / Tailwind / shadcn ###
+# dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# testing
+coverage/
+*.lcov
+
+# production
+build/
+dist/
+
+# misc
+.DS_Store
+.env
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+.pnpm-debug.log
+
+# shadcn UI (generated stuff)
+*.tsbuildinfo
+.next/
+.cache/
+
+### OS ###
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/

@@ -1,0 +1,5 @@
+plugins { id "java-library" }
+dependencies {
+    api project(":domain")
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.3"
+}

@@ -1,0 +1,16 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "vehicle-rental"
+
+include(
+        ":domain",
+        ":application",
+        ":boot",
+        ":infrastructure:web",
+        ":infrastructure:persistence"
+)
