@@ -1,13 +1,30 @@
-plugins { id "java" }
+plugins {
+    id "java"
+    id "io.freefair.lombok" version "8.10"
+    id 'io.spring.dependency-management' version '1.1.6'
+}
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
 
-subprojects {
+subprojects { Project p ->
     apply plugin: "java"
+    apply plugin: "io.freefair.lombok"
+    apply plugin: 'io.spring.dependency-management'
+
     group = "com.swiftly"
     version = "0.0.1-SNAPSHOT"
-    repositories { mavenCentral() }
-    tasks.withType(Test).configureEach { useJUnitPlatform() }
+
+    repositories {
+        mavenCentral()
+    }
+
+    lombok {
+        version = '1.18.42'
+    }
+
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+    }
 }
 
 allprojects {
