@@ -3,7 +3,7 @@ stages:
   - test
 
 variables:
-  # Put Gradle caches & downloaded distribution OUTSIDE the repo to avoid long paths
+  # Keep Gradle data OUTSIDE the repo to avoid Windows long path deletions
   GRADLE_HOME_DIR: "D:/gcache/${CI_PROJECT_ID}/${CI_CONCURRENT_ID}"
   GRADLE_USER_HOME: "$GRADLE_HOME_DIR"
   GRADLE_VERSION: "8.10.2"
@@ -15,25 +15,22 @@ build:
     - $ErrorActionPreference = 'Stop'
     - Set-Location $env:CI_PROJECT_DIR
 
-    # --- Setup pinned Gradle in GRADLE_HOME_DIR ---
-    - $distDir   = Join-Path $env:GRADLE_HOME_DIR "dist"
+    # Download fixed Gradle (once per runner cache dir)
+    - $distDir   = Join-Path $env:GRADLE_HOME_DIR 'dist'
     - $gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)
-    - $gradleExe  = Join-Path $gradleHome "bin\gradle.bat"
+    - $gradleExe  = Join-Path $gradleHome 'bin\gradle.bat'
     - if (-not (Test-Path $gradleExe)) {
         New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
         $zipUrl  = "https://services.gradle.org/distributions/gradle-$($env:GRADLE_VERSION)-bin.zip";
         $zipPath = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION + ".zip");
-        Write-Host "Downloading Gradle $($env:GRADLE_VERSION) to $distDir";
         Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath;
         Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
         Remove-Item $zipPath -Force;
       }
-    - 'Write-Host "JAVA_HOME=$env:JAVA_HOME"; java -version'
-    - '& "' + $gradleExe + '" -v'
 
-    # --- Build your Spring Boot module (skip tests here) ---
+    # Build Spring Boot module (skip tests here)
     - Set-Location "$env:CI_PROJECT_DIR\backend"
-    - '& "' + $gradleExe + '" :boot:build -x test --no-daemon'
+    - "& `"$($gradleExe)`" :boot:build -x test --no-daemon"
   artifacts:
     paths:
       - backend/**/build/libs/*.jar
@@ -44,11 +41,11 @@ test:
   script:
     - $ErrorActionPreference = 'Stop'
     - Set-Location $env:CI_PROJECT_DIR
-    - $distDir   = Join-Path $env:GRADLE_HOME_DIR "dist"
+    - $distDir   = Join-Path $env:GRADLE_HOME_DIR 'dist'
     - $gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)
-    - $gradleExe  = Join-Path $gradleHome "bin\gradle.bat"
+    - $gradleExe  = Join-Path $gradleHome 'bin\gradle.bat'
     - Set-Location "$env:CI_PROJECT_DIR\backend"
-    - '& "' + $gradleExe + '" test --no-daemon'
+    - "& `"$($gradleExe)`" test --no-daemon"
   dependencies:
     - build
   artifacts:
