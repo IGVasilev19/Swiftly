@@ -1,45 +1,41 @@
-stages: [build, test]
+stages:
+  - build
+  - test
 
 variables:
-  # Pick the Gradle version you want CI to use
   GRADLE_VERSION: "8.10.2"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
   GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
 
-# Cache Gradle caches AND the downloaded distribution
 cache:
   key: gradle-cache
+  policy: pull-push
   paths:
     - .gradle/caches
     - .gradle/dist
-  policy: pull-push
-
-# Reusable step: ensure a local Gradle is available without the wrapper
-.setup_gradle: &setup_gradle
-  - $ErrorActionPreference = 'Stop'
-  - Set-Location $env:CI_PROJECT_DIR
-  - $distDir = Join-Path $env:CI_PROJECT_DIR ".gradle\dist"
-  - $gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)
-  - $gradleExe  = Join-Path $gradleHome "bin\gradle.bat"
-  - if (-not (Test-Path $gradleExe)) {
-    New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
-    $zipUrl = "https://services.gradle.org/distributions/gradle-$env:GRADLE_VERSION-bin.zip";
-    $zipPath = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION + ".zip");
-    Write-Host "Downloading Gradle $env:GRADLE_VERSION from $zipUrl";
-    Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath;
-    Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
-    Remove-Item $zipPath -Force;
-    }
-  - $env:GRADLE_EXE = $gradleExe
-  - & $env:GRADLE_EXE -v
 
 build:
   stage: build
   script:
-    - *setup_gradle
+    - $ErrorActionPreference = 'Stop'
+    - Set-Location $env:CI_PROJECT_DIR
+    - $distDir   = Join-Path $env:CI_PROJECT_DIR ".gradle\dist"
+    - $gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)
+    - $gradleExe  = Join-Path $gradleHome "bin\gradle.bat"
+    - if (-not (Test-Path $gradleExe)) {
+      New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
+      $zipUrl  = "https://services.gradle.org/distributions/gradle-$env:GRADLE_VERSION-bin.zip";
+      $zipPath = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION + ".zip");
+      Write-Host "Downloading Gradle $($env:GRADLE_VERSION) ...";
+      Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath;
+      Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
+      Remove-Item $zipPath -Force;
+      }
+    - $env:GRADLE_EXE = $gradleExe
+    - "& $env:GRADLE_EXE -v"
+
     - Set-Location "$env:CI_PROJECT_DIR\backend"
-    # Build the Spring Boot module; skip tests here
-    - & $env:GRADLE_EXE :boot:build -x test --no-daemon
+    - "& $env:GRADLE_EXE :boot:build -x test --no-daemon"
   artifacts:
     paths:
       - backend/**/build/libs/*.jar
@@ -48,10 +44,25 @@ build:
 test:
   stage: test
   script:
-    - *setup_gradle
+    - $ErrorActionPreference = 'Stop'
+    - Set-Location $env:CI_PROJECT_DIR
+    - $distDir   = Join-Path $env:CI_PROJECT_DIR ".gradle\dist"
+    - $gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)
+    - $gradleExe  = Join-Path $gradleHome "bin\gradle.bat"
+    - if (-not (Test-Path $gradleExe)) {
+      New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
+      $zipUrl  = "https://services.gradle.org/distributions/gradle-$env:GRADLE_VERSION-bin.zip";
+      $zipPath = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION + ".zip");
+      Write-Host "Downloading Gradle $($env:GRADLE_VERSION) ...";
+      Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath;
+      Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
+      Remove-Item $zipPath -Force;
+      }
+    - $env:GRADLE_EXE = $gradleExe
     - Set-Location "$env:CI_PROJECT_DIR\backend"
-    - & $env:GRADLE_EXE test --no-daemon
-  dependencies: [build]
+    - "& $env:GRADLE_EXE test --no-daemon"
+  dependencies:
+    - build
   artifacts:
     when: always
     reports:
