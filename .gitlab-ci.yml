@@ -1,23 +1,45 @@
 stages: [build, test]
 
 variables:
+  # Pick the Gradle version you want CI to use
+  GRADLE_VERSION: "8.10.2"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
   GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
 
+# Cache Gradle caches AND the downloaded distribution
 cache:
   key: gradle-cache
   paths:
-    - .gradle/wrapper
     - .gradle/caches
+    - .gradle/dist
   policy: pull-push
+
+# Reusable step: ensure a local Gradle is available without the wrapper
+.setup_gradle: &setup_gradle
+  - $ErrorActionPreference = 'Stop'
+  - Set-Location $env:CI_PROJECT_DIR
+  - $distDir = Join-Path $env:CI_PROJECT_DIR ".gradle\dist"
+  - $gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)
+  - $gradleExe  = Join-Path $gradleHome "bin\gradle.bat"
+  - if (-not (Test-Path $gradleExe)) {
+    New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
+    $zipUrl = "https://services.gradle.org/distributions/gradle-$env:GRADLE_VERSION-bin.zip";
+    $zipPath = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION + ".zip");
+    Write-Host "Downloading Gradle $env:GRADLE_VERSION from $zipUrl";
+    Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath;
+    Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
+    Remove-Item $zipPath -Force;
+    }
+  - $env:GRADLE_EXE = $gradleExe
+  - & $env:GRADLE_EXE -v
 
 build:
   stage: build
   script:
+    - *setup_gradle
     - Set-Location "$env:CI_PROJECT_DIR\backend"
-    - if (-not (Test-Path .\gradle\wrapper\gradle-wrapper.jar)) { Write-Error "Missing gradle-wrapper.jar in repo"; exit 1 }
-    - if (-not (Test-Path .\gradle\wrapper\gradle-wrapper.properties)) { Write-Error "Missing gradle-wrapper.properties in repo"; exit 1 }
-    - .\gradlew.bat :boot:build -x test --no-daemon
+    # Build the Spring Boot module; skip tests here
+    - & $env:GRADLE_EXE :boot:build -x test --no-daemon
   artifacts:
     paths:
       - backend/**/build/libs/*.jar
@@ -26,10 +48,10 @@ build:
 test:
   stage: test
   script:
+    - *setup_gradle
     - Set-Location "$env:CI_PROJECT_DIR\backend"
-    - .\gradlew.bat test --no-daemon
-  dependencies:
-    - build
+    - & $env:GRADLE_EXE test --no-daemon
+  dependencies: [build]
   artifacts:
     when: always
     reports:

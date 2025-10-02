@@ -47,7 +47,6 @@ public class Listing {
 
     @Column(nullable = false)
     @org.hibernate.annotations.ColumnDefault("false")
-    @Builder.Default
     private Boolean instantBook = false;
 
     @Column
