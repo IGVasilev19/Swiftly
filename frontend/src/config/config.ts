@@ -1,6 +1,6 @@
 export const config = {
   app: {
-    name: "MonoMERN",
+    name: "Swiftly",
   },
   user: {
     allowedUpdates: ["username", "email", "password", "emailVerified"],

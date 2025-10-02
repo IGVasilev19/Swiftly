@@ -2,16 +2,26 @@ stages:
   - build
   - test
 
-job_build:
+build:
   stage: build
+  image: eclipse-temurin:21-jdk
   script:
-    - cd backend
-    - cd VehicleRental
-    - .\gradlew assemble --no-daemon
+    - cd backend/VehicleRental
+    - ./gradlew assemble --no-daemon
+  artifacts:
+    paths:
+      - backend/VehicleRental/build/libs/
+    expire_in: 1 week
 
-job_test:
+test:
   stage: test
+  image: eclipse-temurin:21-jdk
   script:
-    - cd backend
-    - cd VehicleRental
-    - .\gradlew test --no-daemon
+    - cd backend/VehicleRental
+    - ./gradlew test --no-daemon
+  dependencies:
+    - build
+  artifacts:
+    when: always
+    reports:
+      junit: backend/VehicleRental/build/test-results/test/*.xml
