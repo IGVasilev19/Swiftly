@@ -3,49 +3,37 @@ stages:
   - test
 
 variables:
+  # Put Gradle caches & downloaded distribution OUTSIDE the repo to avoid long paths
+  GRADLE_HOME_DIR: "D:/gcache/${CI_PROJECT_ID}/${CI_CONCURRENT_ID}"
+  GRADLE_USER_HOME: "$GRADLE_HOME_DIR"
   GRADLE_VERSION: "8.10.2"
-  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
-  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g -Dorg.gradle.daemon=false"
-
-before_script:
-  # Enable long paths support for Windows
-  - git config --global core.longPaths true
-  # Clean up any existing gradle cache to avoid path issues
-  - if (Test-Path ".gradle") { Remove-Item -Recurse -Force ".gradle" -ErrorAction SilentlyContinue }
-
-cache:
-  key: gradle-wrapper-cache
-  policy: pull-push
-  paths:
-    - .gradle/wrapper
-    - .gradle/dist
-    # Exclude problematic cache directories with long paths
-    # - .gradle/caches  # Commented out to avoid long path issues
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
 
 build:
   stage: build
   script:
     - $ErrorActionPreference = 'Stop'
     - Set-Location $env:CI_PROJECT_DIR
-    - $distDir   = Join-Path $env:CI_PROJECT_DIR ".gradle\dist"
+
+    # --- Setup pinned Gradle in GRADLE_HOME_DIR ---
+    - $distDir   = Join-Path $env:GRADLE_HOME_DIR "dist"
     - $gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)
     - $gradleExe  = Join-Path $gradleHome "bin\gradle.bat"
     - if (-not (Test-Path $gradleExe)) {
-      New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
-      $zipUrl  = "https://services.gradle.org/distributions/gradle-$env:GRADLE_VERSION-bin.zip";
-      $zipPath = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION + ".zip");
-      Write-Host "Downloading Gradle $($env:GRADLE_VERSION) ...";
-      Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath;
-      Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
-      Remove-Item $zipPath -Force;
+        New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
+        $zipUrl  = "https://services.gradle.org/distributions/gradle-$($env:GRADLE_VERSION)-bin.zip";
+        $zipPath = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION + ".zip");
+        Write-Host "Downloading Gradle $($env:GRADLE_VERSION) to $distDir";
+        Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath;
+        Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
+        Remove-Item $zipPath -Force;
       }
-    - $env:GRADLE_EXE = $gradleExe
-    - "& $env:GRADLE_EXE -v"
+    - 'Write-Host "JAVA_HOME=$env:JAVA_HOME"; java -version'
+    - '& "' + $gradleExe + '" -v'
 
+    # --- Build your Spring Boot module (skip tests here) ---
     - Set-Location "$env:CI_PROJECT_DIR\backend"
-    # Clean build directories before building
-    - "& $env:GRADLE_EXE clean --no-daemon"
-    - "& $env:GRADLE_EXE :boot:build -x test --no-daemon --no-build-cache"
+    - '& "' + $gradleExe + '" :boot:build -x test --no-daemon'
   artifacts:
     paths:
       - backend/**/build/libs/*.jar
@@ -56,27 +44,14 @@ test:
   script:
     - $ErrorActionPreference = 'Stop'
     - Set-Location $env:CI_PROJECT_DIR
-    - $distDir   = Join-Path $env:CI_PROJECT_DIR ".gradle\dist"
+    - $distDir   = Join-Path $env:GRADLE_HOME_DIR "dist"
     - $gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)
     - $gradleExe  = Join-Path $gradleHome "bin\gradle.bat"
-    - if (-not (Test-Path $gradleExe)) {
-      New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
-      $zipUrl  = "https://services.gradle.org/distributions/gradle-$env:GRADLE_VERSION-bin.zip";
-      $zipPath = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION + ".zip");
-      Write-Host "Downloading Gradle $($env:GRADLE_VERSION) ...";
-      Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath;
-      Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
-      Remove-Item $zipPath -Force;
-      }
-    - $env:GRADLE_EXE = $gradleExe
     - Set-Location "$env:CI_PROJECT_DIR\backend"
-    - "& $env:GRADLE_EXE test --no-daemon --no-build-cache"
+    - '& "' + $gradleExe + '" test --no-daemon'
   dependencies:
     - build
   artifacts:
     when: always
     reports:
       junit: backend/**/build/test-results/test/*.xml
-  after_script:
-    # Clean up gradle cache to prevent long path issues in future runs
-    - if (Test-Path ".gradle\caches") { Remove-Item -Recurse -Force ".gradle\caches" -ErrorAction SilentlyContinue }
