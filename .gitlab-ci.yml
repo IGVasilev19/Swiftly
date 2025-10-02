@@ -13,11 +13,47 @@ cache:
     - .gradle/caches
   policy: pull-push
 
+# Common Windows PowerShell setup
+.default_windows_job: &default_windows_job
+  before_script:
+    - $ErrorActionPreference = 'Stop'
+    - Set-Location $env:CI_PROJECT_DIR
+    # show what's actually in backend (helps when it fails)
+    - Write-Host "Listing backend (2 levels):"
+    - Get-ChildItem -Path .\backend -Recurse -Depth 2 | Select-Object FullName
+    # verify wrapper files
+    - $wrpDir = Join-Path $env:CI_PROJECT_DIR 'backend\gradle\wrapper'
+    - $wrpBat = Join-Path $env:CI_PROJECT_DIR 'backend\gradlew.bat'
+    - $wrpJar = Join-Path $wrpDir 'gradle-wrapper.jar'
+    - $wrpProps = Join-Path $wrpDir 'gradle-wrapper.properties'
+    - if (-not (Test-Path $wrpBat -PathType Leaf)) {
+        Write-Warning "backend\gradlew.bat is missing."
+      }
+    - if (-not (Test-Path $wrpJar -PathType Leaf) -or -not (Test-Path $wrpProps -PathType Leaf)) {
+        Write-Warning "Gradle wrapper JAR/properties are missing under backend\gradle\wrapper."
+        Write-Warning "Generate and commit the wrapper from backend/:  gradle wrapper --gradle-version 8.10.2"
+      }
+    # choose command: wrapper if complete, else try system gradle
+    - if ((Test-Path $wrpBat) -and (Test-Path $wrpJar) -and (Test-Path $wrpProps)) {
+        $env:GRADLE_CMD = "$wrpBat"
+      } elseif (Get-Command gradle -ErrorAction SilentlyContinue) {
+        Write-Warning "Falling back to system 'gradle' (wrapper not present). Prefer committing the wrapper."
+        $env:GRADLE_CMD = "gradle"
+      } else {
+        Write-Error "No Gradle wrapper in repo AND no system 'gradle' on the runner. Commit the wrapper files."
+        exit 1
+      }
+    - Set-Location .\backend
+
 build:
   stage: build
+  <<: *default_windows_job
   script:
-    - cd backend
-    - .\gradlew.bat clean assemble -x test --no-daemon
+    - if ($env:GRADLE_CMD -eq "gradle") {
+        gradle -p . clean assemble -x test --no-daemon
+      } else {
+        .\gradlew.bat clean assemble -x test --no-daemon
+      }
   artifacts:
     paths:
       - backend/build/libs/
@@ -25,9 +61,13 @@ build:
 
 test:
   stage: test
+  <<: *default_windows_job
   script:
-    - cd backend
-    - .\gradlew.bat test --no-daemon
+    - if ($env:GRADLE_CMD -eq "gradle") {
+        gradle -p . test --no-daemon
+      } else {
+        .\gradlew.bat test --no-daemon
+      }
   dependencies:
     - build
   artifacts:
