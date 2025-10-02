@@ -3,8 +3,7 @@ stages:
   - test
 
 variables:
-  # Keep Gradle data OUTSIDE the repo to avoid Windows long path deletions
-  GRADLE_HOME_DIR: "D:/gcache/${CI_PROJECT_ID}/${CI_CONCURRENT_ID}"
+  GRADLE_HOME_DIR: "D:/gcache/${CI_PROJECT_ID}/${CI_CONCURRENT_ID}"  # outside repo
   GRADLE_USER_HOME: "$GRADLE_HOME_DIR"
   GRADLE_VERSION: "8.10.2"
   GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
@@ -15,7 +14,7 @@ build:
     - $ErrorActionPreference = 'Stop'
     - Set-Location $env:CI_PROJECT_DIR
 
-    # Download fixed Gradle (once per runner cache dir)
+    # Download fixed Gradle to GRADLE_HOME_DIR (if missing)
     - $distDir   = Join-Path $env:GRADLE_HOME_DIR 'dist'
     - $gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)
     - $gradleExe  = Join-Path $gradleHome 'bin\gradle.bat'
