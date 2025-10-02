@@ -5,14 +5,22 @@ stages:
 variables:
   GRADLE_VERSION: "8.10.2"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
-  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g -Dorg.gradle.daemon=false"
+
+before_script:
+  # Enable long paths support for Windows
+  - git config --global core.longPaths true
+  # Clean up any existing gradle cache to avoid path issues
+  - if (Test-Path ".gradle") { Remove-Item -Recurse -Force ".gradle" -ErrorAction SilentlyContinue }
 
 cache:
-  key: gradle-cache
+  key: gradle-wrapper-cache
   policy: pull-push
   paths:
-    - .gradle/caches
+    - .gradle/wrapper
     - .gradle/dist
+    # Exclude problematic cache directories with long paths
+    # - .gradle/caches  # Commented out to avoid long path issues
 
 build:
   stage: build
@@ -35,7 +43,9 @@ build:
     - "& $env:GRADLE_EXE -v"
 
     - Set-Location "$env:CI_PROJECT_DIR\backend"
-    - "& $env:GRADLE_EXE :boot:build -x test --no-daemon"
+    # Clean build directories before building
+    - "& $env:GRADLE_EXE clean --no-daemon"
+    - "& $env:GRADLE_EXE :boot:build -x test --no-daemon --no-build-cache"
   artifacts:
     paths:
       - backend/**/build/libs/*.jar
@@ -60,10 +70,13 @@ test:
       }
     - $env:GRADLE_EXE = $gradleExe
     - Set-Location "$env:CI_PROJECT_DIR\backend"
-    - "& $env:GRADLE_EXE test --no-daemon"
+    - "& $env:GRADLE_EXE test --no-daemon --no-build-cache"
   dependencies:
     - build
   artifacts:
     when: always
     reports:
       junit: backend/**/build/test-results/test/*.xml
+  after_script:
+    # Clean up gradle cache to prevent long path issues in future runs
+    - if (Test-Path ".gradle\caches") { Remove-Item -Recurse -Force ".gradle\caches" -ErrorAction SilentlyContinue }
