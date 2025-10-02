@@ -17,6 +17,8 @@ public class User {
     private Integer id;
     @Column(nullable = false, length = 100)
     private String fullName;
+    @Column(nullable = false, length = 17)
+    private String phone;
     @Column(nullable = false, unique = true ,length = 150)
     private String email;
     @Column(nullable = false, length = 255)

@@ -29,9 +29,6 @@ public class Blackout {
     @Column(name = "end_at", nullable = false)
     private Instant endAt;
 
-    @Column(length = 200)
-    private String reason;
-
     @Column(nullable = false, updatable = false)
     @org.hibernate.annotations.ColumnDefault("CURRENT_TIMESTAMP")
     private Instant creationDate;
