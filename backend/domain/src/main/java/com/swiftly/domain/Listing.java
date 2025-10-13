@@ -2,6 +2,7 @@ package com.swiftly.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -17,11 +18,8 @@ public class Listing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private Integer ownerId;
-
-    @Column(nullable = false)
-    private Integer vehicleId;
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    private Vehicle vehicle;
 
     @Column(nullable = false, length = 100)
     private String title;
@@ -30,7 +28,7 @@ public class Listing {
     private String description;
 
     @Column(nullable = false, updatable = false)
-    @org.hibernate.annotations.ColumnDefault("CURRENT_TIMESTAMP")
+    @ColumnDefault("CURRENT_TIMESTAMP")
     private Instant creationDate;
 
     @Column(nullable = false, precision = 10, scale = 2)
@@ -46,8 +44,7 @@ public class Listing {
     private Double latitude;
 
     @Column(nullable = false)
-    @org.hibernate.annotations.ColumnDefault("false")
-    @Builder.Default
+    @ColumnDefault("false")
     private Boolean instantBook = false;
 
     @Column

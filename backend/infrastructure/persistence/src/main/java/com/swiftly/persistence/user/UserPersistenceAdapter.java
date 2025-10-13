@@ -1,28 +1,19 @@
 package com.swiftly.persistence.user;
 
-import com.swiftly.application.user.port.UserReadPort;
-import com.swiftly.application.user.port.UserWritePort;
+import com.swiftly.application.user.port.outbound.UserPort;
 import com.swiftly.domain.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
-public class UserPersistenceAdapter implements UserReadPort, UserWritePort {
+public class UserPersistenceAdapter implements UserPort {
 
     private final JpaUserRepository repository;
 
     public UserPersistenceAdapter(JpaUserRepository repository)
     {
         this.repository = repository;
-    }
-
-    @Override
-    public Page<User> findAll(Pageable pageable)
-    {
-        return repository.findAll(pageable);
     }
 
     @Override
@@ -47,11 +38,5 @@ public class UserPersistenceAdapter implements UserReadPort, UserWritePort {
     public User save(User user)
     {
         return repository.save(user);
-    }
-
-    @Override
-    public void deleteById(Integer id)
-    {
-        repository.deleteById(id);
     }
 }

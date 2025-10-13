@@ -23,11 +23,12 @@ public class Booking {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "listing_id", nullable = false)
-    private Listing listing;
+    @JoinColumn(name = "vehicle_id", nullable = false)
+    private Vehicle vehicle;
 
-    @Column(nullable = false)
-    private Integer renterId;
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "profile_id", nullable = false)
+    private Profile renter;
 
     @Column(name = "start_at", nullable = false)
     private Instant startAt;
