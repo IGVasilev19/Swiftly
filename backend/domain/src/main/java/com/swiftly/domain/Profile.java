@@ -40,4 +40,15 @@ public class Profile {
     private String avatarUrl;
     private String locale;
     private String timezone;
+
+    public Profile(User user, String fullName, String phone, String address, String City, String Country, String postalCode)
+    {
+        this.user = user;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.address = address;
+        this.City = City;
+        this.Country = Country;
+        this.postalCode = postalCode;
+    }
 }

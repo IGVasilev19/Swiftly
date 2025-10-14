@@ -34,4 +34,12 @@ public class User {
         this.profile = p;
         if (p != null) p.setUser(this);
     }
+
+    public User(String email, String passwordHash, Role role,  Boolean status)
+    {
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+        this.status = status;
+    }
 }
