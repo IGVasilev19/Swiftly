@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Link } from "react-router-dom";
 
 export function LoginForm() {
   return (
@@ -15,19 +16,27 @@ export function LoginForm() {
         <form>
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
-              <Label
-                htmlFor="email"
-                className="font-sans text-[#0F172A] text-md"
-              >
-                Email
-              </Label>
+              <div className="flex items-baseline justify-between">
+                <Label
+                  htmlFor="email"
+                  className="font-sans text-[#0F172A] text-md"
+                >
+                  Email
+                </Label>
+                {/* <span
+                  className="text-sm text-destructive min-h-4 ml-4"
+                  aria-live="polite"
+                >
+                  {errors.email?.message ?? ""}
+                </span> */}
+              </div>
               <Input
                 id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
+                //{...login("email")}
+                className="text-[#0F172A] border-[#0f172a1a] caret-[#0F172A]"
               />
             </div>
+
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label
@@ -56,14 +65,14 @@ export function LoginForm() {
           Login
         </Button>
         <div className="flex justify-center items-center">
-          <p className="text-[#0F172A]">Already have an Account?</p>
+          <p className="text-[#0F172A]">Don't have an Account?</p>
           <CardAction>
-            <Button
-              variant="link"
+            <Link
               className="text-[#0F172A] text-md p-0 pl-1 hover:text-[#FD6123]"
+              to="/register"
             >
-              Sign In
-            </Button>
+              Sign Up
+            </Link>
           </CardAction>
         </div>
       </CardFooter>

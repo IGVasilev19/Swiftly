@@ -1,7 +1,17 @@
-import { COUNTRIES } from "../lib/countries";
-import { SelectMenuOption } from "../lib/types";
+/*
+  Based on: https://github.com/driaug/country-picker
+  Original license: see upstream repository LICENSE
+*/
+
+import { COUNTRIES } from "@/lib/countries";
+import { type SelectMenuOption } from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
-import React, { MutableRefObject, useEffect, useRef, useState } from "react";
+import React, {
+  type MutableRefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 export interface CountrySelectorProps {
   id: string;
@@ -9,7 +19,7 @@ export interface CountrySelectorProps {
   disabled?: boolean;
   onToggle: () => void;
   onChange: (value: SelectMenuOption["value"]) => void;
-  selectedValue: SelectMenuOption;
+  selectedValue: SelectMenuOption | null;
 }
 
 export default function CountrySelector({
@@ -25,10 +35,10 @@ export default function CountrySelector({
   useEffect(() => {
     const mutableRef = ref as MutableRefObject<HTMLDivElement | null>;
 
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: MouseEvent) => {
       if (
         mutableRef.current &&
-        !mutableRef.current.contains(event.target) &&
+        !mutableRef.current.contains(event.target as Node) &&
         open
       ) {
         onToggle();
@@ -40,31 +50,37 @@ export default function CountrySelector({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [ref]);
+  }, [ref, open, onToggle]);
 
   const [query, setQuery] = useState("");
 
+  const defaultDisplay = { value: "NL", title: "Netherlands" };
+  const display =
+    selectedValue && selectedValue.value ? selectedValue : defaultDisplay;
+
   return (
     <div ref={ref}>
-      <div className="mt-1 relative">
+      <div className="relative">
         <button
           type="button"
           className={`${
             disabled ? "bg-neutral-100" : "bg-white"
-          } relative w-full border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+          } flex items-center h-10 w-full border border-gray-300 rounded-md pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:border-[#0f172a1a] sm:text-sm`}
           aria-haspopup="listbox"
-          aria-expanded="true"
+          aria-expanded={open}
           aria-labelledby="listbox-label"
           onClick={onToggle}
           disabled={disabled}
         >
           <span className="truncate flex items-center">
-            <img
-              alt={`${selectedValue.value}`}
-              src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${selectedValue.value}.svg`}
-              className={"inline mr-2 h-4 rounded-sm"}
-            />
-            {selectedValue.title}
+            {display.value ? (
+              <img
+                alt={`${display.value}`}
+                src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${display.value}.svg`}
+                className={"inline mr-2 h-4 rounded-sm"}
+              />
+            ) : null}
+            {display.title}
           </span>
           <span
             className={`absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none ${
@@ -94,19 +110,18 @@ export default function CountrySelector({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.1 }}
-              className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-80 rounded-md text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+              className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-80 rounded-md text-base ring-opacity-5 focus:outline-none sm:text-sm"
               tabIndex={-1}
               role="listbox"
               aria-labelledby="listbox-label"
-              aria-activedescendant="listbox-option-3"
             >
               <div className="sticky top-0 z-10 bg-white">
-                <li className=" text-gray-900 cursor-default select-none relative py-2 px-3">
+                <li className=" text-[#0F172A] cursor-[#0F172A] select-none relative py-2 px-3">
                   <input
                     type="search"
                     name="search"
                     autoComplete={"off"}
-                    className="focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="block w-full sm:text-sm border-gray-300"
                     placeholder={"Search a country"}
                     onChange={(e) => setQuery(e.target.value)}
                   />
@@ -122,18 +137,20 @@ export default function CountrySelector({
                 {COUNTRIES.filter((country) =>
                   country.title.toLowerCase().startsWith(query.toLowerCase())
                 ).length === 0 ? (
-                  <li className="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9">
+                  <li className="text-[#0F172A] cursor-[#0F172A] select-none relative py-2 pl-3 pr-9">
                     No countries found
                   </li>
                 ) : (
                   COUNTRIES.filter((country) =>
                     country.title.toLowerCase().startsWith(query.toLowerCase())
                   ).map((value, index) => {
+                    const isSelected =
+                      !!selectedValue && selectedValue.value === value.value;
                     return (
                       <li
                         key={`${id}-${index}`}
-                        className="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 flex items-center hover:bg-gray-50 transition"
-                        id="listbox-option-0"
+                        className="text-[#0F172A] cursor-[#0F172A] select-none relative py-2 pl-3 pr-9 flex items-center hover:bg-gray-50 transition"
+                        id={`listbox-option-${index}`}
                         role="option"
                         onClick={() => {
                           onChange(value.value);
@@ -150,8 +167,8 @@ export default function CountrySelector({
                         <span className="font-normal truncate">
                           {value.title}
                         </span>
-                        {value.value === selectedValue.value ? (
-                          <span className="text-blue-600 absolute inset-y-0 right-0 flex items-center pr-8">
+                        {isSelected ? (
+                          <span className="text-[#FD6123] absolute inset-y-0 right-0 flex items-center pr-8">
                             <svg
                               className="h-5 w-5"
                               xmlns="http://www.w3.org/2000/svg"

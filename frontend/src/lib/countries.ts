@@ -1,4 +1,6 @@
-export const COUNTRIES = [
+import { DIAL_MAP } from "./dialMap";
+
+export const RAW_COUNTRIES = [
   {
     title: "Afghanistan",
     value: "AF",
@@ -42,6 +44,10 @@ export const COUNTRIES = [
   {
     title: "Australia",
     value: "AU",
+  },
+  {
+    title: "Austria",
+    value: "AT",
   },
   {
     title: "Azerbaijan",
@@ -433,7 +439,7 @@ export const COUNTRIES = [
   },
   {
     title: "Liberia",
-    value: "LB",
+    value: "LR",
   },
   {
     title: "Libya",
@@ -880,3 +886,29 @@ export const COUNTRIES = [
     value: "ZW",
   },
 ] as const;
+
+export const COUNTRIES = RAW_COUNTRIES.map((c: any) => {
+  const code = String(
+    c.value ?? c.code ?? c.iso2 ?? c.alpha2 ?? ""
+  ).toUpperCase();
+  const label = String(c.title ?? c.label ?? c.name ?? c.country ?? "");
+  const dialDigits = (
+    c.dial ??
+    c.callingCode ??
+    c.callingCodes ??
+    DIAL_MAP[code] ??
+    ""
+  )
+    .toString()
+    .replace(/\D/g, "");
+  const dial = dialDigits ? `+${dialDigits}` : "";
+  return {
+    ...c,
+    value: c.value ?? code,
+    title: c.title ?? label,
+    code,
+    label,
+    dial,
+    dialDigits,
+  };
+});
