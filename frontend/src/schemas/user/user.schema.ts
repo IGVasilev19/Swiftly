@@ -49,7 +49,7 @@ export const postalCodeSchema = z
   .nonempty("Postal code is required")
   .min(3, { message: "Postal code must be at least 3 characters long" })
   .max(12, { message: "Postal code must be at most 12 characters long" })
-  .regex(/^[A-Za-z0-9\s\-]+$/, {
+  .regex(/^[A-Za-z0-9\- ]{3,10}$/, {
     message:
       "Postal code can only contain letters, numbers, spaces, and hyphens",
   })

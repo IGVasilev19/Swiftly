@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/v1/api/auth")
+@RequestMapping("/api/v1/auth")
 @Tag(name="Auth")
 public class AuthController {
     private final RegisterUseCase registerService;
@@ -28,6 +28,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest)
     {
+        System.out.println("Register request received: " + registerRequest);
         registerService.register(RegisterMapper.toCommand(registerRequest));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Registration successfull!"));

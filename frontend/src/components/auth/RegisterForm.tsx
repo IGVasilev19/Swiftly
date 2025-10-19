@@ -255,8 +255,8 @@ export function RegisterForm({
                               <option value="" disabled>
                                 Select role
                               </option>
-                              <option value="user">Renter</option>
-                              <option value="owner">Owner</option>
+                              <option value="RENTER">Renter</option>
+                              <option value="OWNER">Owner</option>
                             </select>
                           </FormControl>
                           <FormMessage />
@@ -267,62 +267,60 @@ export function RegisterForm({
                 </div>
               </div>
             )}
+            <div className="w-full flex gap-3 mt-6">
+              <Button
+                onClick={onBack}
+                className="flex-1 text-[#0F172A] border-[#0F172A]"
+                type="button"
+                variant="outline"
+                disabled={step === 0}
+              >
+                Back
+              </Button>
+
+              {step < steps.length - 1 ? (
+                <Button
+                  onClick={onNext}
+                  className="flex-1 bg-[#0F172A] hover:bg-[#16213b]"
+                  type="button"
+                >
+                  Next
+                </Button>
+              ) : (
+                <Button
+                  disabled={isPending}
+                  type="submit"
+                  className="flex-1 bg-[#0F172A] hover:bg-[#16213b]"
+                >
+                  {isPending ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <LoaderCircle className="animate-spin" />
+                      <p>Signing up...</p>
+                    </div>
+                  ) : (
+                    "Sign Up"
+                  )}
+                </Button>
+              )}
+            </div>
+
+            <div className="flex justify-center items-center mt-3">
+              <p className="font-sans text-[#0F172A] text-md">
+                Already have an Account?
+              </p>
+              <CardAction>
+                <Link
+                  className="font-sans text-[#0F172A] text-md p-0 pl-1 hover:text-[#FD6123]"
+                  to="/"
+                >
+                  Sign In
+                </Link>
+              </CardAction>
+            </div>
           </form>
         </Form>
       </CardContent>
-
-      <CardFooter className="flex-col gap-2">
-        <div className="w-full flex gap-3">
-          <Button
-            onClick={onBack}
-            className="flex-1 text-[#0F172A] border-[#0F172A]"
-            type="button"
-            variant="outline"
-            disabled={step === 0}
-          >
-            Back
-          </Button>
-
-          {step < steps.length - 1 ? (
-            <Button
-              onClick={onNext}
-              className="flex-1 bg-[#0F172A] hover:bg-[#16213b]"
-              type="button"
-            >
-              Next
-            </Button>
-          ) : (
-            <Button
-              disabled={isPending}
-              type="submit"
-              className="flex-1 bg-[#0F172A] hover:bg-[#16213b]"
-            >
-              {isPending ? (
-                <div className="flex items-center justify-center gap-2">
-                  <LoaderCircle className="animate-spin" />
-                  <p>Signing up...</p>
-                </div>
-              ) : (
-                "Sign Up"
-              )}
-            </Button>
-          )}
-        </div>
-
-        <div className="flex justify-center items-center">
-          <p className="font-sans text-[#0F172A] text-md">
-            Already have an Account?
-          </p>
-          <CardAction>
-            <Link
-              className="font-sans text-[#0F172A] text-md p-0 pl-1 hover:text-[#FD6123]"
-              to="/"
-            >
-              Sign In
-            </Link>
-          </CardAction>
-        </div>
-      </CardFooter>
+      <CardFooter></CardFooter>
     </Card>
   );
 }

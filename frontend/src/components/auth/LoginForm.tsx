@@ -69,7 +69,7 @@ export function LoginForm() {
           <CardAction>
             <Link
               className="text-[#0F172A] text-md p-0 pl-1 hover:text-[#FD6123]"
-              to="/register"
+              to="/auth/register"
             >
               Sign Up
             </Link>
