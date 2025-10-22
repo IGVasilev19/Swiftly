@@ -1,7 +1,10 @@
 package com.swiftly.application.profile;
 
 import com.swiftly.application.profile.port.inbound.ProfileUseCase;
+import com.swiftly.application.profile.port.outbound.ProfilePort;
 import com.swiftly.domain.Profile;
+import com.swiftly.domain.User;
+import com.swiftly.domain.enums.user.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -20,52 +22,54 @@ class ProfileServiceTest {
     @Mock
     private ProfileUseCase profileUseCase;
 
+    @Mock
+    ProfilePort profilePort;
+
     @InjectMocks
     private ProfileService profileService;
 
     @Test
     void getById_profileExists() {
         // Arrange
-        Random random = new Random();
-        Integer id = random.nextInt(10000);
-        Profile expectedProfile = new Profile(id);
+        Integer profileId = 42;
 
-        when(profileUseCase.getById(id)).thenReturn(Optional.of(expectedProfile));
+        Profile mockProfile = new Profile(
+                new User("ada@example.com", "hashedPassword", Role.OWNER, false),
+                "Ada Lovelace",
+                "+31612345678",
+                "123 Babbage Street",
+                "London",
+                "UK",
+                "EC1A 1BB"
+        );
 
-        // Act
-        Optional<Profile> actualProfile = profileService.getById(id);
+        when(profilePort.findById(profileId)).thenReturn(Optional.of(mockProfile));
 
-        // Assert
-        assertEquals(expectedProfile, actualProfile);
-        verify(profileUseCase).getById(id);
-    }
-
-    @Test
-    void getById_profileNotFound_returnsNull() {
-        // Arrange
-        Random random = new Random();
-        Integer id = random.nextInt(10000);
-        when(profileUseCase.getById(id)).thenReturn(Optional.empty());
-
+        ProfileService profileService = new ProfileService(profilePort); // make sure this isn't null!
 
         // Act
-        Optional<Profile> result = profileService.getById(id);
+        Optional<Profile> result = profileService.getById(profileId);
 
         // Assert
-        assertNull(result);
-        verify(profileUseCase).getById(id);
+        assertNotNull(result);
+        assertEquals("Ada Lovelace", result.get().getFullName());
+        verify(profilePort).findById(profileId);
     }
+
 
     @Test
     void getById_profileNotFound_throwsException() {
-        // Arrange
-        Random random = new Random();
-        Integer id = random.nextInt(10000);
+        Integer profileId = 999;
 
-        when(profileUseCase.getById(id)).thenReturn(Optional.empty());
+        // Arrange: return empty to simulate "not found"
+        when(profilePort.findById(profileId)).thenReturn(Optional.empty());
 
         // Act + Assert
-        assertThrows(IllegalArgumentException.class, () -> profileService.getById(id));
-        verify(profileUseCase).getById(id);
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+            profileService.getById(profileId);
+        });
+
+        assertEquals("Profile not found", ex.getMessage());
+        verify(profilePort).findById(profileId);
     }
 }

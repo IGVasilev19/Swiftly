@@ -1,8 +1,8 @@
 package com.swiftly.application.auth;
 
-import com.swiftly.application.auth.RegisterService;
 import com.swiftly.application.auth.dto.RegisterCommand;
 import com.swiftly.application.auth.port.inbound.RegisterUseCase;
+import com.swiftly.application.auth.port.outbound.RegisterPort;
 import com.swiftly.application.helpers.PasswordHasher;
 import com.swiftly.application.user.port.inbound.UserUseCase;
 import com.swiftly.domain.Profile;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 class RegisterServiceTest {
 
     @Mock
-    private RegisterUseCase registerUseCase;
+    private RegisterPort registerPort;
 
     @Mock
     private UserUseCase userUseCase;
@@ -34,19 +34,18 @@ class RegisterServiceTest {
         // Arrange
         RegisterCommand command = new RegisterCommand(
                 "newuser@example.com",
-                "@strongPassword123",
-                "USER",
+                "StrongPassword123!",
                 "Ada Lovelace",
+                "+31612345678",
                 Role.OWNER,
-                "Analytical Engine St",
+                "123 Babbage Street",
                 "London",
-                "Netherlands",
-                "2131412"
+                "UK",
+                "EC1A 1BB"
         );
 
         when(userUseCase.existsByEmail(command.email())).thenReturn(false);
 
-        // Fake a saved user for return
         User savedUser = new User(
                 command.email(),
                 PasswordHasher.hashPassword(command.password()),
@@ -54,8 +53,18 @@ class RegisterServiceTest {
                 false
         );
 
-        // We don't test PasswordHasher logic here — assume it's static and tested elsewhere
-        when(registerUseCase.register(command))
+        Profile profile = new Profile(
+                savedUser,
+                command.fullName(),
+                command.phoneNumber(),
+                command.address(),
+                command.city(),
+                command.country(),
+                command.postalCode()
+        );
+        savedUser.attachProfile(profile);
+
+        when(registerPort.saveNewUserAndProfile(any(User.class), any(Profile.class)))
                 .thenReturn(savedUser);
 
         // Act
@@ -66,9 +75,11 @@ class RegisterServiceTest {
         assertEquals(command.email(), result.getEmail());
         assertEquals(command.role(), result.getRole());
         assertFalse(result.getStatus());
+        assertNotNull(result.getProfile());
+        assertEquals(command.fullName(), result.getProfile().getFullName());
 
         verify(userUseCase).existsByEmail(command.email());
-        verify(registerUseCase).register(command);
+        verify(registerPort).saveNewUserAndProfile(any(User.class), any(Profile.class));
     }
 
     @Test
@@ -77,12 +88,12 @@ class RegisterServiceTest {
         RegisterCommand command = new RegisterCommand(
                 "existing@example.com",
                 "@password3123W",
-                "USER",
-                "Alan Turing",
+                "Grace Hopper",
+                "+31698765432",
                 Role.RENTER,
                 "Codebreaker Lane",
                 "Bletchley",
-                "67890",
+                "UK",
                 "0213Usd"
         );
 
@@ -95,6 +106,6 @@ class RegisterServiceTest {
         assertEquals("User already exists", ex.getMessage());
 
         verify(userUseCase).existsByEmail(command.email());
-        verify(registerUseCase, never()).register(command);
+        verify(registerPort, never()).saveNewUserAndProfile(any(), any());
     }
 }

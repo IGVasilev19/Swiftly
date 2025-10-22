@@ -1,8 +1,8 @@
 package com.swiftly.application.user;
 
-import com.swiftly.application.user.port.inbound.UserUseCase;
 import com.swiftly.application.user.port.outbound.UserPort;
 import com.swiftly.domain.User;
+import com.swiftly.domain.enums.user.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -15,8 +15,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class UserServiceTest {
+
     @Mock
-    private UserUseCase userUseCase;
+    private UserPort userPort;
 
     @InjectMocks
     private UserService userService;
@@ -30,57 +31,58 @@ class UserServiceTest {
     void getByEmail_returnsUser() {
         // Arrange
         String email = "test@example.com";
-        User user = new User();
-        user.setEmail(email);
-        when(userUseCase.getByEmail(email)).thenReturn(Optional.of(user));
+        User user = new User(email, "hashedPassword", Role.RENTER, false);
+
+        when(userPort.findByEmail(email)).thenReturn(Optional.of(user));
 
         // Act
         Optional<User> result = userService.getByEmail(email);
 
         // Assert
-        assertTrue(result.equals(user));
+        assertNotNull(result);
         assertEquals(email, result.get().getEmail());
-        verify(userUseCase, times(1)).getByEmail(email);
+        verify(userPort).findByEmail(email);
     }
 
     @Test
-    void getByEmail_userNotFound() {
-        //Arrange
+    void getByEmail_userNotFound_throwsException() {
+        // Arrange
         String email = "missing@example.com";
-        when(userUseCase.getByEmail(email)).thenReturn(Optional.empty());
+        when(userPort.findByEmail(email)).thenReturn(Optional.empty());
 
-        //Act
-        Optional<User> result = userService.getByEmail(email);
+        // Act + Assert
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> userService.getByEmail(email));
 
-        //Assert
-        assertTrue(result.equals(null));
-        verify(userUseCase).getByEmail(email);
+        assertEquals("User not found", ex.getMessage());
+        verify(userPort).findByEmail(email);
     }
 
     @Test
     void existsByEmail_returnsTrue() {
-        //Arrange
+        // Arrange
         String email = "exists@example.com";
-        when(userUseCase.existsByEmail(email)).thenReturn(true);
+        when(userPort.existsByEmail(email)).thenReturn(true);
 
-        //Act
+        // Act
         boolean result = userService.existsByEmail(email);
 
-        //Assert
+        // Assert
         assertTrue(result);
-        verify(userUseCase).existsByEmail(email);
+        verify(userPort).existsByEmail(email);
     }
 
     @Test
     void existsByEmail_returnsFalse() {
-        //Arrange
+        // Arrange
         String email = "notfound@example.com";
-        when(userUseCase.existsByEmail(email)).thenReturn(false);
+        when(userPort.existsByEmail(email)).thenReturn(false);
 
-        //Act
+        // Act
         boolean result = userService.existsByEmail(email);
 
-        //Assert
+        // Assert
         assertFalse(result);
+        verify(userPort).existsByEmail(email);
     }
 }
