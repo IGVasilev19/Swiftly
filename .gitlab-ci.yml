@@ -33,7 +33,7 @@ test:
     - '$gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)'
     - '$gradleExe = Join-Path $gradleHome ''bin\gradle.bat'''
     - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
-    - '& "$gradleExe" test --no-daemon --tests "com.swiftly.application.*"'
+    - '& "$gradleExe" test --no-daemon --tests "com.swiftly.application.**"'
   dependencies:
     - build
   artifacts:
