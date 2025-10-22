@@ -51,4 +51,16 @@ public class Profile {
         this.Country = Country;
         this.postalCode = postalCode;
     }
+
+    public Profile(Integer id)
+    {
+        this.id = id;
+        this.user = null;
+        this.fullName = null;
+        this.phone = null;
+        this.address = null;
+        this.City = null;
+        this.Country = null;
+        this.postalCode = null;
+    }
 }

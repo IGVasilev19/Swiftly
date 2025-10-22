@@ -2,7 +2,9 @@ package com.swiftly.application.profile.port.inbound;
 
 import com.swiftly.domain.Profile;
 
+import java.util.Optional;
+
 
 public interface ProfileUseCase {
-    Profile getById(Integer id);
+    Optional<Profile> getById(Integer id);
 }

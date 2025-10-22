@@ -28,9 +28,13 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest)
     {
-        System.out.println("Register request received: " + registerRequest);
         registerService.register(RegisterMapper.toCommand(registerRequest));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Registration successfull!"));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(Map.of(
+                        "success", true,
+                        "data", Map.of("message", "Account created successfully!")
+                ));
     }
 }

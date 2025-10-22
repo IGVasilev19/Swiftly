@@ -28,8 +28,9 @@ const Register = () => {
 
   const { mutateAsync: register, isPending } =
     useApiMutation<RegisterSchemaType>("POST", "/auth/register", {
-      onSuccess: () => {
-        toast.success("Account created successfully!");
+      onSuccess: ({ data, message }) => {
+        if (!data) return;
+        toast.success(message);
         navigate(`/`);
       },
       onError: (err) => {

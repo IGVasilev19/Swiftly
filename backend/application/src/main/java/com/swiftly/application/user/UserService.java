@@ -5,6 +5,8 @@ import com.swiftly.application.user.port.outbound.UserPort;
 import com.swiftly.domain.User;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @Service
 public class UserService implements UserUseCase {
@@ -15,9 +17,9 @@ public class UserService implements UserUseCase {
         this.userPort = userPort;
     }
 
-    public User getByEmail(String email)
+    public Optional<User> getByEmail(String email)
     {
-        return userPort.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return Optional.ofNullable(userPort.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found")));
     }
 
     public Boolean existsByEmail(String email)

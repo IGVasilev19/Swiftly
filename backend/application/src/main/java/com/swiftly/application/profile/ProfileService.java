@@ -5,6 +5,9 @@ import com.swiftly.application.profile.port.outbound.ProfilePort;
 import com.swiftly.domain.Profile;
 import org.springframework.stereotype.Service;
 
+import java.awt.color.ProfileDataException;
+import java.util.Optional;
+
 @Service
 public class ProfileService implements ProfileUseCase {
     private final ProfilePort profilePort;
@@ -14,8 +17,8 @@ public class ProfileService implements ProfileUseCase {
         this.profilePort = profilePort;
     }
 
-    public Profile getById(Integer id)
+    public Optional<Profile> getById(Integer id)
     {
-        return profilePort.findById(id).orElseThrow(() -> new IllegalArgumentException("Profile not found"));
+        return Optional.ofNullable(profilePort.findById(id).orElseThrow(() -> new IllegalArgumentException("Profile not found")));
     }
 }
