@@ -17,8 +17,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ActiveProfiles("test")
-@SpringBootTest
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 
 class UserServiceTest {

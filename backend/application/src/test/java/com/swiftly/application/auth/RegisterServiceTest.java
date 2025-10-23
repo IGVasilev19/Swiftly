@@ -1,7 +1,6 @@
 package com.swiftly.application.auth;
 
 import com.swiftly.application.auth.dto.RegisterCommand;
-import com.swiftly.application.auth.port.inbound.RegisterUseCase;
 import com.swiftly.application.auth.port.outbound.RegisterPort;
 import com.swiftly.application.helpers.PasswordHasher;
 import com.swiftly.application.user.port.inbound.UserUseCase;
@@ -20,8 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ActiveProfiles("test")
-@SpringBootTest
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 
 @ExtendWith(MockitoExtension.class)
