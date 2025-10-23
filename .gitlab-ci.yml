@@ -32,10 +32,11 @@ test:
     - "$distDir = Join-Path $env:GRADLE_HOME_DIR 'dist'"
     - '$gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)'
     - '$gradleExe = Join-Path $gradleHome ''bin\gradle.bat'''
+    - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
     - '& "$gradleExe" test --no-daemon'
   dependencies:
     - build
   artifacts:
     when: always
     reports:
-      junit: "**/build/test-results/test/*.xml"
+      junit: "backend/**/build/test-results/test/*.xml"
