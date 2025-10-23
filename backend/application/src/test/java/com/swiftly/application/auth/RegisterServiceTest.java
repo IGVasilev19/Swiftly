@@ -20,8 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-
 @ExtendWith(MockitoExtension.class)
 class RegisterServiceTest {
 
