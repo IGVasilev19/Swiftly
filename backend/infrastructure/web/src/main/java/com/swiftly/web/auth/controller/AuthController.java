@@ -32,9 +32,7 @@ public class AuthController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(Map.of(
-                        "success", true,
-                        "data", Map.of("message", "Account created successfully!")
-                ));
+                .body(Map.of("message", "Account created successfully!")
+                );
     }
 }

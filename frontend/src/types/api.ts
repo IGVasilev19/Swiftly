@@ -1,9 +1,8 @@
 import { AxiosError } from "axios";
 
-export type ApiSuccessResponse<T = undefined> = {
+export type ApiSuccessResponse = {
   success: true;
   message: string;
-  data?: T;
 };
 
 export type ApiErrorResponse<T = unknown> = {
@@ -16,8 +15,6 @@ export type ApiErrorResponse<T = unknown> = {
   [key: string]: unknown;
 } & Record<string, unknown>;
 
-export type ApiResponse<T = undefined, E = unknown> =
-  | ApiSuccessResponse<T>
-  | ApiErrorResponse<E>;
+export type ApiResponse<E = unknown> = ApiSuccessResponse | ApiErrorResponse<E>;
 
 export type ApiError<T = unknown> = AxiosError<ApiErrorResponse<T>>;

@@ -1,5 +1,6 @@
 package com.swiftly.application.auth.dto;
 
-import com.swiftly.domain.enums.user.Role;
+import com.swiftly.domain.Profile;
+import com.swiftly.domain.User;
 
-public record RegisterCommand (String email, String password, String fullName, String phoneNumber, Role role, String address, String city, String country, String postalCode) { }
+public record RegisterCommand (User user, Profile profile) { }

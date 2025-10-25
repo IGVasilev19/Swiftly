@@ -9,36 +9,36 @@ import type { ApiSuccessResponse, ApiError, ApiResponse } from "@/types/api";
 
 const DEFAULT_STALE_TIME = 5 * 60 * 1000;
 
-type QueryOptions<T, R = ApiSuccessResponse<T>> = {
+type QueryOptions<R = ApiSuccessResponse> = {
   enabled?: boolean;
   staleTime?: number;
   cacheTime?: number;
   refetchInterval?: number;
-  select?: (data: ApiSuccessResponse<T>) => R;
+  select?: (data: ApiSuccessResponse) => R;
   onSuccess?: (data: R) => void;
   onError?: (error: ApiError) => void;
 };
 
-type MutationOptions<T, U = unknown, R = ApiSuccessResponse<T>> = {
+type MutationOptions<U = unknown, R = ApiSuccessResponse> = {
   invalidateQueries?: QueryKey[];
   onSuccess?: (data: R, variables: U) => void;
   onError?: (error: ApiError, variables: U) => void;
 };
 
-const fetcher = async <T>(endpoint: string): Promise<ApiSuccessResponse<T>> => {
+const fetcher = async <T>(endpoint: string): Promise<ApiSuccessResponse> => {
   const response = await api.get<ApiResponse<T>>(endpoint);
   if (!response.data.success) throw response;
   return response.data;
 };
 
-export const useApiQuery = <T, R = ApiSuccessResponse<T>>(
+export const useApiQuery = <R = ApiSuccessResponse>(
   queryKey: QueryKey,
   endpoint: string,
-  options?: QueryOptions<T, R>
+  options?: QueryOptions<R>
 ) => {
-  return useQuery<ApiSuccessResponse<T>, ApiError, R>({
+  return useQuery<ApiSuccessResponse, ApiError, R>({
     queryKey,
-    queryFn: () => fetcher<T>(endpoint),
+    queryFn: () => fetcher(endpoint),
     refetchOnWindowFocus: false,
     staleTime: options?.staleTime ?? DEFAULT_STALE_TIME,
     enabled: options?.enabled,
@@ -48,14 +48,14 @@ export const useApiQuery = <T, R = ApiSuccessResponse<T>>(
   });
 };
 
-export const useApiMutation = <T, U = unknown, R = ApiSuccessResponse<T>>(
+export const useApiMutation = <T, U = unknown, R = ApiSuccessResponse>(
   method: "POST" | "PUT" | "PATCH" | "DELETE",
   endpoint: string | ((data: U) => string),
-  options?: MutationOptions<T, U, R>
+  options?: MutationOptions<U, R>
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation<ApiSuccessResponse<T>, ApiError, U, R>({
+  return useMutation<ApiSuccessResponse, ApiError, U, R>({
     mutationFn: async (data: U) => {
       const resolvedEndpoint =
         typeof endpoint === "function" ? endpoint(data) : endpoint;

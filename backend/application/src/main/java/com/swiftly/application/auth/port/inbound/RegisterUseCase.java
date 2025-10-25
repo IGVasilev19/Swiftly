@@ -4,5 +4,5 @@ import com.swiftly.application.auth.dto.RegisterCommand;
 import com.swiftly.domain.User;
 
 public interface RegisterUseCase {
-    User register(RegisterCommand registerUser);
+    User register(RegisterCommand registerCommand);
 }

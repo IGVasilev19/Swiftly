@@ -26,10 +26,11 @@ const Register = () => {
     },
   });
 
-  const { mutateAsync: register, isPending } =
-    useApiMutation<RegisterSchemaType>("POST", "/auth/register", {
-      onSuccess: ({ data, message }) => {
-        if (!data) return;
+  const { mutate: register, isPending } = useApiMutation<RegisterSchemaType>(
+    "POST",
+    "/auth/register",
+    {
+      onSuccess: ({ message }) => {
         toast.success(message);
         navigate(`/`);
       },
@@ -37,7 +38,8 @@ const Register = () => {
         console.log(err);
         toast.error("Something went wrong");
       },
-    });
+    }
+  );
 
   const handleRegister = (data: RegisterSchemaType) => register(data);
 
