@@ -38,6 +38,17 @@ export function RegisterForm({
   const onNext = async () => {
     if (step >= steps.length - 1) return;
     const fields = stepFields[step] ?? [];
+
+    const values = registerForm.getValues();
+    const firstEmpty = fields.find((f) => {
+      const v = values[f as keyof typeof values];
+      return v === undefined || v === null || String(v).trim() === "";
+    });
+    if (firstEmpty) {
+      registerForm.setFocus(firstEmpty as any);
+      return;
+    }
+
     const ok = await registerForm.trigger(fields);
     if (ok) {
       setStep((s) => Math.min(s + 1, steps.length - 1));

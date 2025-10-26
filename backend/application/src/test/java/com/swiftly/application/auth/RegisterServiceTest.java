@@ -35,37 +35,42 @@ class RegisterServiceTest {
     @Test
     void register_successfullyRegistersNewUser() {
         // Arrange
-        RegisterCommand command = new RegisterCommand(
+        User user = new User(
                 "newuser@example.com",
                 "StrongPassword123!",
+                Role.OWNER,
+                false
+        );
+        
+        Profile profile = new Profile(
                 "Ada Lovelace",
                 "+31612345678",
-                Role.OWNER,
                 "123 Babbage Street",
                 "London",
                 "UK",
                 "EC1A 1BB"
         );
+        
+        RegisterCommand command = new RegisterCommand(user, profile);
 
-        when(userUseCase.existsByEmail(command.email())).thenReturn(false);
+        when(userUseCase.existsByEmail(user.getEmail())).thenReturn(false);
 
         User savedUser = new User(
-                command.email(),
-                PasswordHasher.hashPassword(command.password()),
-                command.role(),
+                user.getEmail(),
+                PasswordHasher.hashPassword(user.getPasswordHash()),
+                user.getRole(),
                 false
         );
 
-        Profile profile = new Profile(
-                savedUser,
-                command.fullName(),
-                command.phoneNumber(),
-                command.address(),
-                command.city(),
-                command.country(),
-                command.postalCode()
+        Profile savedProfile = new Profile(
+                "Ada Lovelace",
+                "+31612345678",
+                "123 Babbage Street",
+                "London",
+                "UK",
+                "EC1A 1BB"
         );
-        savedUser.attachProfile(profile);
+        savedUser.attachProfile(savedProfile);
 
         when(registerPort.saveNewUserAndProfile(any(User.class), any(Profile.class)))
                 .thenReturn(savedUser);
@@ -75,32 +80,38 @@ class RegisterServiceTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(command.email(), result.getEmail());
-        assertEquals(command.role(), result.getRole());
+        assertEquals(user.getEmail(), result.getEmail());
+        assertEquals(user.getRole(), result.getRole());
         assertFalse(result.getStatus());
         assertNotNull(result.getProfile());
-        assertEquals(command.fullName(), result.getProfile().getFullName());
+        assertEquals(profile.getFullName(), result.getProfile().getFullName());
 
-        verify(userUseCase).existsByEmail(command.email());
+        verify(userUseCase).existsByEmail(user.getEmail());
         verify(registerPort).saveNewUserAndProfile(any(User.class), any(Profile.class));
     }
 
     @Test
     void register_throwsWhenUserAlreadyExists() {
         // Arrange
-        RegisterCommand command = new RegisterCommand(
+        User user = new User(
                 "existing@example.com",
                 "@password3123W",
+                Role.RENTER,
+                false
+        );
+        
+        Profile profile = new Profile(
                 "Grace Hopper",
                 "+31698765432",
-                Role.RENTER,
                 "Codebreaker Lane",
                 "Bletchley",
                 "UK",
                 "0213Usd"
         );
+        
+        RegisterCommand command = new RegisterCommand(user, profile);
 
-        when(userUseCase.existsByEmail(command.email())).thenReturn(true);
+        when(userUseCase.existsByEmail(user.getEmail())).thenReturn(true);
 
         // Act + Assert
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
@@ -108,7 +119,7 @@ class RegisterServiceTest {
 
         assertEquals("User already exists", ex.getMessage());
 
-        verify(userUseCase).existsByEmail(command.email());
+        verify(userUseCase).existsByEmail(user.getEmail());
         verify(registerPort, never()).saveNewUserAndProfile(any(), any());
     }
 }

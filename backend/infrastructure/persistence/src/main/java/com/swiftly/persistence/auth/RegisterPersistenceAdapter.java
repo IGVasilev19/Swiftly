@@ -5,8 +5,6 @@ import com.swiftly.application.profile.port.outbound.ProfilePort;
 import com.swiftly.application.user.port.outbound.UserPort;
 import com.swiftly.domain.Profile;
 import com.swiftly.domain.User;
-import com.swiftly.persistence.entities.ProfileEntity;
-import com.swiftly.persistence.entities.UserEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
@@ -24,12 +22,12 @@ public class RegisterPersistenceAdapter implements RegisterPort {
     @Transactional
     public User saveNewUserAndProfile(User user, Profile profile)
     {
+        User savedUser = userPort.save(user);
 
-        UserEntity userEntity = new UserEntity(user.getEmail(), user.getPasswordHash(), user.getRole(), false);
-
-        ProfileEntity profileEntity = new ProfileEntity(userEntity, profile.getFullName(), profile.getPhone(), profile.getAddress(), profile.getCity(), profile.getCountry(), profile.getPostalCode());
+        profile.setUser(savedUser);
 
         profilePort.save(profile);
-        return  userPort.save(user);
+        
+        return savedUser;
     }
 }

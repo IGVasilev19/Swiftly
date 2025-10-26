@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
-@NoArgsConstructor @AllArgsConstructor @Getter @Setter @Builder
+@NoArgsConstructor @AllArgsConstructor @Getter @Setter
 public class User {
     private Integer id;
 

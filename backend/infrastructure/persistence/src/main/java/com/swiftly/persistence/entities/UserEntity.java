@@ -3,10 +3,7 @@ package com.swiftly.persistence.entities;
 import com.swiftly.domain.User;
 import com.swiftly.domain.enums.user.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity

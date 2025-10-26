@@ -1,10 +1,10 @@
 package com.swiftly.persistence.user;
 
-import com.swiftly.domain.User;
+import com.swiftly.persistence.entities.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
-interface JpaUserRepository extends JpaRepository<User, Integer> {
+interface JpaUserRepository extends JpaRepository<UserEntity, Integer> {
     boolean existsByEmail(String email);
-    Optional<User> findByEmail(String email);
+    Optional<UserEntity> findByEmail(String email);
 }

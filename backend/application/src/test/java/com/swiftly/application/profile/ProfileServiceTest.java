@@ -41,7 +41,6 @@ class ProfileServiceTest {
         Integer profileId = 42;
 
         Profile mockProfile = new Profile(
-                new User("ada@example.com", "hashedPassword", Role.OWNER, false),
                 "Ada Lovelace",
                 "+31612345678",
                 "123 Babbage Street",

@@ -6,7 +6,7 @@ import java.time.Instant;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter @Builder
+@Getter @Setter
 public class Blackout {
 
     private Integer id;

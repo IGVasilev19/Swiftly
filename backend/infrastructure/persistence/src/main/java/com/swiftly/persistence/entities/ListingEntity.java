@@ -15,7 +15,6 @@ import java.time.Instant;
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
 public class ListingEntity extends Listing {
 
     @Id
@@ -23,7 +22,7 @@ public class ListingEntity extends Listing {
     private Integer id;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    private Vehicle vehicle;
+    private VehicleEntity vehicle;
 
     @Column(nullable = false, length = 100)
     private String title;

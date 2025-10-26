@@ -5,7 +5,6 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
 public class Profile {
 
     private Integer id;

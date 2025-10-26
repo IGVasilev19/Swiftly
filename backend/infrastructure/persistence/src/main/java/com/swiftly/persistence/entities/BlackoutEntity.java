@@ -2,9 +2,9 @@ package com.swiftly.persistence.entities;
 
 
 import com.swiftly.domain.Blackout;
-import com.swiftly.domain.Vehicle;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
@@ -18,7 +18,6 @@ import java.time.Instant;
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
 public class BlackoutEntity extends Blackout {
 
     @Id
@@ -27,7 +26,7 @@ public class BlackoutEntity extends Blackout {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "vehicle_id", nullable = false)
-    private Vehicle vehicle;
+    private VehicleEntity vehicle;
 
     @Column(name = "start_at", nullable = false)
     private Instant startAt;

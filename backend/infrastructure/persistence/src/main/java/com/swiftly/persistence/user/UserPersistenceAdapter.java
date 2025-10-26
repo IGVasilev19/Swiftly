@@ -1,8 +1,8 @@
 package com.swiftly.persistence.user;
 
 import com.swiftly.application.user.port.outbound.UserPort;
-import com.swiftly.domain.Booking;
 import com.swiftly.domain.User;
+import com.swiftly.persistence.entities.UserEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -24,11 +24,15 @@ public class UserPersistenceAdapter implements UserPort {
 
     public Optional<User> findByEmail(String email)
     {
-        return repository.findByEmail(email);
+        Optional<UserEntity> userEntity = repository.findByEmail(email);
+
+        return Optional.of(userEntity.get());
     }
 
     public User save(User user)
     {
-        return repository.save(user);
+        UserEntity userEntity = new UserEntity(user.getEmail(), user.getPasswordHash(), user.getRole(), user.getStatus());
+
+        return repository.save(userEntity);
     }
 }

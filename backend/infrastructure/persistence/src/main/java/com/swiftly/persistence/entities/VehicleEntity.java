@@ -4,9 +4,15 @@ import com.swiftly.domain.enums.vehicle.Feature;
 import com.swiftly.domain.enums.vehicle.FuelType;
 import com.swiftly.domain.enums.vehicle.VehicleType;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.List;
 
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "vehicles")
 public class VehicleEntity extends Vehicle {

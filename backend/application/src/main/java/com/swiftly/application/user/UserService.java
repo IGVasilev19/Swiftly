@@ -19,7 +19,11 @@ public class UserService implements UserUseCase {
 
     public Optional<User> getByEmail(String email)
     {
-        return Optional.ofNullable(userPort.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found")));
+        Optional<User> user = userPort.findByEmail(email);
+        if (user.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+        return user;
     }
 
     public Boolean existsByEmail(String email)

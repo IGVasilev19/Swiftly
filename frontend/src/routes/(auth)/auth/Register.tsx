@@ -7,10 +7,14 @@ import {
   type RegisterSchemaType,
 } from "@/schemas/auth/auth.schema";
 import { toast } from "sonner";
-import { useApiMutation } from "@/hooks/hook";
+import api from "@/hooks/api";
+import { useState } from "react";
+import type { AxiosError } from "axios";
 
 const Register = () => {
   const navigate = useNavigate();
+  const [isPending, setIsPending] = useState(false);
+
   const form = useForm<RegisterSchemaType>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -26,22 +30,20 @@ const Register = () => {
     },
   });
 
-  const { mutate: register, isPending } = useApiMutation<RegisterSchemaType>(
-    "POST",
-    "/auth/register",
-    {
-      onSuccess: ({ message }) => {
-        toast.success(message);
-        navigate(`/`);
-      },
-      onError: (err) => {
-        console.log(err);
-        toast.error("Something went wrong");
-      },
+  const handleRegister = async (data: RegisterSchemaType) => {
+    try {
+      setIsPending(true);
+      const response = await api.post("/auth/register", data);
+      toast.success(response.data.message);
+      navigate("/");
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      console.error(axiosError);
+      toast.error(axiosError.response?.data?.message || "Something went wrong");
+    } finally {
+      setIsPending(false);
     }
-  );
-
-  const handleRegister = (data: RegisterSchemaType) => register(data);
+  };
 
   return (
     <div className="min-h-screen w-screen flex flex-col justify-center items-center gap-10">

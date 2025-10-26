@@ -9,7 +9,7 @@ import java.time.Instant;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter @Builder
+@Getter @Setter
 public class Listing {
 
     private Integer id;
