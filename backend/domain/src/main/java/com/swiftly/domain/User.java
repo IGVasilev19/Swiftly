@@ -14,8 +14,6 @@ public class User {
 
     private Role role;
 
-    private Boolean status;
-
     private Profile profile;
 
     public void attachProfile(Profile p) {
@@ -23,11 +21,10 @@ public class User {
         if (p != null) p.setUser(this);
     }
 
-    public User(String email, String passwordHash, Role role,  Boolean status)
+    public User(String email, String passwordHash, Role role)
     {
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
-        this.status = status;
     }
 }

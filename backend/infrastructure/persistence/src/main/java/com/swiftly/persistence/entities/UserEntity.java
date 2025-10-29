@@ -27,19 +27,14 @@ public class UserEntity extends User {
     @Column(nullable = false)
     private Role role;
 
-    @Column(nullable = false)
-    @ColumnDefault("false")
-    private Boolean status;
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
     private ProfileEntity profile;
 
 
-    public UserEntity(String email, String passwordHash, Role role, Boolean status)
+    public UserEntity(String email, String passwordHash, Role role)
     {
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
-        this.status = status;
     }
 }

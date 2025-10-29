@@ -31,7 +31,7 @@ public class UserPersistenceAdapter implements UserPort {
 
     public User save(User user)
     {
-        UserEntity userEntity = new UserEntity(user.getEmail(), user.getPasswordHash(), user.getRole(), user.getStatus());
+        UserEntity userEntity = new UserEntity(user.getEmail(), user.getPasswordHash(), user.getRole());
 
         return repository.save(userEntity);
     }

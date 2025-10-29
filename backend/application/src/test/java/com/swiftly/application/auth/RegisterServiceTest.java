@@ -8,13 +8,10 @@ import com.swiftly.domain.Profile;
 import com.swiftly.domain.User;
 import com.swiftly.domain.enums.user.Role;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -38,8 +35,7 @@ class RegisterServiceTest {
         User user = new User(
                 "newuser@example.com",
                 "StrongPassword123!",
-                Role.OWNER,
-                false
+                Role.OWNER
         );
         
         Profile profile = new Profile(
@@ -58,8 +54,7 @@ class RegisterServiceTest {
         User savedUser = new User(
                 user.getEmail(),
                 PasswordHasher.hashPassword(user.getPasswordHash()),
-                user.getRole(),
-                false
+                user.getRole()
         );
 
         Profile savedProfile = new Profile(
@@ -82,7 +77,6 @@ class RegisterServiceTest {
         assertNotNull(result);
         assertEquals(user.getEmail(), result.getEmail());
         assertEquals(user.getRole(), result.getRole());
-        assertFalse(result.getStatus());
         assertNotNull(result.getProfile());
         assertEquals(profile.getFullName(), result.getProfile().getFullName());
 
@@ -96,8 +90,7 @@ class RegisterServiceTest {
         User user = new User(
                 "existing@example.com",
                 "@password3123W",
-                Role.RENTER,
-                false
+                Role.RENTER
         );
         
         Profile profile = new Profile(
