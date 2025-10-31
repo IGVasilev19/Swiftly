@@ -3,9 +3,14 @@ import com.swiftly.domain.enums.user.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @NoArgsConstructor @AllArgsConstructor @Getter @Setter
-public class User {
+public class User implements UserDetails {
     private Integer id;
 
     private String email;
@@ -15,6 +20,10 @@ public class User {
     private Role role;
 
     private Profile profile;
+
+    String accessToken;
+
+    String refreshToken;
 
     public void attachProfile(Profile p) {
         this.profile = p;
@@ -26,5 +35,26 @@ public class User {
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
+    }
+
+    public User(String email, String passwordHash)
+    {
+        this.email = email;
+        this.passwordHash = passwordHash;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public String getPassword() {
+        return passwordHash;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 }

@@ -3,27 +3,33 @@ package com.swiftly.application.auth;
 import com.swiftly.application.auth.port.inbound.LogInUseCase;
 import com.swiftly.application.helpers.PasswordHasher;
 import com.swiftly.application.user.port.outbound.UserPort;
+import com.swiftly.domain.RefreshToken;
 import com.swiftly.domain.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
+@Service
+@RequiredArgsConstructor
 public class LogInService implements LogInUseCase {
     private final UserPort userPort;
+    private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
-    public LogInService(UserPort userPort)
+
+    public User login(User requestedUser)
     {
-        this.userPort = userPort;
-    }
+        User userToLogIn = userPort.findByEmail(requestedUser.getEmail());
 
-    public Optional<User> logIn(String email, String password)
-    {
-        Optional<User> userToLogIn = userPort.findByEmail(email);
-
-        if(userToLogIn.isPresent())
+        if(userToLogIn == null)
         {
-            if(PasswordHasher.checkPassword(password, userToLogIn.get().getPasswordHash()))
+            if(PasswordHasher.checkPassword(requestedUser.getPasswordHash(), userToLogIn.getPasswordHash()))
             {
-                return  userToLogIn;
+                String accessToken = jwtService.generateAccessToken(userToLogIn);
+
+                RefreshToken refreshToken = refreshTokenService.createRefreshToken(userToLogIn.getEmail());
+
+                return new User(accessToken, refreshToken.getToken());
             }
             else {
                 throw new IllegalArgumentException("Wrong password");
@@ -31,6 +37,22 @@ public class LogInService implements LogInUseCase {
         }
         else {
             throw new IllegalArgumentException("Account doesn't exist");
+        }
+    }
+
+    public User refreshToken(String token)
+    {
+        RefreshToken refreshToken = refreshTokenService.getByToken(token).map(refreshTokenService::verifyExpiration).orElseThrow(()-> new RuntimeException("Invalid token"));
+
+        String accessToken = jwtService.generateAccessToken(refreshToken.getUser());
+
+        return new User(accessToken, refreshToken.getToken());
+    }
+
+    public void logout(String email) {
+        if(userPort.findByEmail(email) != null)
+        {
+            refreshTokenService.deleteTokenByEmail(email);
         }
     }
 }

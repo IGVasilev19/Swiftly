@@ -12,8 +12,13 @@ spring:
     locations: classpath:db-persistence.migrations
     baseline-on-migrate: false
     baseline-version: 1
+    validate-on-migrate: true
+    clean-disabled: true
   config:
-    import: "classpath:application-persistence.properties"
+    import:
+      - "classpath:application-persistence.properties"
+      - "classpath:jwt.properties"
+      - "optional:file:boot/.env[.properties]"
 
   doc:
     default-produces-media-type: application/json

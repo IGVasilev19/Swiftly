@@ -6,19 +6,15 @@ import com.swiftly.application.auth.port.outbound.RegisterPort;
 import com.swiftly.application.helpers.PasswordHasher;
 import com.swiftly.application.user.port.inbound.UserUseCase;
 import com.swiftly.domain.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class RegisterService implements RegisterUseCase {
     private final RegisterPort registerPort;
     private final UserUseCase userUseCase;
 
-
-    public RegisterService(RegisterPort registerPort,  UserUseCase userUseCase)
-    {
-        this.registerPort = registerPort;
-        this.userUseCase = userUseCase;
-    }
 
     public User register(RegisterCommand  registerAccount)
     {

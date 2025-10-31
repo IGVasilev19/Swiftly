@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
-@SpringBootApplication(scanBasePackages = "com.swiftly")
+@SpringBootApplication(scanBasePackages = {"com.swiftly", "com.swiftly.boot", "com.swiftly.application.auth"})
 @EnableJpaRepositories(basePackages = "com.swiftly.persistence")
 @EntityScan(basePackages = "com.swiftly.persistence.entities")
 @EnableConfigurationProperties(CorsProperties.class)

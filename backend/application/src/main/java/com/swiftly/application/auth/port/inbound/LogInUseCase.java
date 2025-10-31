@@ -5,5 +5,5 @@ import com.swiftly.domain.User;
 import java.util.Optional;
 
 public interface LogInUseCase {
-    Optional<User> logIn(String username, String password);
+    User login(User user);
 }
