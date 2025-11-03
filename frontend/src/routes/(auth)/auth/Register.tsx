@@ -7,13 +7,14 @@ import {
   type RegisterSchemaType,
 } from "@/schemas/auth/auth.schema";
 import { toast } from "sonner";
-import api from "@/hooks/api";
 import { useState } from "react";
 import type { AxiosError } from "axios";
+import { useAuth } from "@/hooks/useAuth";
 
 const Register = () => {
   const navigate = useNavigate();
   const [isPending, setIsPending] = useState(false);
+  const { register } = useAuth();
 
   const form = useForm<RegisterSchemaType>({
     resolver: zodResolver(registerSchema),
@@ -33,13 +34,13 @@ const Register = () => {
   const handleRegister = async (data: RegisterSchemaType) => {
     try {
       setIsPending(true);
-      const response = await api.post("/auth/register", data);
-      toast.success(response.data.message);
+      const response = await register(data);
+      toast.success(response);
       navigate("/");
     } catch (error: unknown) {
       const axiosError = error as AxiosError<{ message: string }>;
       console.error(axiosError);
-      toast.error(axiosError.response?.data?.message || "Something went wrong");
+      toast.error(axiosError.response?.data?.message || "Registration failed");
     } finally {
       setIsPending(false);
     }

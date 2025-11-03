@@ -4,18 +4,17 @@ import com.swiftly.application.auth.port.outbound.RefreshTokenPort;
 import com.swiftly.domain.RefreshToken;
 import com.swiftly.persistence.entities.RefreshTokenEntity;
 import com.swiftly.persistence.entities.UserEntity;
+import com.swiftly.persistence.user.JpaUserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class RefreshTokenPersistenceAdapter implements RefreshTokenPort {
     private final RefreshTokenRepository refreshTokenRepository;
-
-    public RefreshTokenPersistenceAdapter(RefreshTokenRepository refreshTokenRepository)
-    {
-        this.refreshTokenRepository = refreshTokenRepository;
-    }
+    private final JpaUserRepository  userRepository;
 
     public Optional<RefreshToken> findByToken(String refreshToken)
     {
@@ -32,7 +31,7 @@ public class RefreshTokenPersistenceAdapter implements RefreshTokenPort {
     public RefreshToken save(RefreshToken refreshToken)
     {
 
-        UserEntity userEntity = new UserEntity(refreshToken.getUser().getEmail(), refreshToken.getUser().getPasswordHash(), refreshToken.getUser().getRole());
+        UserEntity userEntity =  userRepository.findById(refreshToken.getUser().getId()).orElse(null);
 
         RefreshTokenEntity refreshTokenEntity = new RefreshTokenEntity(refreshToken.getToken(), refreshToken.getExpiryDate(), userEntity, refreshToken.isRevoked());
 
@@ -46,5 +45,12 @@ public class RefreshTokenPersistenceAdapter implements RefreshTokenPort {
         RefreshTokenEntity refreshTokenEntity = new RefreshTokenEntity(refreshToken.getId(), refreshToken.getToken(), refreshToken.getExpiryDate(), userEntity, refreshToken.isRevoked());
 
         refreshTokenRepository.delete(refreshTokenEntity);
+    }
+
+    public RefreshToken findByUserId(Integer userId)
+    {
+        RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByUserId(userId);
+
+        return new RefreshToken(refreshTokenEntity.getId(), refreshTokenEntity.getToken(), refreshTokenEntity.getExpiryDate(), refreshTokenEntity.getUser(), refreshTokenEntity.isRevoked());
     }
 }

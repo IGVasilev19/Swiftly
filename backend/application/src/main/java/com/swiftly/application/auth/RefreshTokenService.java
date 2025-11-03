@@ -42,8 +42,10 @@ public class RefreshTokenService implements RefreshTokenUseCase {
 
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().isBefore(Instant.now()) || token.isRevoked()) {
+
             refreshTokenPort.delete(token);
-            throw new RuntimeException("Refresh token expired or revoked");
+
+            return null;
         }
         return token;
     }
@@ -55,5 +57,10 @@ public class RefreshTokenService implements RefreshTokenUseCase {
     public Optional<RefreshToken> getByToken(String token)
     {
         return refreshTokenPort.findByToken(token);
+    }
+
+    public RefreshToken getByUserId(Integer userId)
+    {
+        return refreshTokenPort.findByUserId(userId);
     }
 }

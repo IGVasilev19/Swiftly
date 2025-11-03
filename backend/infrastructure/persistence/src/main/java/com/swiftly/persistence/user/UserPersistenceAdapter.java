@@ -24,7 +24,8 @@ public class UserPersistenceAdapter implements UserPort {
     public User findByEmail(String email)
     {
         UserEntity userEntity = repository.findByEmail(email);
-        return userEntity; // preserve id and fields; UserEntity extends domain User
+
+        return new User(userEntity.getId(), userEntity.getEmail(), userEntity.getPasswordHash());
     }
 
     public User save(User user)
@@ -34,8 +35,9 @@ public class UserPersistenceAdapter implements UserPort {
         return repository.save(userEntity);
     }
 
-    @Override
     public User findById(Integer id) {
-        return repository.findById(id).orElse(null);
+        UserEntity userEntity =  repository.findById(id).orElse(null);
+
+        return  new User(userEntity.getEmail(), userEntity.getPasswordHash());
     }
 }

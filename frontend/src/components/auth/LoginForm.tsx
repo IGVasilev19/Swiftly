@@ -8,8 +8,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { LoginFormProps } from "@/types/types";
-import { Form, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -54,10 +55,19 @@ export function LoginForm({
                   name="password"
                   render={({ field }) => (
                     <FormItem className="grid gap-3">
-                      <FormLabel>Password</FormLabel>
+                      <div className="flex items-center">
+                        <FormLabel>Password</FormLabel>
+                        <a
+                          href="#"
+                          className="ml-auto inline-block text-sm underline-offset-4 hover:underline hover:text-[#FD6123] text-[#0F172A]"
+                        >
+                          Forgot your password?
+                        </a>
+                      </div>
                       <FormControl>
                         <Input
                           id="password"
+                          type="password"
                           {...field}
                           className="text-[#0F172A] border-[#0f172a1a] caret-[#0F172A] h-10"
                         />
@@ -67,55 +77,35 @@ export function LoginForm({
                   )}
                 />
               </div>
-
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label
-                    htmlFor="password"
-                    className="font-sans text-[#0F172A] text-md"
-                  >
-                    Password
-                  </Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline hover:text-[#FD6123] text-[#0F172A]"
-                  >
-                    Forgot your password?
-                  </a>
+            </div>
+            <Button
+              disabled={isPending}
+              type="submit"
+              className="flex-1 bg-[#0F172A] hover:bg-[#16213b] w-full flex gap-3 mt-6"
+            >
+              {isPending ? (
+                <div className="flex items-center justify-center gap-2">
+                  <LoaderCircle className="animate-spin" />
+                  <p>Signing in...</p>
                 </div>
-                <Input id="password" type="password" required />
-              </div>
+              ) : (
+                "Sign In"
+              )}
+            </Button>
+            <div className="flex justify-center items-center mt-3">
+              <p className="text-[#0F172A]">Don't have an Account?</p>
+              <CardAction>
+                <Link
+                  className="text-[#0F172A] text-md p-0 pl-1 hover:text-[#FD6123]"
+                  to="/auth/register"
+                >
+                  Sign Up
+                </Link>
+              </CardAction>
             </div>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex-col gap-2">
-        <Button
-          disabled={isPending}
-          type="submit"
-          className="flex-1 bg-[#0F172A] hover:bg-[#16213b]"
-        >
-          {isPending ? (
-            <div className="flex items-center justify-center gap-2">
-              <LoaderCircle className="animate-spin" />
-              <p>Signing in...</p>
-            </div>
-          ) : (
-            "Sign In"
-          )}
-        </Button>
-        <div className="flex justify-center items-center">
-          <p className="text-[#0F172A]">Don't have an Account?</p>
-          <CardAction>
-            <Link
-              className="text-[#0F172A] text-md p-0 pl-1 hover:text-[#FD6123]"
-              to="/auth/register"
-            >
-              Sign Up
-            </Link>
-          </CardAction>
-        </div>
-      </CardFooter>
     </Card>
   );
 }

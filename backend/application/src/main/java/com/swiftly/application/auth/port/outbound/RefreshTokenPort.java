@@ -9,4 +9,5 @@ public interface RefreshTokenPort {
     void deleteByEmail(String email);
     RefreshToken save(RefreshToken refreshToken);
     void delete(RefreshToken refreshToken);
+    RefreshToken findByUserId(Integer userId);
 }

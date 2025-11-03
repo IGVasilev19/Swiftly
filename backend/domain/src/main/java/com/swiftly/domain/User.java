@@ -30,11 +30,31 @@ public class User implements UserDetails {
         if (p != null) p.setUser(this);
     }
 
+    public User(Integer id, String email, String passwordHash, Role role)
+    {
+        this.id = id;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+    }
+
     public User(String email, String passwordHash, Role role)
     {
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
+    }
+
+    public User(String accessToken)
+    {
+        this.accessToken = accessToken;
+    }
+
+    public User(Integer id,String email, String passwordHash)
+    {
+        this.id = id;
+        this.email = email;
+        this.passwordHash = passwordHash;
     }
 
     public User(String email, String passwordHash)

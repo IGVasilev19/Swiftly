@@ -12,6 +12,6 @@ public class LogInMapper {
 
     public static LogInResponse toLogInResponse(User user)
     {
-        return new LogInResponse(user.getAccessToken(), user.getRefreshToken());
+        return new LogInResponse(user.getAccessToken());
     }
 }

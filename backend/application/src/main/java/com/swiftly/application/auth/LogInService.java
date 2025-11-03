@@ -2,7 +2,7 @@ package com.swiftly.application.auth;
 
 import com.swiftly.application.auth.port.inbound.LogInUseCase;
 import com.swiftly.application.helpers.PasswordHasher;
-import com.swiftly.application.user.port.outbound.UserPort;
+import com.swiftly.application.user.UserService;
 import com.swiftly.domain.RefreshToken;
 import com.swiftly.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -12,31 +12,25 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class LogInService implements LogInUseCase {
-    private final UserPort userPort;
+    private final UserService userService;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
 
 
     public User login(User requestedUser)
     {
-        User userToLogIn = userPort.findByEmail(requestedUser.getEmail());
+        User userToLogIn = userService.getByEmail(requestedUser.getEmail());
 
-        if(userToLogIn == null)
+        if(PasswordHasher.checkPassword(requestedUser.getPasswordHash(), userToLogIn.getPasswordHash()))
         {
-            if(PasswordHasher.checkPassword(requestedUser.getPasswordHash(), userToLogIn.getPasswordHash()))
-            {
-                String accessToken = jwtService.generateAccessToken(userToLogIn);
+            refreshTokenService.createRefreshToken(userToLogIn.getEmail());
 
-                RefreshToken refreshToken = refreshTokenService.createRefreshToken(userToLogIn.getEmail());
+            String accessToken = jwtService.generateAccessToken(userToLogIn);
 
-                return new User(accessToken, refreshToken.getToken());
-            }
-            else {
-                throw new IllegalArgumentException("Wrong password");
-            }
+            return new User(accessToken);
         }
         else {
-            throw new IllegalArgumentException("Account doesn't exist");
+            throw new IllegalArgumentException("Wrong password");
         }
     }
 
@@ -50,7 +44,7 @@ public class LogInService implements LogInUseCase {
     }
 
     public void logout(String email) {
-        if(userPort.findByEmail(email) != null)
+        if(userService.getByEmail(email) != null)
         {
             refreshTokenService.deleteTokenByEmail(email);
         }

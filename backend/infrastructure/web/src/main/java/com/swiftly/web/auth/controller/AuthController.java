@@ -28,6 +28,8 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest)
     {
+        try
+        {
         registerService.register(RegisterMapper.toCommand(registerRequest));
 
         return ResponseEntity
@@ -36,16 +38,33 @@ public class AuthController {
                         "success", true,
                         "message", "Account created successfully!"
                 ));
+
+        } catch(IllegalArgumentException e)
+        {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("success", false, "message", e.getMessage()));
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LogInResponse> login(@RequestBody LogInRequest logInRequest)
+    public ResponseEntity<?> login(@RequestBody LogInRequest logInRequest)
     {
-        User user = logInService.login(LogInMapper.toUser(logInRequest));
+        try {
+            User user = logInService.login(LogInMapper.toUser(logInRequest));
 
-        LogInResponse response = LogInMapper.toLogInResponse(user);
+            System.out.println(user.getAccessToken());
+            System.out.println(user.getRefreshToken());
 
-        return  ResponseEntity.status(HttpStatus.OK).body(response);
+            LogInResponse response = LogInMapper.toLogInResponse(user);
+
+            return  ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
     }
 
     @PostMapping("/refresh")

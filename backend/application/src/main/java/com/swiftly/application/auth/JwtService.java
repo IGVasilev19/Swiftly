@@ -30,8 +30,8 @@ public class JwtService {
     }
 
     public String generateAccessToken(UserDetails userDetails) {
-        // Prefer using user id as subject when available, fallback to username for compatibility
         String subject;
+
         if (userDetails instanceof User u && u.getId() != null) {
             subject = u.getId().toString();
         } else {
@@ -64,15 +64,10 @@ public class JwtService {
     }
 
     public boolean isValid(String token, UserDetails userDetails) {
-        // Backward compatible validation; retained for any legacy flow
         final String subject = extractUsername(token);
         boolean subjectMatches = subject.equals(userDetails.getUsername())
                 || (userDetails instanceof User u && u.getId() != null && subject.equals(u.getId().toString()));
         return subjectMatches && !isExpired(token);
-    }
-
-    public boolean isValid(String token) {
-        return !isExpired(token);
     }
 
     private boolean isExpired(String token) {

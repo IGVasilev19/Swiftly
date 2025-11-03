@@ -331,7 +331,6 @@ export function RegisterForm({
           </form>
         </Form>
       </CardContent>
-      <CardFooter></CardFooter>
     </Card>
   );
 }

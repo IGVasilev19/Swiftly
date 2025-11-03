@@ -17,9 +17,11 @@ public class UserService implements UserUseCase {
     public User getByEmail(String email)
     {
         User user = userPort.findByEmail(email);
+
         if (user == null) {
             throw new IllegalArgumentException("User not found");
         }
+        
         return user;
     }
 
