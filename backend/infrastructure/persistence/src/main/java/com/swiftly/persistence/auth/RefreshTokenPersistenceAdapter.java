@@ -16,11 +16,11 @@ public class RefreshTokenPersistenceAdapter implements RefreshTokenPort {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JpaUserRepository  userRepository;
 
-    public Optional<RefreshToken> findByToken(String refreshToken)
+    public RefreshToken findByToken(String refreshToken)
     {
         Optional<RefreshTokenEntity> tokenEntity = refreshTokenRepository.findByToken(refreshToken);
 
-        return Optional.of(new RefreshToken(tokenEntity.get().getId(), tokenEntity.get().getToken(), tokenEntity.get().getExpiryDate(), tokenEntity.get().getUser(), tokenEntity.get().isRevoked()));
+        return new RefreshToken(tokenEntity.get().getId(), tokenEntity.get().getToken(), tokenEntity.get().getExpiryDate(), tokenEntity.get().getUser(), tokenEntity.get().isRevoked());
     }
 
     public void deleteByEmail(String email)

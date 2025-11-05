@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
+
 @Service
 @RequiredArgsConstructor
 public class LogInService implements LogInUseCase {
@@ -23,11 +24,16 @@ public class LogInService implements LogInUseCase {
 
         if(PasswordHasher.checkPassword(requestedUser.getPasswordHash(), userToLogIn.getPasswordHash()))
         {
-            refreshTokenService.createRefreshToken(userToLogIn.getEmail());
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userToLogIn.getEmail());
 
             String accessToken = jwtService.generateAccessToken(userToLogIn);
 
-            return new User(accessToken);
+            User authUser = new User();
+
+            authUser.setAccessToken(accessToken);
+            authUser.setRefreshToken(refreshToken.getToken());
+
+            return authUser;
         }
         else {
             throw new IllegalArgumentException("Wrong password");
@@ -36,11 +42,23 @@ public class LogInService implements LogInUseCase {
 
     public User refreshToken(String token)
     {
-        RefreshToken refreshToken = refreshTokenService.getByToken(token).map(refreshTokenService::verifyExpiration).orElseThrow(()-> new RuntimeException("Invalid token"));
+        RefreshToken refreshToken = refreshTokenService.getByToken(token);
+
+        if(refreshToken == null)
+        {
+            return null;
+        }
+
+        refreshTokenService.verifyExpiration(refreshToken);
 
         String accessToken = jwtService.generateAccessToken(refreshToken.getUser());
 
-        return new User(accessToken, refreshToken.getToken());
+        User authUser = new User();
+
+        authUser.setAccessToken(accessToken);
+        authUser.setRefreshToken(refreshToken.getToken());
+
+        return authUser;
     }
 
     public void logout(String email) {

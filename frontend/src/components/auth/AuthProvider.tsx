@@ -1,5 +1,5 @@
 import { AuthContext } from "@/contexts/AuthContext";
-import React, { useState, type ReactNode } from "react";
+import React, { useEffect, useState, type ReactNode } from "react";
 import type {
   LoginSchemaType,
   RegisterSchemaType,
@@ -13,11 +13,22 @@ interface Props {
 export function AuthProvider({ children }: Props) {
   const [token, setToken] = useState<string | null>(null);
 
+  useEffect(() => {
+    const savedToken = localStorage.getItem("accessToken");
+    if (savedToken) {
+      setToken(savedToken);
+    }
+  }, []);
+
   const login = async (data: LoginSchemaType) => {
     const response = await api.post("/auth/login", data);
 
-    setToken(response.data.token);
-    return token;
+    const newToken = response.data.token;
+
+    localStorage.setItem("accessToken", newToken);
+    setToken(newToken);
+
+    return newToken;
   };
 
   const register = async (data: RegisterSchemaType) => {
@@ -27,6 +38,7 @@ export function AuthProvider({ children }: Props) {
   };
 
   const logout = () => {
+    localStorage.removeItem("accessToken");
     setToken(null);
   };
 

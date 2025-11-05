@@ -37,6 +37,7 @@ public class JwtService {
         } else {
             subject = userDetails.getUsername();
         }
+
         return Jwts.builder()
                 .setSubject(subject)
                 .setIssuedAt(new Date())
@@ -63,10 +64,9 @@ public class JwtService {
         }
     }
 
-    public boolean isValid(String token, UserDetails userDetails) {
-        final String subject = extractUsername(token);
-        boolean subjectMatches = subject.equals(userDetails.getUsername())
-                || (userDetails instanceof User u && u.getId() != null && subject.equals(u.getId().toString()));
+    public boolean isValid(String token, Integer userId) {
+        final Integer subject = extractUserId(token);
+        boolean subjectMatches = subject.equals(userId);
         return subjectMatches && !isExpired(token);
     }
 

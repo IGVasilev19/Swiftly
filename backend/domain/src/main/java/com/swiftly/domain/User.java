@@ -45,11 +45,6 @@ public class User implements UserDetails {
         this.role = role;
     }
 
-    public User(String accessToken)
-    {
-        this.accessToken = accessToken;
-    }
-
     public User(Integer id,String email, String passwordHash)
     {
         this.id = id;

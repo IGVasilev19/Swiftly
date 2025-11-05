@@ -54,7 +54,7 @@ public class RefreshTokenService implements RefreshTokenUseCase {
         refreshTokenPort.deleteByEmail(email);
     }
 
-    public Optional<RefreshToken> getByToken(String token)
+    public RefreshToken getByToken(String token)
     {
         return refreshTokenPort.findByToken(token);
     }

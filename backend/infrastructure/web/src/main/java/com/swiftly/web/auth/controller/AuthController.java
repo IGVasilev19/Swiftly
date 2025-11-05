@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
@@ -53,9 +54,6 @@ public class AuthController {
         try {
             User user = logInService.login(LogInMapper.toUser(logInRequest));
 
-            System.out.println(user.getAccessToken());
-            System.out.println(user.getRefreshToken());
-
             LogInResponse response = LogInMapper.toLogInResponse(user);
 
             return  ResponseEntity.ok(response);
@@ -69,8 +67,13 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<LogInResponse> refresh(@RequestBody Map<String, String> body) {
-        String token = body.get("refreshToken");
-        return ResponseEntity.ok(LogInMapper.toLogInResponse(logInService.refreshToken(token)));
+        String refreshToken = body.get("refreshToken");
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing refresh token");
+        }
+
+        LogInResponse response = LogInMapper.toLogInResponse(logInService.refreshToken(refreshToken));
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
