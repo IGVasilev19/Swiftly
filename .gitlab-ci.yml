@@ -11,6 +11,8 @@ variables:
 build:
   stage: build
   script:
+    - docker build -t swiftly-app:latest .
+    - docker run --rm swiftly-app:latest ./gradlew integrationTest
     - "$ErrorActionPreference = 'Stop'"
     - "Set-Location $env:CI_PROJECT_DIR"
     - "$distDir = Join-Path $env:GRADLE_HOME_DIR 'dist'"
