@@ -25,12 +25,12 @@ build:
     - '$gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)'
     - '$gradleExe = Join-Path $gradleHome ''bin\gradle.bat'''
     - 'if (-not (Test-Path $gradleExe)) {
-        New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
-        $zipUrl = "https://services.gradle.org/distributions/gradle-$($env:GRADLE_VERSION)-bin.zip";
-        $zipPath = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION + ".zip");
-        Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath;
-        Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
-        Remove-Item $zipPath -Force;
+      New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
+      $zipUrl = "https://services.gradle.org/distributions/gradle-$($env:GRADLE_VERSION)-bin.zip";
+      $zipPath = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION + ".zip");
+      Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath;
+      Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
+      Remove-Item $zipPath -Force;
       }'
     - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
     - '& "$gradleExe" :boot:build -x test --no-daemon'
@@ -45,4 +45,13 @@ test:
     - "$ErrorActionPreference = 'Stop'"
     - "Set-Location $env:CI_PROJECT_DIR"
     - "$distDir = Join-Path $env:GRADLE_HOME_DIR 'dist'"
-    - '$gradleHome = Join-
+    - '$gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)'
+    - '$gradleExe = Join-Path $gradleHome ''bin\gradle.bat'''
+    - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
+    - '& "$gradleExe" test --no-daemon'
+  dependencies:
+    - build
+  artifacts:
+    when: always
+    reports:
+      junit: "backend/**/build/test-results/test/*.xml"
