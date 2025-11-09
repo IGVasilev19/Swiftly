@@ -11,6 +11,7 @@ variables:
 build:
   stage: build
   script:
+    - cd backend
     - docker build -t swiftly-app:latest .
     - docker run --rm swiftly-app:latest ./gradlew integrationTest
     - "$ErrorActionPreference = 'Stop'"
