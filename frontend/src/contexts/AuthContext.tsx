@@ -1,16 +1,15 @@
-import type {
-  LoginSchemaType,
-  RegisterSchemaType,
-} from "@/schemas/auth/auth.schema";
-import { createContext } from "react";
+import { createContext, useContext } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
-export interface AuthContextType {
-  token: string | null;
-  login: (data: LoginSchemaType) => Promise<string>;
-  register: (data: RegisterSchemaType) => Promise<string>;
-  logout: () => void;
-}
+const AuthContext = createContext<ReturnType<typeof useAuth> | null>(null);
 
-export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
-);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const auth = useAuth();
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+};
+
+export const useAuthContext = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuthContext must be used inside AuthProvider");
+  return ctx;
+};

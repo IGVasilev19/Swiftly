@@ -23,9 +23,9 @@ public class RefreshTokenPersistenceAdapter implements RefreshTokenPort {
         return new RefreshToken(tokenEntity.get().getId(), tokenEntity.get().getToken(), tokenEntity.get().getExpiryDate(), tokenEntity.get().getUser(), tokenEntity.get().isRevoked());
     }
 
-    public void deleteByEmail(String email)
+    public void deleteById(Integer userId)
     {
-        refreshTokenRepository.deleteByUserEmail(email);
+        refreshTokenRepository.deleteByUserId(userId);
     }
 
     public RefreshToken save(RefreshToken refreshToken)

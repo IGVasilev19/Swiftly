@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface RefreshTokenPort {
     RefreshToken findByToken(String token);
-    void deleteByEmail(String email);
+    void deleteById(Integer userId);
     RefreshToken save(RefreshToken refreshToken);
     void delete(RefreshToken refreshToken);
     RefreshToken findByUserId(Integer userId);

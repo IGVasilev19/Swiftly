@@ -1,21 +1,27 @@
 package com.swiftly.web.auth.controller;
 
-import com.swiftly.application.auth.LogInService;
+import com.swiftly.application.auth.port.inbound.JwtUseCase;
+import com.swiftly.application.auth.port.inbound.LogInUseCase;
 import com.swiftly.application.auth.port.inbound.RegisterUseCase;
-import com.swiftly.domain.User;
 import com.swiftly.web.auth.dto.LogInRequest;
 import com.swiftly.web.auth.dto.LogInResponse;
 import com.swiftly.web.auth.dto.RegisterRequest;
 import com.swiftly.web.auth.mapper.LogInMapper;
 import com.swiftly.web.auth.mapper.RegisterMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
 import java.util.Map;
 
 @RestController
@@ -24,7 +30,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
     private final RegisterUseCase registerService;
-    private final LogInService logInService;
+    private final LogInUseCase logInService;
+    private final JwtUseCase jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest)
@@ -52,11 +59,19 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LogInRequest logInRequest)
     {
         try {
-            User user = logInService.login(LogInMapper.toUser(logInRequest));
+            LogInResponse response = LogInMapper.toLogInResponse(logInService.login(LogInMapper.toUser(logInRequest)));
 
-            LogInResponse response = LogInMapper.toLogInResponse(user);
+            ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", response.refreshToken())
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/api/v1/auth/refresh")
+                    .maxAge(7 * 24 * 60 * 60)
+                    .sameSite("Strict")
+                    .build();
 
-            return  ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                    .body(response.accessToken());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                     "success", false,
@@ -66,20 +81,44 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<LogInResponse> refresh(@RequestBody Map<String, String> body) {
-        String refreshToken = body.get("refreshToken");
-        if (refreshToken == null || refreshToken.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing refresh token");
+    public ResponseEntity<?> refresh(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing cookies");
+        }
+
+        String refreshToken = Arrays.stream(cookies)
+                .filter(c -> "refresh_token".equals(c.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
+
+        if (refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing refresh token");
         }
 
         LogInResponse response = LogInMapper.toLogInResponse(logInService.refreshToken(refreshToken));
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(response.accessToken());
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody Map<String, String> body) {
-        String email = body.get("email");
-        logInService.logout(email);
+    public ResponseEntity<Void> logout( @RequestHeader("Authorization") String authHeader, HttpServletResponse response) {
+
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Strict")
+                .path("/api/v1/auth/refresh")
+                .maxAge(0)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        String accessToken = authHeader.replace("Bearer ", "");
+
+        logInService.logout(jwtService.extractUserId(accessToken));
+
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,6 +1,6 @@
 package com.swiftly.boot.config;
 
-import com.swiftly.application.auth.JwtService;
+import com.swiftly.application.auth.port.inbound.JwtUseCase;
 import com.swiftly.application.user.port.outbound.UserPort;
 import com.swiftly.domain.User;
 import jakarta.servlet.FilterChain;
@@ -20,7 +20,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final JwtUseCase jwtService;
     private final UserPort userPort;
 
     @Override
@@ -30,7 +30,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getServletPath();
-
+        System.out.println("JwtAuthFilter intercepted: {}" + path);
         if (path.startsWith("/api/v1/auth")) {
             chain.doFilter(request, response);
             return;

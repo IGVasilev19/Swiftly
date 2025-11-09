@@ -5,6 +5,8 @@ import com.swiftly.domain.User;
 import com.swiftly.persistence.entities.UserEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 
 @Component
 public class UserPersistenceAdapter implements UserPort {
@@ -21,11 +23,11 @@ public class UserPersistenceAdapter implements UserPort {
         return repository.existsByEmail(email);
     }
 
-    public User findByEmail(String email)
+    public Optional<User> findByEmail(String email)
     {
-        UserEntity userEntity = repository.findByEmail(email);
+        Optional<UserEntity> userEntity = repository.findByEmail(email);
 
-        return new User(userEntity.getId(), userEntity.getEmail(), userEntity.getPasswordHash());
+        return Optional.of(new User(userEntity.get().getId(), userEntity.get().getEmail(), userEntity.get().getPasswordHash()));
     }
 
     public User save(User user)
@@ -35,9 +37,10 @@ public class UserPersistenceAdapter implements UserPort {
         return repository.save(userEntity);
     }
 
-    public User findById(Integer id) {
-        UserEntity userEntity =  repository.findById(id).orElse(null);
+    public User findById(Integer id)
+    {
+        Optional<UserEntity> userEntity = repository.findById(id);
 
-        return  new User(userEntity.getEmail(), userEntity.getPasswordHash());
+        return new User(userEntity.get().getId(), userEntity.get().getEmail(), userEntity.get().getPasswordHash());
     }
 }

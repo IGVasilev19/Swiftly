@@ -6,6 +6,7 @@ import com.swiftly.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 
 
 @Service
@@ -16,18 +17,15 @@ public class UserService implements UserUseCase {
 
     public User getByEmail(String email)
     {
-        User user = userPort.findByEmail(email);
+        Optional<User> user = userPort.findByEmail(email);
 
-        if (user == null) {
-            throw new IllegalArgumentException("User not found");
-        }
+        User existingUser = user.orElseThrow(() -> new IllegalArgumentException("User not found"));
         
-        return user;
+        return existingUser;
     }
 
     public Boolean existsByEmail(String email)
     {
         return userPort.existsByEmail(email);
     }
-
 }

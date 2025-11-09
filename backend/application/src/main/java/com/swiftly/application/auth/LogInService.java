@@ -1,21 +1,23 @@
 package com.swiftly.application.auth;
 
+import com.swiftly.application.auth.port.inbound.JwtUseCase;
 import com.swiftly.application.auth.port.inbound.LogInUseCase;
+import com.swiftly.application.auth.port.inbound.RefreshTokenUseCase;
 import com.swiftly.application.helpers.PasswordHasher;
-import com.swiftly.application.user.UserService;
+import com.swiftly.application.user.port.inbound.UserUseCase;
 import com.swiftly.domain.RefreshToken;
 import com.swiftly.domain.User;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 
 
 @Service
 @RequiredArgsConstructor
 public class LogInService implements LogInUseCase {
-    private final UserService userService;
-    private final JwtService jwtService;
-    private final RefreshTokenService refreshTokenService;
+    private final UserUseCase userService;
+    private final JwtUseCase jwtService;
+    private final RefreshTokenUseCase refreshTokenService;
 
 
     public User login(User requestedUser)
@@ -61,10 +63,11 @@ public class LogInService implements LogInUseCase {
         return authUser;
     }
 
-    public void logout(String email) {
-        if(userService.getByEmail(email) != null)
+    @Transactional
+    public void logout(Integer userId) {
+        if(userId != null)
         {
-            refreshTokenService.deleteTokenByEmail(email);
+            refreshTokenService.deleteTokenById(userId);
         }
     }
 }

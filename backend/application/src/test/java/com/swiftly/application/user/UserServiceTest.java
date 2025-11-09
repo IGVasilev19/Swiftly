@@ -5,7 +5,6 @@ import com.swiftly.domain.User;
 import com.swiftly.domain.enums.user.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -33,16 +32,16 @@ class UserServiceTest {
     void getByEmail_returnsUser() {
         // Arrange
         String email = "test@example.com";
-        User user = new User(email, "hashedPassword", Role.RENTER, false);
+        User user = new User( email, "hashedPassword", Role.RENTER);
 
         when(userPort.findByEmail(email)).thenReturn(Optional.of(user));
 
         // Act
-        Optional<User> result = userService.getByEmail(email);
+        User result = userService.getByEmail(email);
 
         // Assert
         assertNotNull(result);
-        assertEquals(email, result.get().getEmail());
+        assertEquals(email, result.getEmail());
         verify(userPort).findByEmail(email);
     }
 

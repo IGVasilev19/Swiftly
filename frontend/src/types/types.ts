@@ -15,3 +15,9 @@ export interface RegisterFormProps {
   handleSubmit: (data: RegisterSchemaType) => void;
   isPending: boolean;
 }
+
+export interface DecodedToken {
+  exp: number;
+  sub: string;
+  email?: string;
+}

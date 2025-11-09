@@ -3,6 +3,7 @@ import Loading from "./components/ui/Loading";
 import { Route, Routes } from "react-router-dom";
 import { Register, Login } from "./routes/(auth)";
 import Dashboard from "./routes/(root)/Dashboard/Dashboard";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const App = () => {
   return (
@@ -10,7 +11,9 @@ const App = () => {
       <Routes>
         <Route path="/auth/register" element={<Register />} />
         <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
       </Routes>
     </Suspense>
   );
