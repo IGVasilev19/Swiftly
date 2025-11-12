@@ -98,10 +98,9 @@ public class AuthController {
         }
 
         LogInResponse response = LogInMapper.toLogInResponse(logInService.refreshToken(refreshToken));
-        return ResponseEntity.ok(response.accessToken());
+        return ResponseEntity.ok(Map.of("accessToken", response.accessToken()));
     }
 
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout( @RequestHeader("Authorization") String authHeader, HttpServletResponse response) {
 

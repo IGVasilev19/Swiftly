@@ -1,7 +1,7 @@
 import { LoginForm } from "@/components/auth/LoginForm";
 import { loginSchema, type LoginSchemaType } from "@/schemas/auth/auth.schema";
 import type { AxiosError } from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 const Login = () => {
   const navigate = useNavigate();
   const [isPending, setIsPending] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const form = useForm<LoginSchemaType>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -49,6 +49,12 @@ const Login = () => {
       setIsPending(false);
     }
   };
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, loading, navigate]);
 
   return (
     <div className="min-h-screen w-screen flex flex-col justify-center items-center gap-10">

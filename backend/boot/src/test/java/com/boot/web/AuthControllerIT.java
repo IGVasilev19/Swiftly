@@ -8,7 +8,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import wiremock.com.google.common.net.HttpHeaders;
@@ -32,7 +31,6 @@ class AuthControllerIT extends Containers {
 
     @Test
     @Order(1)
-    @WithMockUser(username = "testuser", roles = "USER")
     void register_ShouldPersistAndReturnCreated() {
         var payload = new RegisterRequest("mock123@gmail.com", "@MockPassword123", "Mocking Testing Name", "+123456789012", OWNER, "MockAddress 356", "Eindhoven", "Netherlands", "3561 CK");
 
@@ -48,7 +46,6 @@ class AuthControllerIT extends Containers {
 
     @Test
     @Order(2)
-    @WithMockUser(username = "testuser", roles = "USER")
     void login_ShouldReturnAccessToken() {
         var payload = new LogInRequest("mock123@gmail.com", "@MockPassword123");
 

@@ -38,14 +38,28 @@ export function useAuth() {
   };
 
   const logout = async () => {
+    const accessToken = sessionStorage.getItem("accessToken");
+
+    if (!accessToken) return;
+
     try {
-      await api.post("/auth/logout", null, { withCredentials: true });
-    } catch (err) {
-      console.error(err);
-    } finally {
+      await api.post(
+        "/auth/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+        }
+      );
+
       sessionStorage.removeItem("accessToken");
-      toast.success("Logged out");
+      toast.success("Logged out successfully");
       navigate("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+      toast.error("Failed to log out");
     }
   };
 
