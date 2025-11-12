@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardAction, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import PhoneNumberInput from "@/components/ui/PhoneNumberInput";
 import { COUNTRIES } from "@/lib/countries";
