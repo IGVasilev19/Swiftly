@@ -120,3 +120,34 @@ allprojects {
         tasks.register("prepareKotlinBuildScriptModel") {}
     }
 }
+
+sourceSets {
+    integrationTest {
+        java.srcDir file("src/integrationTest/java")
+        resources.srcDir file("src/integrationTest/resources")
+
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+tasks.register("integrationTest", Test) {
+    description = "Runs integration tests"
+    group = "verification"
+
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+
+    useJUnitPlatform()
+
+    systemProperty "spring.profiles.active", "test"
+}
+
+tasks.named("check") {
+    dependsOn(tasks.named("integrationTest"))
+}

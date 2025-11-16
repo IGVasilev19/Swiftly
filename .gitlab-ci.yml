@@ -8,19 +8,19 @@ variables:
   GRADLE_VERSION: "8.10.2"
   GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
 
-# ----------------------------------------
-# 1. UNIT + INTEGRATION TESTS (Testcontainers)
-# ----------------------------------------
 tests:
   stage: test
   script:
     - "$ErrorActionPreference = 'Stop'"
 
+    # -------------------------
     # Prepare Gradle
+    # -------------------------
     - "Set-Location $env:CI_PROJECT_DIR"
     - "$distDir = Join-Path $env:GRADLE_HOME_DIR 'dist'"
     - '$gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)'
     - '$gradleExe = Join-Path $gradleHome ''bin\gradle.bat'''
+
     - 'if (-not (Test-Path $gradleExe)) {
       New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
       $zipUrl = "https://services.gradle.org/distributions/gradle-$($env:GRADLE_VERSION)-bin.zip";
@@ -30,19 +30,23 @@ tests:
       Remove-Item $zipPath -Force;
       }'
 
-    # Run unit tests (H2)
+    # -------------------------
+    # Run UNIT tests (H2)
+    # -------------------------
     - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
     - '& "$gradleExe" test --no-daemon "-Dspring.profiles.active=unit"'
 
-    # Run integration tests (Testcontainers)
-    - '& "$gradleExe" integrationTest --no-daemon "-Dspring.profiles.active=test"'
+    # -------------------------
+    # Run INTEGRATION tests (Testcontainers)
+    # -------------------------
+    - '& "$gradleExe" integrationTest --no-daemon'
 
   artifacts:
     when: always
     reports:
       junit:
-        - "backend/**/build/test-results/test/*.xml"
-        - "backend/**/build/test-results/integrationTest/*.xml"
+        - "backend/build/test-results/test/*.xml"
+        - "backend/build/test-results/integrationTest/*.xml"
 
 # ----------------------------------------
 # 2. DOCKER BUILD (only if tests passed)
