@@ -1,6 +1,6 @@
 stages:
-  - build
   - test
+  - build
 
 variables:
   GRADLE_HOME_DIR: "D:/gcache/${CI_PROJECT_ID}/${CI_CONCURRENT_ID}"
@@ -8,18 +8,15 @@ variables:
   GRADLE_VERSION: "8.10.2"
   GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
 
-build:
-  stage: build
+# ----------------------------------------
+# 1. UNIT + INTEGRATION TESTS (Testcontainers)
+# ----------------------------------------
+tests:
+  stage: test
   script:
-    - cd backend
-    # Build Docker image
-    - docker build -t swiftly-app:latest .
-
-    # Run integration tests inside the container, passing JWT_SECRET from GitLab
-    - docker run --rm -e JWT_SECRET="$env:JWT_SECRET" swiftly-app:latest ./gradlew integrationTest
-
-    # PowerShell Gradle setup
     - "$ErrorActionPreference = 'Stop'"
+
+    # Prepare Gradle
     - "Set-Location $env:CI_PROJECT_DIR"
     - "$distDir = Join-Path $env:GRADLE_HOME_DIR 'dist'"
     - '$gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)'
@@ -32,26 +29,35 @@ build:
       Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
       Remove-Item $zipPath -Force;
       }'
+
+    # Run unit tests (H2)
     - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
-    - '& "$gradleExe" :boot:build -x test --no-daemon'
+    - '& "$gradleExe" test --no-daemon -Dspring.profiles.active=unit'
+
+    # Run integration tests (Testcontainers)
+    - '& "$gradleExe" integrationTest --no-daemon -Dspring.profiles.active=test'
+
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - "backend/**/build/test-results/test/*.xml"
+        - "backend/**/build/test-results/integrationTest/*.xml"
+
+# ----------------------------------------
+# 2. DOCKER BUILD (only if tests passed)
+# ----------------------------------------
+build:
+  stage: build
+  script:
+    - cd backend
+
+    - docker build -t swiftly-app:latest .
+
   artifacts:
     paths:
       - backend/**/build/libs/*.jar
     expire_in: 1 week
 
-test:
-  stage: test
-  script:
-    - "$ErrorActionPreference = 'Stop'"
-    - "Set-Location $env:CI_PROJECT_DIR"
-    - "$distDir = Join-Path $env:GRADLE_HOME_DIR 'dist'"
-    - '$gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)'
-    - '$gradleExe = Join-Path $gradleHome ''bin\gradle.bat'''
-    - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
-    - '& "$gradleExe" test --no-daemon'
   dependencies:
-    - build
-  artifacts:
-    when: always
-    reports:
-      junit: "backend/**/build/test-results/test/*.xml"
+    - tests

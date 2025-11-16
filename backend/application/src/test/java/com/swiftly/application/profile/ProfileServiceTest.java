@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-
+@ActiveProfiles("unit")
 @ExtendWith(MockitoExtension.class)
 class ProfileServiceTest {
 
