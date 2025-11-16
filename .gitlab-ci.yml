@@ -32,10 +32,8 @@ tests:
 
     # Run unit tests (H2)
     - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
-    - '& "$gradleExe" test --no-daemon -Dspring.profiles.active=unit'
-
-    # Run integration tests (Testcontainers)
-    - '& "$gradleExe" integrationTest --no-daemon -Dspring.profiles.active=test'
+    - & "$gradleExe" test --no-daemon "-Dspring.profiles.active=unit"
+    - & "$gradleExe" integrationTest --no-daemon "-Dspring.profiles.active=test"
 
   artifacts:
     when: always

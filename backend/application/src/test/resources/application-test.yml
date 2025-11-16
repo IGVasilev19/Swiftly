@@ -11,4 +11,4 @@ spring:
     show-sql: false
 
   flyway:
-    enabled: false   # unit tests should NOT run migrations
+    enabled: false
