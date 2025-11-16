@@ -1,11 +1,11 @@
 package com.swiftly.persistence.entities;
 
-import com.swiftly.domain.RefreshToken;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import com.swiftly.domain.RefreshToken;
 
 import java.time.Instant;
 

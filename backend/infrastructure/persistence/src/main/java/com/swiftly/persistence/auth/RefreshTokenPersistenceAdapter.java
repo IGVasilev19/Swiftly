@@ -13,19 +13,19 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class RefreshTokenPersistenceAdapter implements RefreshTokenPort {
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final JpaRefreshTokenRepository jpaRefreshTokenRepository;
     private final JpaUserRepository  userRepository;
 
     public RefreshToken findByToken(String refreshToken)
     {
-        Optional<RefreshTokenEntity> tokenEntity = refreshTokenRepository.findByToken(refreshToken);
+        Optional<RefreshTokenEntity> tokenEntity = jpaRefreshTokenRepository.findByToken(refreshToken);
 
         return new RefreshToken(tokenEntity.get().getId(), tokenEntity.get().getToken(), tokenEntity.get().getExpiryDate(), tokenEntity.get().getUser(), tokenEntity.get().isRevoked());
     }
 
     public void deleteById(Integer userId)
     {
-        refreshTokenRepository.deleteByUserId(userId);
+        jpaRefreshTokenRepository.deleteByUserId(userId);
     }
 
     public RefreshToken save(RefreshToken refreshToken)
@@ -35,7 +35,7 @@ public class RefreshTokenPersistenceAdapter implements RefreshTokenPort {
 
         RefreshTokenEntity refreshTokenEntity = new RefreshTokenEntity(refreshToken.getToken(), refreshToken.getExpiryDate(), userEntity, refreshToken.isRevoked());
 
-        return refreshTokenRepository.save(refreshTokenEntity);
+        return jpaRefreshTokenRepository.save(refreshTokenEntity);
     }
 
     public void delete(RefreshToken refreshToken)
@@ -44,12 +44,12 @@ public class RefreshTokenPersistenceAdapter implements RefreshTokenPort {
 
         RefreshTokenEntity refreshTokenEntity = new RefreshTokenEntity(refreshToken.getId(), refreshToken.getToken(), refreshToken.getExpiryDate(), userEntity, refreshToken.isRevoked());
 
-        refreshTokenRepository.delete(refreshTokenEntity);
+        jpaRefreshTokenRepository.delete(refreshTokenEntity);
     }
 
     public RefreshToken findByUserId(Integer userId)
     {
-        RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByUserId(userId);
+        RefreshTokenEntity refreshTokenEntity = jpaRefreshTokenRepository.findByUserId(userId);
 
         return new RefreshToken(refreshTokenEntity.getId(), refreshTokenEntity.getToken(), refreshTokenEntity.getExpiryDate(), refreshTokenEntity.getUser(), refreshTokenEntity.isRevoked());
     }

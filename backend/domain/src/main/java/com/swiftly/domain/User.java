@@ -2,7 +2,6 @@ package com.swiftly.domain;
 import com.swiftly.domain.enums.user.Role;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -21,9 +20,9 @@ public class User implements UserDetails {
 
     private Profile profile;
 
-    String accessToken;
+    private String accessToken;
 
-    String refreshToken;
+    private String refreshToken;
 
     public void attachProfile(Profile p) {
         this.profile = p;

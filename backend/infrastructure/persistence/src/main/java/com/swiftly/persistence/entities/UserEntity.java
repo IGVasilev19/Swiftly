@@ -4,8 +4,6 @@ import com.swiftly.domain.User;
 import com.swiftly.domain.enums.user.Role;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "users", schema = "public")
