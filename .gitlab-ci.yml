@@ -11,31 +11,31 @@ variables:
 tests:
   stage: test
   script:
-    - $ErrorActionPreference = 'Stop'
+    - "$ErrorActionPreference = 'Stop'"
 
     # -------------------------
     # Prepare Gradle
     # -------------------------
-    - Set-Location $env:CI_PROJECT_DIR
-    - $distDir = Join-Path $env:GRADLE_HOME_DIR 'dist'
-    - $gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)
-    - $gradleExe = Join-Path $gradleHome 'bin/gradle.bat'
+    - "Set-Location $env:CI_PROJECT_DIR"
+    - "$distDir = Join-Path $env:GRADLE_HOME_DIR 'dist'"
+    - '$gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)'
+    - '$gradleExe = Join-Path $gradleHome ''bin\gradle.bat'''
 
-    - if (-not (Test-Path $gradleExe)) {
-        New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
-        $zipUrl = "https://services.gradle.org/distributions/gradle-$($env:GRADLE_VERSION)-bin.zip";
-        $zipPath = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION + ".zip");
-        Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath;
-        Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
-        Remove-Item $zipPath -Force;
-      }
+    - 'if (-not (Test-Path $gradleExe)) {
+      New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
+      $zipUrl = "https://services.gradle.org/distributions/gradle-$($env:GRADLE_VERSION)-bin.zip";
+      $zipPath = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION + ".zip");
+      Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath;
+      Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
+      Remove-Item $zipPath -Force;
+      }'
 
     # -------------------------
     # Run ONLY UNIT tests (H2)
     # Integration tests are disabled because Testcontainers cannot run on shell executor
     # -------------------------
-    - Set-Location "$env:CI_PROJECT_DIR/backend"
-    - & "$gradleExe" test --no-daemon "-Dspring.profiles.active=unit" -x integrationTest
+    - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
+    - '& "$gradleExe" test --no-daemon "-Dspring.profiles.active=unit" -x integrationTest'
 
   artifacts:
     when: always
@@ -43,7 +43,7 @@ tests:
       junit:
         - "backend/boot/build/test-results/test/*.xml"
     paths:
-      - backend/**/build/test-results/test/*.xml
+      - "backend/**/build/test-results/test/*.xml"
 
 # ----------------------------------------
 # 2. DOCKER BUILD (only if tests passed)
@@ -51,12 +51,12 @@ tests:
 build:
   stage: build
   script:
-    - cd backend
-    - docker build -t swiftly-app:latest .
+    - "cd backend"
+    - "docker build -t swiftly-app:latest ."
 
   artifacts:
     paths:
-      - backend/**/build/libs/*.jar
+      - "backend/**/build/libs/*.jar"
     expire_in: 1 week
 
   dependencies:
