@@ -1,6 +1,7 @@
 package com.boot.web;
 
 import com.boot.testsupport.Containers;
+import com.jayway.jsonpath.JsonPath;
 import com.swiftly.boot.BootApplication;
 import com.swiftly.web.auth.dto.LogInRequest;
 import com.swiftly.web.auth.dto.RegisterRequest;
@@ -13,6 +14,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import wiremock.com.google.common.net.HttpHeaders;
 
 import java.net.URI;
+import java.util.Arrays;
 
 import static com.swiftly.domain.enums.user.Role.OWNER;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -29,10 +31,22 @@ class AuthControllerIT extends Containers {
     @Autowired
     WebTestClient webTestClient;
 
+    private static String refreshToken;
+    private static String accessToken;
+
+    private static String extractCookie(String header, String name) {
+        return Arrays.stream(header.split(";"))
+                .map(String::trim)
+                .filter(c -> c.startsWith(name + "="))
+                .map(c -> c.substring((name + "=").length()))
+                .findFirst()
+                .orElseThrow();
+    }
+
     @Test
     @Order(1)
     void register_ShouldPersistAndReturnCreated() {
-        var payload = new RegisterRequest("mock123@gmail.com", "@MockPassword123", "Mocking Testing Name", "+123456789012", OWNER, "MockAddress 356", "Eindhoven", "Netherlands", "3561 CK");
+        RegisterRequest payload = new RegisterRequest("mock123@gmail.com", "@MockPassword123", "Mocking Testing Name", "+123456789012", OWNER, "MockAddress 356", "Eindhoven", "Netherlands", "3561 CK");
 
         webTestClient.post()
                 .uri(URI.create("http://localhost:" + port + "/api/v1/auth/register"))
@@ -47,7 +61,7 @@ class AuthControllerIT extends Containers {
     @Test
     @Order(2)
     void login_ShouldReturnAccessToken() {
-        var payload = new LogInRequest("mock123@gmail.com", "@MockPassword123");
+        LogInRequest payload = new LogInRequest("mock123@gmail.com", "@MockPassword123");
 
         webTestClient.post()
                 .uri(URI.create("http://localhost:" + port + "/api/v1/auth/login"))
@@ -56,6 +70,41 @@ class AuthControllerIT extends Containers {
                 .expectStatus().isOk()
                 .expectHeader().exists(HttpHeaders.SET_COOKIE)
                 .expectBody(String.class)
+                .consumeWith(result -> {
+                    String setCookie = result.getResponseHeaders()
+                            .getFirst(HttpHeaders.SET_COOKIE);
+
+                    refreshToken = extractCookie(setCookie, "refresh_token");
+                })
                 .value(token -> assertThat(token).isNotBlank());
     }
+
+    @Test
+    @Order(3)
+    void refresh_ShouldReturnNewAccessToken() {
+        webTestClient.post()
+                .uri("/api/v1/auth/refresh")
+                .cookie("refresh_token", refreshToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(result -> {
+                    String body = new String(result.getResponseBody());
+                    accessToken = JsonPath.read(body, "$.accessToken");
+                })
+                .value(token -> assertThat(token).isNotBlank());
+    }
+
+    @Test
+    @Order(4)
+    void logout_ShouldClearRefreshCookieAndInvalidateSession() {
+        webTestClient.post()
+                .uri("/api/v1/auth/logout")
+                .header("Authorization", "Bearer " + accessToken)
+                .exchange()
+                .expectStatus().isNoContent()
+                .expectHeader().exists(HttpHeaders.SET_COOKIE)
+                .expectBody().isEmpty();
+    }
+
 }
