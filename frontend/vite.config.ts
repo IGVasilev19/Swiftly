@@ -1,11 +1,10 @@
 import path from "path";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import viteImagemin from "vite-plugin-imagemin";
 import viteCompression from "vite-plugin-compression";
-
 import { defineConfig } from "vite";
-import { visualizer } from "rollup-plugin-visualizer";
+
+const isCI = process.env.CI === "true";
 
 export default defineConfig({
   plugins: [
@@ -17,21 +16,29 @@ export default defineConfig({
       threshold: 1024,
       deleteOriginFile: false,
     }),
-    visualizer({ open: true }),
-    viteImagemin({
-      webp: {
-        quality: 80,
-      },
-    }),
-  ],
+
+    !isCI &&
+      require("rollup-plugin-visualizer").visualizer({
+        open: false,
+        filename: "stats.html",
+      }),
+
+    !isCI &&
+      require("vite-plugin-imagemin").default({
+        webp: { quality: 80 },
+      }),
+  ].filter(Boolean),
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+
   build: {
     sourcemap: true,
   },
+
   optimizeDeps: {
     include: [
       "react",
@@ -42,12 +49,13 @@ export default defineConfig({
       "zod",
     ],
   },
+
   server: {
     proxy: {
       "/api": {
         target: "http://localhost:8080",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, "/api"),
+        rewrite: (p) => p.replace(/^\/api/, "/api"),
       },
     },
   },
