@@ -2,13 +2,12 @@ stages:
   - test
   - build
   - push
-
+#---
 variables:
   GRADLE_HOME_DIR: "D:/gcache/${CI_PROJECT_ID}/${CI_CONCURRENT_ID}"
   GRADLE_USER_HOME: "$GRADLE_HOME_DIR"
   GRADLE_VERSION: "8.10.2"
   GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
-
 tests:
   stage: test
   script:
