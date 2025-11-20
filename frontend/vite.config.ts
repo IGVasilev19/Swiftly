@@ -4,41 +4,41 @@ import tailwindcss from "@tailwindcss/vite";
 import viteCompression from "vite-plugin-compression";
 import { defineConfig } from "vite";
 
-const isCI = process.env.CI === "true";
+const isDocker = process.env.BUILD_ENV === "docker";
+
+const corePlugins = [
+  react(),
+  tailwindcss(),
+  viteCompression({
+    algorithm: "brotliCompress",
+    ext: ".br",
+    threshold: 1024,
+    deleteOriginFile: false,
+  }),
+];
+
+const optionalPlugins = [];
+
+if (!isDocker) {
+  const { visualizer } = require("rollup-plugin-visualizer");
+  const imagemin = require("vite-plugin-imagemin");
+
+  optionalPlugins.push(
+    visualizer({ open: true }),
+    imagemin({
+      webp: {
+        quality: 80,
+      },
+    })
+  );
+}
 
 export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-    viteCompression({
-      algorithm: "brotliCompress",
-      ext: ".br",
-      threshold: 1024,
-      deleteOriginFile: false,
-    }),
-
-    !isCI &&
-      require("rollup-plugin-visualizer").visualizer({
-        open: false,
-        filename: "stats.html",
-      }),
-
-    !isCI &&
-      require("vite-plugin-imagemin").default({
-        webp: { quality: 80 },
-      }),
-  ].filter(Boolean),
-
+  plugins: [...corePlugins, ...optionalPlugins],
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
+    alias: { "@": path.resolve(__dirname, "./src") },
   },
-
-  build: {
-    sourcemap: true,
-  },
-
+  build: { sourcemap: true },
   optimizeDeps: {
     include: [
       "react",
@@ -49,13 +49,11 @@ export default defineConfig({
       "zod",
     ],
   },
-
   server: {
     proxy: {
       "/api": {
         target: "http://localhost:8080",
         changeOrigin: true,
-        rewrite: (p) => p.replace(/^\/api/, "/api"),
       },
     },
   },
