@@ -1,28 +1,23 @@
-# ---------- Build Stage ----------
+# Build stage
 FROM node:20 AS build
 WORKDIR /app
 
-# Install pnpm globally (best practice for CI)
-RUN npm install -g pnpm
+# Install pnpm manually
+RUN corepack enable
 
-# Copy only package manifests first for caching
+# Copy lockfiles
 COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies using pnpm (fast + cached)
-RUN pnpm install --frozen-lockfile --prefer-offline
+# Force Windows GitLab runner to run this through CMD, not PowerShell
+RUN ["cmd.exe", "/C", "pnpm install --frozen-lockfile --prefer-offline"]
 
-# Copy the rest of the source code
+# Copy source
 COPY . .
 
-# Build your React app (or Vite/Next/etc.)
-RUN pnpm build
+RUN ["cmd.exe", "/C", "pnpm run build"]
 
-
-# ---------- Runtime Stage ----------
+# Runtime stage
 FROM nginx:stable
 WORKDIR /usr/share/nginx/html
-
-# Copy built assets from build step
-COPY --from=build /app/dist .   # or /app/build depending on your config
-
+COPY --from=build /app/dist .  # Vite output
 EXPOSE 80
