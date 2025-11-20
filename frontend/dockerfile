@@ -15,7 +15,8 @@ RUN pnpm install --frozen-lockfile --prefer-offline
 COPY . .
 
 # Build your React app (or Vite/Next/etc.)
-RUN pnpm exec vite build
+RUN pnpm build
+
 
 # ---------- Runtime Stage ----------
 FROM nginx:stable
