@@ -1,6 +1,7 @@
 stages:
   - test
   - build
+  - push
 
 variables:
   GRADLE_HOME_DIR: "D:/gcache/${CI_PROJECT_ID}/${CI_CONCURRENT_ID}"
@@ -48,16 +49,43 @@ tests:
 # ----------------------------------------
 # 2. DOCKER BUILD (only if tests passed)
 # ----------------------------------------
-build:
+build_images:
   stage: build
   script:
-    - "cd backend"
-    - "docker build -t swiftly-app:latest ."
+    # Login to Docker Hub
+    - docker login -u $env:DOCKERHUB_USERNAME -p $env:DOCKERHUB_PASSWORD
 
-  artifacts:
-    paths:
-      - "backend/**/build/libs/*.jar"
-    expire_in: 1 week
+    # Build backend image
+    - cd backend
+    - docker build -t "$env:DOCKERHUB_USERNAME/swiftly-backend:$env:CI_COMMIT_SHA" .
 
-  dependencies:
+    # Build frontend image
+    - cd ../frontend
+    - docker build -t "$env:DOCKERHUB_USERNAME/swiftly-frontend:$env:CI_COMMIT_SHA" .
+
+  needs:
     - tests
+  only:
+    - main
+
+push_images:
+  stage: push
+  script:
+    # Login to Docker Hub
+    - docker login -u $env:DOCKERHUB_USERNAME -p $env:DOCKERHUB_PASSWORD
+
+    # Push SHA-tag versions
+    - docker push "$env:DOCKERHUB_USERNAME/swiftly-backend:$env:CI_COMMIT_SHA"
+    - docker push "$env:DOCKERHUB_USERNAME/swiftly-frontend:$env:CI_COMMIT_SHA"
+
+    # Tag "latest"
+    - docker tag "$env:DOCKERHUB_USERNAME/swiftly-backend:$env:CI_COMMIT_SHA" "$env:DOCKERHUB_USERNAME/swiftly-backend:latest"
+    - docker tag "$env:DOCKERHUB_USERNAME/swiftly-frontend:$env:CI_COMMIT_SHA" "$env:DOCKERHUB_USERNAME/swiftly-frontend:latest"
+
+    # Push "latest"
+    - docker push "$env:DOCKERHUB_USERNAME/swiftly-backend:latest"
+    - docker push "$env:DOCKERHUB_USERNAME/swiftly-frontend:latest"
+  needs:
+    - build_images
+  only:
+    - main
