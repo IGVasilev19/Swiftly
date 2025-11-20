@@ -2,26 +2,26 @@
 FROM node:20 AS build
 WORKDIR /app
 
-# Copy package metadata first for caching
-COPY package*.json ./
+# Install pnpm globally (best practice for CI)
+RUN npm install -g pnpm
 
-# Install dependencies using faster, reproducible method
-# - npm ci: clean, deterministic, MUCH faster than npm install
-# - --no-audit: skips slow audit
-# - --omit=optional: ignores optional deps that slow Windows runners
-# - --quiet: reduces log overhead in CI
-RUN npm ci --no-audit --omit=optional --quiet
+# Copy only package manifests first for caching
+COPY package.json pnpm-lock.yaml ./
 
-# Copy rest of the source
+# Install dependencies using pnpm (fast + cached)
+RUN pnpm install --frozen-lockfile --prefer-offline
+
+# Copy the rest of the source code
 COPY . .
 
-# Build the production bundle
-RUN npm run build
+# Build your React app (or Vite/Next/etc.)
+RUN pnpm build
 
-# ---------- Serve Stage ----------
+# ---------- Runtime Stage ----------
 FROM nginx:stable
+WORKDIR /usr/share/nginx/html
 
-# Copy built frontend into Nginx static root
-COPY --from=build /app/build /usr/share/nginx/html
+# Copy built assets from build step
+COPY --from=build /app/dist .   # or /app/build depending on your config
 
 EXPOSE 80
