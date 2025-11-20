@@ -60,8 +60,8 @@ build_images:
     - docker build -t "$env:DOCKERHUB_USERNAME/swiftly-backend:$env:CI_COMMIT_SHA" .
 
     # Build frontend image
-    - cd ../frontend
-    - docker build -t "$env:DOCKERHUB_USERNAME/swiftly-frontend:$env:CI_COMMIT_SHA" .
+    - cd frontend
+    - cmd /C "docker build -t %DOCKERHUB_USERNAME%/swiftly-frontend:%CI_COMMIT_SHA% ."
 
   needs:
     - tests
