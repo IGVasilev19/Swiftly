@@ -1,7 +1,7 @@
 package com.swiftly.boot.config;
 
-import com.swiftly.application.auth.port.inbound.JwtUseCase;
-import com.swiftly.application.user.port.outbound.UserPort;
+import com.swiftly.application.auth.port.inbound.JwtService;
+import com.swiftly.application.user.port.outbound.UserRepository;
 import com.swiftly.domain.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,8 +20,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtUseCase jwtService;
-    private final UserPort userPort;
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -46,7 +46,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         Integer userId = jwtService.extractUserId(jwt);
 
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = userPort.findById(userId);
+            User user = userRepository.findById(userId);
             if (user != null && jwtService.isValid(jwt, userId)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());

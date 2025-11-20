@@ -1,6 +1,6 @@
 package com.swiftly.persistence.user;
 
-import com.swiftly.application.user.port.outbound.UserPort;
+import com.swiftly.application.user.port.outbound.UserRepository;
 import com.swiftly.domain.User;
 import com.swiftly.persistence.entities.UserEntity;
 import org.springframework.stereotype.Component;
@@ -9,11 +9,11 @@ import java.util.Optional;
 
 
 @Component
-public class UserPersistenceAdapter implements UserPort {
+public class UserPersistenceImpl implements UserRepository {
 
     private final JpaUserRepository repository;
 
-    public UserPersistenceAdapter(JpaUserRepository repository)
+    public UserPersistenceImpl(JpaUserRepository repository)
     {
         this.repository = repository;
     }

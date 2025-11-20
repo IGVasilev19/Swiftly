@@ -1,17 +1,14 @@
 package com.swiftly.application.profile;
 
-import com.swiftly.application.profile.port.inbound.ProfileUseCase;
-import com.swiftly.application.profile.port.outbound.ProfilePort;
+import com.swiftly.application.profile.port.inbound.ProfileService;
+import com.swiftly.application.profile.port.outbound.ProfileRepository;
 import com.swiftly.domain.Profile;
-import com.swiftly.domain.User;
-import com.swiftly.domain.enums.user.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 
@@ -24,16 +21,16 @@ import static org.mockito.Mockito.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("unit")
 @ExtendWith(MockitoExtension.class)
-class ProfileServiceTest {
+class ProfileServiceImplTest {
 
     @Mock
-    private ProfileUseCase profileUseCase;
+    private ProfileService profileService;
 
     @Mock
-    ProfilePort profilePort;
+    ProfileRepository profileRepository;
 
     @InjectMocks
-    private ProfileService profileService;
+    private ProfileServiceImpl profileServiceImpl;
 
     @Test
     void getById_profileExists() {
@@ -49,17 +46,17 @@ class ProfileServiceTest {
                 "EC1A 1BB"
         );
 
-        when(profilePort.findById(profileId)).thenReturn(Optional.of(mockProfile));
+        when(profileRepository.findById(profileId)).thenReturn(Optional.of(mockProfile));
 
-        ProfileService profileService = new ProfileService(profilePort); // make sure this isn't null!
+        ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(profileRepository); // make sure this isn't null!
 
         // Act
-        Optional<Profile> result = profileService.getById(profileId);
+        Optional<Profile> result = profileServiceImpl.getById(profileId);
 
         // Assert
         assertNotNull(result);
         assertEquals("Ada Lovelace", result.get().getFullName());
-        verify(profilePort).findById(profileId);
+        verify(profileRepository).findById(profileId);
     }
 
 
@@ -68,14 +65,14 @@ class ProfileServiceTest {
         Integer profileId = 999;
 
         // Arrange: return empty to simulate "not found"
-        when(profilePort.findById(profileId)).thenReturn(Optional.empty());
+        when(profileRepository.findById(profileId)).thenReturn(Optional.empty());
 
         // Act + Assert
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
-            profileService.getById(profileId);
+            profileServiceImpl.getById(profileId);
         });
 
         assertEquals("Profile not found", ex.getMessage());
-        verify(profilePort).findById(profileId);
+        verify(profileRepository).findById(profileId);
     }
 }

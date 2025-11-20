@@ -3,7 +3,7 @@ package com.swiftly.application.auth.port.inbound;
 import com.swiftly.domain.RefreshToken;
 
 
-public interface RefreshTokenUseCase {
+public interface RefreshTokenService {
     RefreshToken getByToken(String token);
     void deleteTokenById(Integer userId);
     RefreshToken getByUserId(Integer userId);

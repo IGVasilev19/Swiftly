@@ -1,6 +1,6 @@
 package com.swiftly.persistence.auth;
 
-import com.swiftly.application.auth.port.outbound.RefreshTokenPort;
+import com.swiftly.application.auth.port.outbound.RefreshTokenRepository;
 import com.swiftly.domain.RefreshToken;
 import com.swiftly.persistence.entities.RefreshTokenEntity;
 import com.swiftly.persistence.entities.UserEntity;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class RefreshTokenPersistenceAdapter implements RefreshTokenPort {
+public class RefreshTokenPersistenceImpl implements RefreshTokenRepository {
     private final JpaRefreshTokenRepository jpaRefreshTokenRepository;
     private final JpaUserRepository  userRepository;
 

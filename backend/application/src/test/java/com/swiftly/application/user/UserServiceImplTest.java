@@ -1,6 +1,6 @@
 package com.swiftly.application.user;
 
-import com.swiftly.application.user.port.outbound.UserPort;
+import com.swiftly.application.user.port.outbound.UserRepository;
 import com.swiftly.domain.User;
 import com.swiftly.domain.enums.user.Role;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,13 +16,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles("unit")
-class UserServiceTest {
+class UserServiceImplTest {
 
     @Mock
-    private UserPort userPort;
+    private UserRepository userRepository;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @BeforeEach
     void setUp() {
@@ -35,56 +35,56 @@ class UserServiceTest {
         String email = "test@example.com";
         User user = new User( email, "hashedPassword", Role.RENTER);
 
-        when(userPort.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
         // Act
-        User result = userService.getByEmail(email);
+        User result = userServiceImpl.getByEmail(email);
 
         // Assert
         assertNotNull(result);
         assertEquals(email, result.getEmail());
-        verify(userPort).findByEmail(email);
+        verify(userRepository).findByEmail(email);
     }
 
     @Test
     void getByEmail_userNotFound_throwsException() {
         // Arrange
         String email = "missing@example.com";
-        when(userPort.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
         // Act + Assert
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> userService.getByEmail(email));
+                () -> userServiceImpl.getByEmail(email));
 
         assertEquals("User not found", ex.getMessage());
-        verify(userPort).findByEmail(email);
+        verify(userRepository).findByEmail(email);
     }
 
     @Test
     void existsByEmail_returnsTrue() {
         // Arrange
         String email = "exists@example.com";
-        when(userPort.existsByEmail(email)).thenReturn(true);
+        when(userRepository.existsByEmail(email)).thenReturn(true);
 
         // Act
-        boolean result = userService.existsByEmail(email);
+        boolean result = userServiceImpl.existsByEmail(email);
 
         // Assert
         assertTrue(result);
-        verify(userPort).existsByEmail(email);
+        verify(userRepository).existsByEmail(email);
     }
 
     @Test
     void existsByEmail_returnsFalse() {
         // Arrange
         String email = "notfound@example.com";
-        when(userPort.existsByEmail(email)).thenReturn(false);
+        when(userRepository.existsByEmail(email)).thenReturn(false);
 
         // Act
-        boolean result = userService.existsByEmail(email);
+        boolean result = userServiceImpl.existsByEmail(email);
 
         // Assert
         assertFalse(result);
-        verify(userPort).existsByEmail(email);
+        verify(userRepository).existsByEmail(email);
     }
 }

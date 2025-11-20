@@ -1,8 +1,8 @@
 package com.swiftly.web.auth.controller;
 
-import com.swiftly.application.auth.port.inbound.JwtUseCase;
-import com.swiftly.application.auth.port.inbound.LogInUseCase;
-import com.swiftly.application.auth.port.inbound.RegisterUseCase;
+import com.swiftly.application.auth.port.inbound.JwtService;
+import com.swiftly.application.auth.port.inbound.LogInService;
+import com.swiftly.application.auth.port.inbound.RegisterService;
 import com.swiftly.web.auth.dto.LogInRequest;
 import com.swiftly.web.auth.dto.LogInResponse;
 import com.swiftly.web.auth.dto.RegisterRequest;
@@ -18,7 +18,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -29,9 +28,9 @@ import java.util.Map;
 @Tag(name="Auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final RegisterUseCase registerService;
-    private final LogInUseCase logInService;
-    private final JwtUseCase jwtService;
+    private final RegisterService registerService;
+    private final LogInService logInService;
+    private final JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest)

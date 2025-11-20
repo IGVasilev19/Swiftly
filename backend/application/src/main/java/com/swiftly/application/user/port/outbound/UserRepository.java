@@ -4,7 +4,7 @@ import com.swiftly.domain.User;
 import java.util.Optional;
 
 
-public interface UserPort {
+public interface UserRepository {
     User save(User user);
     Boolean existsByEmail(String email);
     Optional<User> findByEmail(String email);

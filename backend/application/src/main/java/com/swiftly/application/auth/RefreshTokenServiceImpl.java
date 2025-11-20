@@ -1,8 +1,8 @@
 package com.swiftly.application.auth;
 
-import com.swiftly.application.auth.port.inbound.RefreshTokenUseCase;
-import com.swiftly.application.auth.port.outbound.RefreshTokenPort;
-import com.swiftly.application.user.port.inbound.UserUseCase;
+import com.swiftly.application.auth.port.inbound.RefreshTokenService;
+import com.swiftly.application.auth.port.outbound.RefreshTokenRepository;
+import com.swiftly.application.user.port.inbound.UserService;
 import com.swiftly.domain.RefreshToken;
 import com.swiftly.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +14,10 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class RefreshTokenService implements RefreshTokenUseCase {
+public class RefreshTokenServiceImpl implements RefreshTokenService {
 
-    private final RefreshTokenPort refreshTokenPort;
-    private final UserUseCase userService;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserService userService;
 
     @Value("${jwt.refresh.expiration}")
     private long refreshExpiration;
@@ -31,13 +31,13 @@ public class RefreshTokenService implements RefreshTokenUseCase {
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshExpiration));
         refreshToken.setRevoked(false);
-        return refreshTokenPort.save(refreshToken);
+        return refreshTokenRepository.save(refreshToken);
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().isBefore(Instant.now()) || token.isRevoked()) {
 
-            refreshTokenPort.delete(token);
+            refreshTokenRepository.delete(token);
 
             return null;
         }
@@ -45,16 +45,16 @@ public class RefreshTokenService implements RefreshTokenUseCase {
     }
 
     public void deleteTokenById(Integer userId) {
-        refreshTokenPort.deleteById(userId);
+        refreshTokenRepository.deleteById(userId);
     }
 
     public RefreshToken getByToken(String token)
     {
-        return refreshTokenPort.findByToken(token);
+        return refreshTokenRepository.findByToken(token);
     }
 
     public RefreshToken getByUserId(Integer userId)
     {
-        return refreshTokenPort.findByUserId(userId);
+        return refreshTokenRepository.findByUserId(userId);
     }
 }

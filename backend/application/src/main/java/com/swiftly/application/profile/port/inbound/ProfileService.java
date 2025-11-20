@@ -5,6 +5,6 @@ import com.swiftly.domain.Profile;
 import java.util.Optional;
 
 
-public interface ProfileUseCase {
+public interface ProfileService {
     Optional<Profile> getById(Integer id);
 }

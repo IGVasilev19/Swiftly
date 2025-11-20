@@ -1,10 +1,10 @@
 package com.swiftly.application.auth;
 
-import com.swiftly.application.auth.port.inbound.JwtUseCase;
-import com.swiftly.application.auth.port.inbound.LogInUseCase;
-import com.swiftly.application.auth.port.inbound.RefreshTokenUseCase;
+import com.swiftly.application.auth.port.inbound.JwtService;
+import com.swiftly.application.auth.port.inbound.LogInService;
+import com.swiftly.application.auth.port.inbound.RefreshTokenService;
 import com.swiftly.application.helpers.PasswordHasher;
-import com.swiftly.application.user.port.inbound.UserUseCase;
+import com.swiftly.application.user.port.inbound.UserService;
 import com.swiftly.domain.RefreshToken;
 import com.swiftly.domain.User;
 import jakarta.transaction.Transactional;
@@ -14,10 +14,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class LogInService implements LogInUseCase {
-    private final UserUseCase userService;
-    private final JwtUseCase jwtService;
-    private final RefreshTokenUseCase refreshTokenService;
+public class LogInServiceImpl implements LogInService {
+    private final UserService userService;
+    private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
 
     public User login(User requestedUser)

@@ -1,6 +1,6 @@
 package com.swiftly.persistence.profile;
 
-import com.swiftly.application.profile.port.outbound.ProfilePort;
+import com.swiftly.application.profile.port.outbound.ProfileRepository;
 import com.swiftly.domain.Profile;
 import com.swiftly.persistence.entities.ProfileEntity;
 import com.swiftly.persistence.entities.UserEntity;
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class ProfilePersistenceAdapter implements ProfilePort {
+public class ProfilePersistenceImpl implements ProfileRepository {
     private final JpaProfileRepository repository;
 
-    public ProfilePersistenceAdapter(JpaProfileRepository repository)
+    public ProfilePersistenceImpl(JpaProfileRepository repository)
     {
         this.repository = repository;
     }

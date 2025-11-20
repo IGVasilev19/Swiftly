@@ -1,6 +1,6 @@
 package com.swiftly.application.auth;
 
-import com.swiftly.application.auth.port.inbound.JwtUseCase;
+import com.swiftly.application.auth.port.inbound.JwtService;
 import com.swiftly.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +18,7 @@ import java.util.Date;
 @Service
 @RequiredArgsConstructor
 
-public class JwtService implements JwtUseCase {
+public class JwtServiceImpl implements JwtService {
 
     @Value("${jwt.secret}")
     private String secret;

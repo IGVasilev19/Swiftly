@@ -1,9 +1,10 @@
 package com.swiftly.application.auth;
 
 import com.swiftly.application.auth.dto.RegisterCommand;
-import com.swiftly.application.auth.port.outbound.RegisterPort;
+import com.swiftly.application.auth.port.inbound.RegisterService;
+import com.swiftly.application.auth.port.outbound.RegisterRepository;
 import com.swiftly.application.helpers.PasswordHasher;
-import com.swiftly.application.user.port.inbound.UserUseCase;
+import com.swiftly.application.user.port.inbound.UserService;
 import com.swiftly.domain.Profile;
 import com.swiftly.domain.User;
 import com.swiftly.domain.enums.user.Role;
@@ -17,19 +18,18 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("unit")
-class RegisterServiceTest {
+public class RegisterServiceImplTest {
 
     @Mock
-    private RegisterPort registerPort;
+    private RegisterRepository registerRepository;
 
     @Mock
-    private UserUseCase userUseCase;
+    private UserService userService;
 
     @InjectMocks
-    private RegisterService registerService;
+    private RegisterServiceImpl registerServiceImpl;
 
     @Test
     void register_successfullyRegistersNewUser() {
@@ -51,7 +51,7 @@ class RegisterServiceTest {
         
         RegisterCommand command = new RegisterCommand(user, profile);
 
-        when(userUseCase.existsByEmail(user.getEmail())).thenReturn(false);
+        when(userService.existsByEmail(user.getEmail())).thenReturn(false);
 
         User savedUser = new User(
                 user.getEmail(),
@@ -69,11 +69,11 @@ class RegisterServiceTest {
         );
         savedUser.attachProfile(savedProfile);
 
-        when(registerPort.saveNewUserAndProfile(any(User.class), any(Profile.class)))
+        when(registerRepository.saveNewUserAndProfile(any(User.class), any(Profile.class)))
                 .thenReturn(savedUser);
 
         // Act
-        User result = registerService.register(command);
+        User result = registerServiceImpl.register(command);
 
         // Assert
         assertNotNull(result);
@@ -82,8 +82,8 @@ class RegisterServiceTest {
         assertNotNull(result.getProfile());
         assertEquals(profile.getFullName(), result.getProfile().getFullName());
 
-        verify(userUseCase).existsByEmail(user.getEmail());
-        verify(registerPort).saveNewUserAndProfile(any(User.class), any(Profile.class));
+        verify(userService).existsByEmail(user.getEmail());
+        verify(registerRepository).saveNewUserAndProfile(any(User.class), any(Profile.class));
     }
 
     @Test
@@ -106,15 +106,15 @@ class RegisterServiceTest {
         
         RegisterCommand command = new RegisterCommand(user, profile);
 
-        when(userUseCase.existsByEmail(user.getEmail())).thenReturn(true);
+        when(userService.existsByEmail(user.getEmail())).thenReturn(true);
 
         // Act + Assert
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> registerService.register(command));
+                () -> registerServiceImpl.register(command));
 
         assertEquals("User already exists", ex.getMessage());
 
-        verify(userUseCase).existsByEmail(user.getEmail());
-        verify(registerPort, never()).saveNewUserAndProfile(any(), any());
+        verify(userService).existsByEmail(user.getEmail());
+        verify(registerRepository, never()).saveNewUserAndProfile(any(), any());
     }
 }
