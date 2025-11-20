@@ -1,16 +1,27 @@
-# Build stage
+# ---------- Build Stage ----------
 FROM node:20 AS build
 WORKDIR /app
 
+# Copy package metadata first for caching
 COPY package*.json ./
-RUN npm install
 
+# Install dependencies using faster, reproducible method
+# - npm ci: clean, deterministic, MUCH faster than npm install
+# - --no-audit: skips slow audit
+# - --omit=optional: ignores optional deps that slow Windows runners
+# - --quiet: reduces log overhead in CI
+RUN npm ci --no-audit --omit=optional --quiet
+
+# Copy rest of the source
 COPY . .
+
+# Build the production bundle
 RUN npm run build
 
-# Serve with nginx
+# ---------- Serve Stage ----------
 FROM nginx:stable
-WORKDIR /usr/share/nginx/html
-COPY --from=build /app/build .  # or /app/build depending on your setup
+
+# Copy built frontend into Nginx static root
+COPY --from=build /app/build /usr/share/nginx/html
 
 EXPOSE 80
