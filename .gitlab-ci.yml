@@ -14,7 +14,6 @@ tests:
   script:
     - "$ErrorActionPreference = 'Stop'"
 
-    # Prepare Gradle
     - "Set-Location $env:CI_PROJECT_DIR"
     - "$distDir = Join-Path $env:GRADLE_HOME_DIR 'dist'"
     - '$gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)'
@@ -29,7 +28,6 @@ tests:
       Remove-Item $zipPath -Force;
       }'
 
-    # Run unit tests with H2
     - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
     - '& "$gradleExe" test --no-daemon "-Dspring.profiles.active=unit" -x integrationTest'
 
@@ -41,23 +39,16 @@ tests:
     paths:
       - "backend/**/build/test-results/test/*.xml"
 
-# ----------------------------------------
-# BUILD DOCKER IMAGES
-# ----------------------------------------
 build_images:
   stage: build
   script:
-    # Login to Docker Hub
     - docker login -u $env:DOCKERHUB_USERNAME -p $env:DOCKERHUB_PASSWORD
 
-    # --------------------- BACKEND ---------------------
     - pushd backend
     - cmd /C "docker build -t %DOCKERHUB_USERNAME%/swiftly-backend:%CI_COMMIT_SHA% ."
     - popd
 
-    # --------------------- FRONTEND --------------------
     - pushd frontend
-    # IMPORTANT: run docker via CMD to avoid PowerShell arg injection
     - cmd /C "docker build -t %DOCKERHUB_USERNAME%/swiftly-frontend:%CI_COMMIT_SHA% ."
     - popd
 
@@ -66,23 +57,17 @@ build_images:
   only:
     - main
 
-# ----------------------------------------
-# PUSH IMAGES TO DOCKER HUB
-# ----------------------------------------
 push_images:
   stage: push
   script:
     - docker login -u $env:DOCKERHUB_USERNAME -p $env:DOCKERHUB_PASSWORD
 
-    # Push SHA-tag images
     - docker push "$env:DOCKERHUB_USERNAME/swiftly-backend:$env:CI_COMMIT_SHA"
     - docker push "$env:DOCKERHUB_USERNAME/swiftly-frontend:$env:CI_COMMIT_SHA"
 
-    # Tag as :latest
     - docker tag "$env:DOCKERHUB_USERNAME/swiftly-backend:$env:CI_COMMIT_SHA" "$env:DOCKERHUB_USERNAME/swiftly-backend:latest"
     - docker tag "$env:DOCKERHUB_USERNAME/swiftly-frontend:$env:CI_COMMIT_SHA" "$env:DOCKERHUB_USERNAME/swiftly-frontend:latest"
 
-    # Push latest
     - docker push "$env:DOCKERHUB_USERNAME/swiftly-backend:latest"
     - docker push "$env:DOCKERHUB_USERNAME/swiftly-frontend:latest"
   needs:
