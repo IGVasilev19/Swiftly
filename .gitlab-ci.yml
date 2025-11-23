@@ -2,21 +2,17 @@ stages:
   - test
   - build
   - push
-
+#---
 variables:
   GRADLE_HOME_DIR: "D:/gcache/${CI_PROJECT_ID}/${CI_CONCURRENT_ID}"
   GRADLE_USER_HOME: "$GRADLE_HOME_DIR"
   GRADLE_VERSION: "8.10.2"
   GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
-
 tests:
   stage: test
   script:
     - "$ErrorActionPreference = 'Stop'"
 
-    # -------------------------
-    # Prepare Gradle
-    # -------------------------
     - "Set-Location $env:CI_PROJECT_DIR"
     - "$distDir = Join-Path $env:GRADLE_HOME_DIR 'dist'"
     - '$gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)'
@@ -31,10 +27,6 @@ tests:
       Remove-Item $zipPath -Force;
       }'
 
-    # -------------------------
-    # Run ONLY UNIT tests (H2)
-    # Integration tests are disabled because Testcontainers cannot run on shell executor
-    # -------------------------
     - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
     - '& "$gradleExe" test --no-daemon "-Dspring.profiles.active=unit" -x integrationTest'
 
@@ -46,22 +38,18 @@ tests:
     paths:
       - "backend/**/build/test-results/test/*.xml"
 
-# ----------------------------------------
-# 2. DOCKER BUILD (only if tests passed)
-# ----------------------------------------
 build_images:
   stage: build
   script:
-    # Login to Docker Hub
     - docker login -u $env:DOCKERHUB_USERNAME -p $env:DOCKERHUB_PASSWORD
 
-    # Build backend image
-    - cd backend
-    - docker build -t "$env:DOCKERHUB_USERNAME/swiftly-backend:$env:CI_COMMIT_SHA" .
+    - pushd backend
+    - cmd /C "docker build -t %DOCKERHUB_USERNAME%/swiftly-backend:%CI_COMMIT_SHA% ."
+    - popd
 
-    # Build frontend image
-    - cd ../frontend
-    - docker build -t "$env:DOCKERHUB_USERNAME/swiftly-frontend:$env:CI_COMMIT_SHA" .
+    - pushd frontend
+    - cmd /C "docker build -t %DOCKERHUB_USERNAME%/swiftly-frontend:%CI_COMMIT_SHA% ."
+    - popd
 
   needs:
     - tests
@@ -71,18 +59,14 @@ build_images:
 push_images:
   stage: push
   script:
-    # Login to Docker Hub
     - docker login -u $env:DOCKERHUB_USERNAME -p $env:DOCKERHUB_PASSWORD
 
-    # Push SHA-tag versions
     - docker push "$env:DOCKERHUB_USERNAME/swiftly-backend:$env:CI_COMMIT_SHA"
     - docker push "$env:DOCKERHUB_USERNAME/swiftly-frontend:$env:CI_COMMIT_SHA"
 
-    # Tag "latest"
     - docker tag "$env:DOCKERHUB_USERNAME/swiftly-backend:$env:CI_COMMIT_SHA" "$env:DOCKERHUB_USERNAME/swiftly-backend:latest"
     - docker tag "$env:DOCKERHUB_USERNAME/swiftly-frontend:$env:CI_COMMIT_SHA" "$env:DOCKERHUB_USERNAME/swiftly-frontend:latest"
 
-    # Push "latest"
     - docker push "$env:DOCKERHUB_USERNAME/swiftly-backend:latest"
     - docker push "$env:DOCKERHUB_USERNAME/swiftly-frontend:latest"
   needs:
