@@ -16,12 +16,9 @@ const Register = () => {
       name: "",
       email: "",
       password: "",
+      confirmPassword: "",
       phoneNumber: "",
-      address: "",
-      country: "",
-      city: "",
-      postalCode: "",
-      role: "",
+      roles: [],
     },
   });
 

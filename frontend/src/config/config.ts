@@ -9,10 +9,6 @@ export const config = {
       "password",
       "emailVerified",
       "phoneNumber",
-      "address",
-      "country",
-      "city",
-      "postalCode",
       "role",
     ],
     passwordRules: {

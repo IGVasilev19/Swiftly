@@ -27,35 +27,14 @@ export const passwordSchema = z
     message: "Password must contain a symbol",
   });
 
+export const confirmPasswordSchema = z.string().min(1, "Required");
+
 export const nameSchema = z
   .string()
   .min(1, "Name is required")
   .max(100, "Name must be at most 100 characters long");
 
-export const countrySchema = z.string().min(1, "Country is required");
-
-export const citySchema = z
-  .string()
-  .nonempty("City is required")
-  .min(2, { message: "City name must be at least 2 characters long" })
-  .max(50, { message: "City name must be at most 50 characters long" })
-  .regex(/^[A-Za-zÀ-ÿ\u00f1\u00d1\s\-]+$/, {
-    message: "City name can only contain letters, spaces, and hyphens",
-  })
-  .trim();
-
-export const postalCodeSchema = z
-  .string()
-  .nonempty("Postal code is required")
-  .min(3, { message: "Postal code must be at least 3 characters long" })
-  .max(12, { message: "Postal code must be at most 12 characters long" })
-  .regex(/^[A-Za-z0-9\- ]{3,10}$/, {
-    message:
-      "Postal code can only contain letters, numbers, spaces, and hyphens",
-  })
-  .trim();
-
-export const roleSchema = z.string().min(1, "Role is required");
+export const roleSchema = z.enum(["OWNER", "RENTER"]);
 
 export const phoneNumberSchema = z
   .string()
@@ -64,16 +43,6 @@ export const phoneNumberSchema = z
     /^\+[1-9]\d{6,14}$/,
     "Phone must be in international E.164 format (e.g. +31612345678)"
   );
-
-export const addressSchema = z
-  .string()
-  .nonempty({ message: "Address is required" })
-  .min(5, { message: "Address must be at least 5 characters long" })
-  .max(100, { message: "Address must be at most 100 characters long" })
-  .regex(/^[A-Za-z0-9À-ÿ\u00f1\u00d1\s.,'\-#/\\()]+$/, {
-    message: "Address contains invalid characters",
-  })
-  .trim();
 
 export const userUpdateSchema = z
   .object({
