@@ -3,6 +3,7 @@ package com.boot.web;
 import com.boot.testsupport.Containers;
 import com.jayway.jsonpath.JsonPath;
 import com.swiftly.boot.BootApplication;
+import com.swiftly.domain.enums.user.Role;
 import com.swiftly.web.auth.dto.LogInRequest;
 import com.swiftly.web.auth.dto.RegisterRequest;
 import org.junit.jupiter.api.*;
@@ -15,6 +16,7 @@ import wiremock.com.google.common.net.HttpHeaders;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.swiftly.domain.enums.user.Role.OWNER;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -46,7 +48,8 @@ class AuthControllerIT extends Containers {
     @Test
     @Order(1)
     void register_ShouldPersistAndReturnCreated() {
-        RegisterRequest payload = new RegisterRequest("mock123@gmail.com", "@MockPassword123", "Mocking Testing Name", "+123456789012", OWNER, "MockAddress 356", "Eindhoven", "Netherlands", "3561 CK");
+        List<Role> roles = List.of(Role.OWNER);
+        RegisterRequest payload = new RegisterRequest("mock123@gmail.com", "@MockPassword123", "Mocking Testing Name", "+123456789012", roles);
 
         webTestClient.post()
                 .uri(URI.create("http://localhost:" + port + "/api/v1/auth/register"))
