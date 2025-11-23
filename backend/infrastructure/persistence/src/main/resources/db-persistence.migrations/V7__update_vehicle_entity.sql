@@ -1,0 +1,17 @@
+ALTER TABLE IF EXISTS vehicles
+     DROP COLUMN IF EXISTS renter_id;
+
+ALTER TABLE IF EXISTS vehicles
+    ALTER COLUMN owner_id SET NOT NULL;
+
+ALTER TABLE IF EXISTS vehicles
+    ADD CONSTRAINT fk_vehicle_owner
+        FOREIGN KEY (owner_id) REFERENCES users(id)
+            ON DELETE CASCADE;
+
+AlTER TABLE IF EXISTS vehicles
+    ADD COLUMN country VARCHAR(100) NOT NULL,
+    ADD COLUMN city VARCHAR(100) NOT NULL,
+    ADD COLUMN latitude DOUBLE PRECISION,
+    ADD COLUMN longitude DOUBLE PRECISION,
+    ADD COLUMN location_timestamp TIMESTAMP;

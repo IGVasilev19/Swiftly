@@ -21,7 +21,8 @@ public class ListingEntity extends Listing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_id", nullable = false, unique = true)
     private VehicleEntity vehicle;
 
     @Column(nullable = false, length = 100)
@@ -37,15 +38,6 @@ public class ListingEntity extends Listing {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal basePricePerDay;
 
-    @Column(nullable = false, length = 255)
-    private String pickUpAddress;
-
-    @Column(nullable = false)
-    private Double longitude;
-
-    @Column(nullable = false)
-    private Double latitude;
-
     @Column(nullable = false)
     @ColumnDefault("false")
     private Boolean instantBook = false;
@@ -56,8 +48,6 @@ public class ListingEntity extends Listing {
     @Column
     private Instant endAvailability;
 
-    @Column(length = 64)
-    private String timeZone;
 
     @PrePersist
     void onCreate() {

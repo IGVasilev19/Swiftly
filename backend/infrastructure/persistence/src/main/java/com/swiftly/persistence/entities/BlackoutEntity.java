@@ -25,8 +25,8 @@ public class BlackoutEntity extends Blackout {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "vehicle_id", nullable = false)
-    private VehicleEntity vehicle;
+    @JoinColumn(name = "listing_id", nullable = false)
+    private ListingEntity listing;
 
     @Column(name = "start_at", nullable = false)
     private Instant startAt;

@@ -1,0 +1,7 @@
+ALTER TABLE IF EXISTS profiles
+     DROP COLUMN IF EXISTS country,
+     DROP COLUMN IF EXISTS city,
+     DROP COLUMN IF EXISTS postal_code,
+     DROP COLUMN IF EXISTS locale,
+     DROP COLUMN IF EXISTS timezone,
+     DROP COLUMN IF EXISTS address;

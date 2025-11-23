@@ -17,4 +17,5 @@ public class Blackout {
 
     private Instant creationDate;
 
+    private Listing listing;
 }

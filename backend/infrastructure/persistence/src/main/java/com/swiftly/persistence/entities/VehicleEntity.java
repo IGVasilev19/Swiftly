@@ -6,6 +6,7 @@ import com.swiftly.domain.enums.vehicle.VehicleType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.List;
 
 
@@ -21,11 +22,9 @@ public class VehicleEntity extends Vehicle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private Integer ownerId;
-
-    @Column
-    private Integer renterId;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private UserEntity owner;
 
     @Column(nullable = false,  length = 17, unique = true)
     private String VIN;
@@ -51,7 +50,28 @@ public class VehicleEntity extends Vehicle {
     @Column(nullable = false)
     private Double fuelConsumption;
 
-    @Column(nullable = false)
+    @ElementCollection(targetClass = Feature.class, fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "vehicle_features",
+            joinColumns = @JoinColumn(name = "vehicle_id")
+    )
+    @Enumerated(EnumType.STRING)
+    @Column(name = "feature", nullable = false)
     private List<Feature> features;
+
+    @Column(nullable = false)
+    private String country;
+
+    @Column(nullable = false)
+    private String city;
+
+    @Column(length = 100)
+    private Double latitude;
+
+    @Column(length = 100)
+    private Double longitude;
+
+    @Column(length = 100)
+    private Instant locationTimeStamp;
 
 }

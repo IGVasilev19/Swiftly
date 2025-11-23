@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "build": "vite build",
     "preview": "vite preview",
+    "lint": "eslint .",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "analyze": "vite build --config visualize.config.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -63,6 +64,7 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.34.1",
     "vite": "^7.0.0",
+    "vite-bundle-visualizer": "^1.2.1",
     "vite-plugin-imagemin": "^0.6.1"
   }
 }

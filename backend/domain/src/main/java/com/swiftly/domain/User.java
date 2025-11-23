@@ -16,7 +16,7 @@ public class User implements UserDetails {
 
     private String passwordHash;
 
-    private Role role;
+    private List<Role> roles;
 
     private Profile profile;
 
@@ -29,19 +29,19 @@ public class User implements UserDetails {
         if (p != null) p.setUser(this);
     }
 
-    public User(Integer id, String email, String passwordHash, Role role)
+    public User(Integer id, String email, String passwordHash, List<Role> roles)
     {
         this.id = id;
         this.email = email;
         this.passwordHash = passwordHash;
-        this.role = role;
+        this.roles = roles;
     }
 
-    public User(String email, String passwordHash, Role role)
+    public User(String email, String passwordHash, List<Role> roles)
     {
         this.email = email;
         this.passwordHash = passwordHash;
-        this.role = role;
+        this.roles = roles;
     }
 
     public User(Integer id,String email, String passwordHash)

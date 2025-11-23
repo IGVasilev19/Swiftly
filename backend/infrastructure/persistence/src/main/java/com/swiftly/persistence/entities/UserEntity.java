@@ -5,6 +5,8 @@ import com.swiftly.domain.enums.user.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "users", schema = "public")
 @Getter
@@ -22,18 +24,23 @@ public class UserEntity extends User {
     @Column(nullable = false, length = 255)
     private String passwordHash;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    private List<Role> roles;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
     private ProfileEntity profile;
 
 
-    public UserEntity(String email, String passwordHash, Role role)
+    public UserEntity(String email, String passwordHash, List<Role> roles)
     {
         this.email = email;
         this.passwordHash = passwordHash;
-        this.role = role;
+        this.roles = roles;
     }
 }

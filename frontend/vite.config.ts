@@ -5,7 +5,9 @@ import viteImagemin from "vite-plugin-imagemin";
 import viteCompression from "vite-plugin-compression";
 
 import { defineConfig } from "vite";
-import { visualizer } from "rollup-plugin-visualizer";
+import viteImagemin from "vite-plugin-imagemin";
+
+const isDocker = process.env.BUILD_ENV === "docker";
 
 export default defineConfig({
   plugins: [
@@ -17,21 +19,24 @@ export default defineConfig({
       threshold: 1024,
       deleteOriginFile: false,
     }),
-    visualizer({ open: true }),
-    viteImagemin({
-      webp: {
-        quality: 80,
-      },
-    }),
+
+    // Optional imagemin plugin for local builds only
+    !isDocker &&
+      viteImagemin({
+        webp: { quality: 80 },
+      }),
   ],
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+
   build: {
     sourcemap: true,
   },
+
   optimizeDeps: {
     include: [
       "react",
@@ -42,6 +47,7 @@ export default defineConfig({
       "zod",
     ],
   },
+
   server: {
     proxy: {
       "/api": {

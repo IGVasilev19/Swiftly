@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = "com.swiftly.persistence")
 @EntityScan(basePackages = "com.swiftly.persistence.entities")
 @EnableConfigurationProperties(CorsProperties.class)
-
 public class BootApplication {
     public static void main(String[] args) {
         SpringApplication.run(BootApplication.class, args);

@@ -23,4 +23,8 @@ public class Booking {
 
     private BigDecimal totalPrice;
 
+    private Listing listing;
+
+    private User renter;
+
 }

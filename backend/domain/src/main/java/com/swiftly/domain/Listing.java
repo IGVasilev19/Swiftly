@@ -14,6 +14,8 @@ public class Listing {
 
     private Integer id;
 
+    private Vehicle vehicle;
+
     private String title;
 
     private String description;
@@ -22,18 +24,9 @@ public class Listing {
 
     private BigDecimal basePricePerDay;
 
-    private String pickUpAddress;
-
-    private Double longitude;
-
-    private Double latitude;
-
     private Boolean instantBook = false;
 
     private Instant startAvailability;
 
     private Instant endAvailability;
-
-    private String timeZone;
-
 }

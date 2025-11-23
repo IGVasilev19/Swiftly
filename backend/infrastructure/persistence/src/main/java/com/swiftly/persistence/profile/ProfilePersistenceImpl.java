@@ -28,7 +28,7 @@ public class ProfilePersistenceImpl implements ProfileRepository {
     {
         UserEntity userEntity = (UserEntity) profile.getUser();
         
-        ProfileEntity profileEntity = new ProfileEntity(userEntity, profile.getFullName(), profile.getPhone(), profile.getAddress(), profile.getCity(), profile.getCountry(), profile.getPostalCode());
+        ProfileEntity profileEntity = new ProfileEntity(userEntity, profile.getFullName(), profile.getPhone(), null);
 
         return repository.save(profileEntity);
     }

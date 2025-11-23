@@ -26,29 +26,13 @@ public class ProfileEntity extends Profile {
     @Column(nullable = false, length = 17)
     private String phone;
 
-    @Column(nullable = false, length = 100)
-    private String address;
-
-    @Column(nullable = false, length = 100)
-    private String City;
-
-    @Column(nullable = false, length = 100)
-    private String Country;
-
-    @Column(nullable = false, length = 100)
-    private String postalCode;
-
+    @Column
     private String avatarUrl;
-    private String locale;
-    private String timezone;
 
-    public ProfileEntity(UserEntity userEntity, String fullName, String phone, String address, String city, String country, String postalCode) {
+    public ProfileEntity(UserEntity userEntity, String fullName, String phone, String avatarUrl) {
         this.user = userEntity;
         this.fullName = fullName;
         this.phone = phone;
-        this.address = address;
-        this.City = city;
-        this.Country = country;
-        this.postalCode = postalCode;
+        this.avatarUrl = avatarUrl;
     }
 }

@@ -6,6 +6,7 @@ import com.swiftly.domain.enums.vehicle.VehicleType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.List;
 
 
@@ -18,9 +19,7 @@ public class Vehicle {
 
     private Integer id;
 
-    private Integer ownerId;
-
-    private Integer renterId;
+    private User owner;
 
     private String VIN;
 
@@ -39,4 +38,14 @@ public class Vehicle {
     private Double fuelConsumption;
 
     private List<Feature> features;
+
+    private String country;
+
+    private String city;
+
+    private Double latitude;
+
+    private Double longitude;
+
+    private Instant locationTimeStamp;
 }

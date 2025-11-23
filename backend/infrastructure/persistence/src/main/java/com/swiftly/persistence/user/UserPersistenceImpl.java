@@ -32,7 +32,7 @@ public class UserPersistenceImpl implements UserRepository {
 
     public User save(User user)
     {
-        UserEntity userEntity = new UserEntity(user.getEmail(), user.getPasswordHash(), user.getRole());
+        UserEntity userEntity = new UserEntity(user.getEmail(), user.getPasswordHash(), user.getRoles());
 
         return repository.save(userEntity);
     }
