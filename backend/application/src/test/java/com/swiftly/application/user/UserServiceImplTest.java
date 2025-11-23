@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,8 +33,10 @@ class UserServiceImplTest {
     @Test
     void getByEmail_returnsUser() {
         // Arrange
+        List<Role> roles = List.of(Role.RENTER);
+
         String email = "test@example.com";
-        User user = new User( email, "hashedPassword", Role.RENTER);
+        User user = new User( email, "hashedPassword", roles);
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 

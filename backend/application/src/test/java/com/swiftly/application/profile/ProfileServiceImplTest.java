@@ -39,11 +39,7 @@ class ProfileServiceImplTest {
 
         Profile mockProfile = new Profile(
                 "Ada Lovelace",
-                "+31612345678",
-                "123 Babbage Street",
-                "London",
-                "UK",
-                "EC1A 1BB"
+                "+31612345678"
         );
 
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(mockProfile));

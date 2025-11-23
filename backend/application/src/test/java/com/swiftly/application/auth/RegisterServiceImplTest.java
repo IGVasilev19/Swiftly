@@ -1,7 +1,6 @@
 package com.swiftly.application.auth;
 
 import com.swiftly.application.auth.dto.RegisterCommand;
-import com.swiftly.application.auth.port.inbound.RegisterService;
 import com.swiftly.application.auth.port.outbound.RegisterRepository;
 import com.swiftly.application.helpers.PasswordHasher;
 import com.swiftly.application.user.port.inbound.UserService;
@@ -14,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
-
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -34,19 +33,17 @@ public class RegisterServiceImplTest {
     @Test
     void register_successfullyRegistersNewUser() {
         // Arrange
+        List<Role> roles = List.of(Role.OWNER);
+
         User user = new User(
                 "newuser@example.com",
                 "StrongPassword123!",
-                Role.OWNER
+                roles
         );
         
         Profile profile = new Profile(
                 "Ada Lovelace",
-                "+31612345678",
-                "123 Babbage Street",
-                "London",
-                "UK",
-                "EC1A 1BB"
+                "+31612345678"
         );
         
         RegisterCommand command = new RegisterCommand(user, profile);
@@ -56,16 +53,12 @@ public class RegisterServiceImplTest {
         User savedUser = new User(
                 user.getEmail(),
                 PasswordHasher.hashPassword(user.getPasswordHash()),
-                user.getRole()
+                user.getRoles()
         );
 
         Profile savedProfile = new Profile(
                 "Ada Lovelace",
-                "+31612345678",
-                "123 Babbage Street",
-                "London",
-                "UK",
-                "EC1A 1BB"
+                "+31612345678"
         );
         savedUser.attachProfile(savedProfile);
 
@@ -78,7 +71,7 @@ public class RegisterServiceImplTest {
         // Assert
         assertNotNull(result);
         assertEquals(user.getEmail(), result.getEmail());
-        assertEquals(user.getRole(), result.getRole());
+        assertEquals(user.getRoles(), result.getRoles());
         assertNotNull(result.getProfile());
         assertEquals(profile.getFullName(), result.getProfile().getFullName());
 
@@ -89,19 +82,17 @@ public class RegisterServiceImplTest {
     @Test
     void register_throwsWhenUserAlreadyExists() {
         // Arrange
+        List<Role> roles = List.of(Role.RENTER);
+
         User user = new User(
                 "existing@example.com",
                 "@password3123W",
-                Role.RENTER
+                roles
         );
         
         Profile profile = new Profile(
                 "Grace Hopper",
-                "+31698765432",
-                "Codebreaker Lane",
-                "Bletchley",
-                "UK",
-                "0213Usd"
+                "+31698765432"
         );
         
         RegisterCommand command = new RegisterCommand(user, profile);
