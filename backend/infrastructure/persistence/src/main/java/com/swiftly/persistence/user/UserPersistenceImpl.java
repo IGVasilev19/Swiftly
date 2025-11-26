@@ -3,20 +3,17 @@ package com.swiftly.persistence.user;
 import com.swiftly.application.user.port.outbound.UserRepository;
 import com.swiftly.domain.User;
 import com.swiftly.persistence.entities.UserEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 
 @Component
+@RequiredArgsConstructor
 public class UserPersistenceImpl implements UserRepository {
 
     private final JpaUserRepository repository;
-
-    public UserPersistenceImpl(JpaUserRepository repository)
-    {
-        this.repository = repository;
-    }
 
     public Boolean existsByEmail(String email)
     {
@@ -27,7 +24,7 @@ public class UserPersistenceImpl implements UserRepository {
     {
         Optional<UserEntity> userEntity = repository.findByEmail(email);
 
-        return Optional.of(new User(userEntity.get().getId(), userEntity.get().getEmail(), userEntity.get().getPasswordHash()));
+        return Optional.of(new User(userEntity.get().getId(), userEntity.get().getEmail(), userEntity.get().getPasswordHash(), userEntity.get().getRoles()));
     }
 
     public User save(User user)
@@ -41,6 +38,6 @@ public class UserPersistenceImpl implements UserRepository {
     {
         Optional<UserEntity> userEntity = repository.findById(id);
 
-        return new User(userEntity.get().getId(), userEntity.get().getEmail(), userEntity.get().getPasswordHash());
+        return new User(userEntity.get().getId(), userEntity.get().getEmail(), userEntity.get().getPasswordHash(), userEntity.get().getRoles());
     }
 }

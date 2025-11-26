@@ -31,7 +31,8 @@ export function useAuth() {
       const { accessToken } = res.data;
       sessionStorage.setItem("accessToken", accessToken);
       return true;
-    } catch {
+    } catch (err) {
+      console.error("Refresh failed:", err);
       sessionStorage.removeItem("accessToken");
       return false;
     }
@@ -39,8 +40,11 @@ export function useAuth() {
 
   const logout = async () => {
     const accessToken = sessionStorage.getItem("accessToken");
-
-    if (!accessToken) return;
+    if (!accessToken) {
+      sessionStorage.removeItem("accessToken");
+      navigate("/");
+      return;
+    }
 
     try {
       await api.post(
@@ -53,13 +57,13 @@ export function useAuth() {
           withCredentials: true,
         }
       );
-
-      sessionStorage.removeItem("accessToken");
-      toast.success("Logged out successfully");
-      navigate("/");
     } catch (err) {
       console.error("Logout failed:", err);
       toast.error("Failed to log out");
+    } finally {
+      sessionStorage.removeItem("accessToken");
+      toast.success("Logged out successfully");
+      navigate("/");
     }
   };
 
@@ -69,11 +73,12 @@ export function useAuth() {
 
       if (token && isTokenValid(token)) {
         setIsAuthenticated(true);
-      } else {
-        const refreshed = await refreshAccessToken();
-        setIsAuthenticated(refreshed);
+        setLoading(false);
+        return;
       }
 
+      const refreshed = await refreshAccessToken();
+      setIsAuthenticated(refreshed);
       setLoading(false);
     };
 

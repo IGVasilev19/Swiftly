@@ -1,14 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { useAuthContext } from "@/contexts/AuthContext";
+import ExpandableCardDemo from "@/components/expandable-card-demo-grid";
+import { Layout } from "@/components/ui/Layout";
 import React from "react";
 
 const Dashboard = () => {
-  const { logout } = useAuthContext();
   return (
-    <>
-      <h1>Dashboard</h1>
-      <Button onClick={logout}>Log out</Button>
-    </>
+    <Layout>
+      <ExpandableCardDemo />
+    </Layout>
   );
 };
 

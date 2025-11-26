@@ -1,4 +1,5 @@
 package com.swiftly.persistence.entities;
+import com.swiftly.domain.User;
 import com.swiftly.domain.Vehicle;
 import com.swiftly.domain.enums.vehicle.Feature;
 import com.swiftly.domain.enums.vehicle.FuelType;
@@ -9,11 +10,10 @@ import lombok.*;
 import java.time.Instant;
 import java.util.List;
 
-
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "vehicles")
 public class VehicleEntity extends Vehicle {
@@ -74,4 +74,13 @@ public class VehicleEntity extends Vehicle {
     @Column(length = 100)
     private Instant locationTimeStamp;
 
+    public VehicleEntity(User owner, String VIN, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
+    {
+        super(owner, VIN, make, model, color, year, type, fuelType, fuelConsumption, features, country, city);
+    }
+
+    public VehicleEntity(Integer id, User owner, String VIN, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
+    {
+        super(id, owner, VIN, make, model, color, year, type, fuelType, fuelConsumption, features, country, city);
+    }
 }

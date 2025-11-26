@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name="vehicles")
 public class VehicleController {
 
+    @PreAuthorize("hasRole('OWNER')")
     @PostMapping("/add")
     public ResponseEntity<?> addVehicle()
     {
