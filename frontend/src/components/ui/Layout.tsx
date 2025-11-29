@@ -12,7 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
-import ExpandableCardDemo from "../expandable-card-demo-grid";
 
 interface LayoutProps {
   children: ReactNode;

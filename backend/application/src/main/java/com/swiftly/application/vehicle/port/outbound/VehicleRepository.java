@@ -9,8 +9,6 @@ public interface VehicleRepository {
     Vehicle save(Vehicle vehicle);
     List<Vehicle> findAll();
     List<Vehicle> findAllByOwnerId(Integer ownerId);
-    List<Vehicle> findAllByRenterId(Integer renterId);
     void deleteById(Integer id);
     Vehicle findByVin(String vin);
-    void update(Vehicle vehicle);
 }

@@ -27,7 +27,7 @@ public class VehicleEntity extends Vehicle {
     private UserEntity owner;
 
     @Column(nullable = false,  length = 17, unique = true)
-    private String VIN;
+    private String vin;
 
     @Column(nullable = false, length = 100)
     private String make;
@@ -73,6 +73,11 @@ public class VehicleEntity extends Vehicle {
 
     @Column(length = 100)
     private Instant locationTimeStamp;
+
+    public VehicleEntity(Integer id)
+    {
+        this.id = id;
+    }
 
     public VehicleEntity(User owner, String VIN, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
     {

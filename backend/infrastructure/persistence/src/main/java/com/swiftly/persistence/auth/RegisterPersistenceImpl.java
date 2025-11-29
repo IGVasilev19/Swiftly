@@ -6,18 +6,15 @@ import com.swiftly.application.user.port.outbound.UserRepository;
 import com.swiftly.domain.Profile;
 import com.swiftly.domain.User;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-@Component
+@RequiredArgsConstructor
+@Repository
 public class RegisterPersistenceImpl implements RegisterRepository {
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
-
-    public RegisterPersistenceImpl(UserRepository userRepository, ProfileRepository profileRepository)
-    {
-        this.userRepository = userRepository;
-        this.profileRepository = profileRepository;
-    }
 
     @Transactional
     public User saveNewUserAndProfile(User user, Profile profile)

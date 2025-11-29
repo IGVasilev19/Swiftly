@@ -7,11 +7,12 @@ import com.swiftly.persistence.entities.UserEntity;
 import com.swiftly.persistence.user.JpaUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Component
 @RequiredArgsConstructor
+@Repository
 public class RefreshTokenPersistenceImpl implements RefreshTokenRepository {
     private final JpaRefreshTokenRepository jpaRefreshTokenRepository;
     private final JpaUserRepository  userRepository;

@@ -5,12 +5,13 @@ import com.swiftly.domain.User;
 import com.swiftly.persistence.entities.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 
-@Component
 @RequiredArgsConstructor
+@Repository
 public class UserPersistenceImpl implements UserRepository {
 
     private final JpaUserRepository repository;
@@ -27,7 +28,7 @@ public class UserPersistenceImpl implements UserRepository {
         return Optional.of(new User(userEntity.get().getId(), userEntity.get().getEmail(), userEntity.get().getPasswordHash(), userEntity.get().getRoles()));
     }
 
-    public User save(User user)
+    public UserEntity save(User user)
     {
         UserEntity userEntity = new UserEntity(user.getEmail(), user.getPasswordHash(), user.getRoles());
 

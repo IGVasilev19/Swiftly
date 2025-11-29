@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface JpaVehicleRepository extends JpaRepository<VehicleEntity, Integer> {
     List<VehicleEntity> findAllByOwnerId(Integer ownerId);
-    List<VehicleEntity> findAllByRenterId(Integer renterId);
     void deleteById(Integer id);
-    void update(Vehicle vehicle);
     VehicleEntity findByVin(String vin);
 }

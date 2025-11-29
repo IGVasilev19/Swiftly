@@ -7,7 +7,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @NoArgsConstructor @AllArgsConstructor @Getter @Setter
@@ -29,6 +28,11 @@ public class User implements UserDetails {
     public void attachProfile(Profile p) {
         this.profile = p;
         if (p != null) p.setUser(this);
+    }
+
+    public User(Integer id)
+    {
+        this.id = id;
     }
 
     public User(Integer id, String email, String passwordHash, List<Role> roles)

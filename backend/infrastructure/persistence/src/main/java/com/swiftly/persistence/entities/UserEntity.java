@@ -37,6 +37,11 @@ public class UserEntity extends User {
     private ProfileEntity profile;
 
 
+    public UserEntity(Integer id)
+    {
+        this.id = id;
+    }
+
     public UserEntity(String email, String passwordHash, List<Role> roles)
     {
         this.email = email;

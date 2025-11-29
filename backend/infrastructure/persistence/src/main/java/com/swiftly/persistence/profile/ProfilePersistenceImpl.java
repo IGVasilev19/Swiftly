@@ -4,18 +4,17 @@ import com.swiftly.application.profile.port.outbound.ProfileRepository;
 import com.swiftly.domain.Profile;
 import com.swiftly.persistence.entities.ProfileEntity;
 import com.swiftly.persistence.entities.UserEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Component
+@RequiredArgsConstructor
+@Repository
 public class ProfilePersistenceImpl implements ProfileRepository {
     private final JpaProfileRepository repository;
 
-    public ProfilePersistenceImpl(JpaProfileRepository repository)
-    {
-        this.repository = repository;
-    }
 
     public Optional<Profile> findById(Integer id)
     {
