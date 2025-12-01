@@ -65,6 +65,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (roles == null) return List.of();
         return roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).toList();
     }
 

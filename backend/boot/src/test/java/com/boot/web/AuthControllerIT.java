@@ -14,11 +14,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import wiremock.com.google.common.net.HttpHeaders;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.swiftly.domain.enums.user.Role.OWNER;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(classes = BootApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -31,6 +29,8 @@ class AuthControllerIT extends Containers {
     int port;
 
     @Autowired
+    WebTestClient webTestClientBase;
+
     WebTestClient webTestClient;
 
     private static String refreshToken;
@@ -45,6 +45,14 @@ class AuthControllerIT extends Containers {
                 .orElseThrow();
     }
 
+    @BeforeEach
+    void setupClient() {
+        this.webTestClient = WebTestClient
+                .bindToServer()
+                .baseUrl("http://localhost:" + port)
+                .build();
+    }
+
     @Test
     @Order(1)
     void register_ShouldPersistAndReturnCreated() {
@@ -52,7 +60,7 @@ class AuthControllerIT extends Containers {
         RegisterRequest payload = new RegisterRequest("mock123@gmail.com", "@MockPassword123", "Mocking Testing Name", "+123456789012", roles);
 
         webTestClient.post()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/auth/register"))
+                .uri("/api/v1/auth/register")
                 .bodyValue(payload)
                 .exchange()
                 .expectStatus().isCreated()
@@ -67,17 +75,17 @@ class AuthControllerIT extends Containers {
         LogInRequest payload = new LogInRequest("mock123@gmail.com", "@MockPassword123");
 
         webTestClient.post()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/auth/login"))
+                .uri("/api/v1/auth/login")
                 .bodyValue(payload)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().exists(HttpHeaders.SET_COOKIE)
                 .expectBody(String.class)
                 .consumeWith(result -> {
-                    String setCookie = result.getResponseHeaders()
-                            .getFirst(HttpHeaders.SET_COOKIE);
-
+                    String setCookie = result.getResponseHeaders().getFirst(HttpHeaders.SET_COOKIE);
                     refreshToken = extractCookie(setCookie, "refresh_token");
+                    String tokenBody = result.getResponseBody();
+                    accessToken = tokenBody;
                 })
                 .value(token -> assertThat(token).isNotBlank());
     }
@@ -109,5 +117,4 @@ class AuthControllerIT extends Containers {
                 .expectHeader().exists(HttpHeaders.SET_COOKIE)
                 .expectBody().isEmpty();
     }
-
 }

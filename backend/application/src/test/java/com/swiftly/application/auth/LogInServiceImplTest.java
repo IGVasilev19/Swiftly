@@ -87,6 +87,8 @@ public class LogInServiceImplTest {
     @Test
     public void refreshToken_validToken_returnsUpdatedAccessToken() {
         when(refreshTokenService.getByToken("rt-123")).thenReturn(refreshToken);
+        when(refreshTokenService.verifyExpiration(refreshToken)).thenReturn(refreshToken);
+        when(userService.getByEmail("test@mail.com")).thenReturn(storedUser);
         when(jwtService.generateAccessToken(storedUser)).thenReturn("new-access-555");
 
         User result = logInService.refreshToken("rt-123");
@@ -104,7 +106,18 @@ public class LogInServiceImplTest {
         User result = logInService.refreshToken("missing");
 
         assertNull(result);
+        assertNull(result);
         verify(refreshTokenService, never()).verifyExpiration(any());
+    }
+
+    @Test
+    public void refreshToken_expiredToken_returnsNull() {
+        when(refreshTokenService.getByToken("expired")).thenReturn(refreshToken);
+        when(refreshTokenService.verifyExpiration(refreshToken)).thenReturn(null);
+
+        User result = logInService.refreshToken("expired");
+
+        assertNull(result);
     }
 
     @Test

@@ -5,6 +5,7 @@ import com.swiftly.application.auth.port.outbound.RefreshTokenRepository;
 import com.swiftly.application.user.port.inbound.UserService;
 import com.swiftly.domain.RefreshToken;
 import com.swiftly.domain.User;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         refreshTokenRepository.deleteById(userId);
     }
 
+    @Transactional
     public RefreshToken getByToken(String token)
     {
         return refreshTokenRepository.findByToken(token);

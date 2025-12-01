@@ -51,9 +51,15 @@ public class LogInServiceImpl implements LogInService {
             return null;
         }
 
-        refreshTokenService.verifyExpiration(refreshToken);
+        refreshToken = refreshTokenService.verifyExpiration(refreshToken);
+        
+        if (refreshToken == null) {
+            return null;
+        }
 
-        String accessToken = jwtService.generateAccessToken(refreshToken.getUser());
+        User fullUser = userService.getByEmail(refreshToken.getUser().getEmail());
+
+        String accessToken = jwtService.generateAccessToken(fullUser);
 
         User authUser = new User();
 
