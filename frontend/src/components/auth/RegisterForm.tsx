@@ -128,7 +128,7 @@ export function RegisterForm({
                         id="roles"
                         value={field.value?.[0] ?? ""}
                         onChange={(e) => field.onChange([e.target.value])}
-                        className="w-full h-10 rounded-md border-[#0f172a1a] bg-white text-sm text-[#0F172A] focus:outline-none appearance-none bg-no-repeat text-center"
+                        className="w-full h-10 rounded-md border border-[#0f172a1a] bg-white text-sm text-[#0F172A] focus:outline-none appearance-none bg-no-repeat text-center"
                       >
                         <option value="" disabled>
                           Select role

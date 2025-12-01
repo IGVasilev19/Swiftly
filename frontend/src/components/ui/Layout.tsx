@@ -1,5 +1,4 @@
-// Layout.tsx
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Button } from "./button";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
+import { SidebarItem } from "../sidebars/SidebarItem";
 
 interface LayoutProps {
   children: ReactNode;
@@ -20,6 +20,7 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const { logout } = useAuthContext();
   const navigate = useNavigate();
+
   return (
     <div className="h-screen w-screen flex">
       <div className="h-full w-[200px] flex flex-col items-center bg-[#F8FAFC]">
@@ -33,28 +34,23 @@ export function Layout({ children }: LayoutProps) {
             className="h-[50px] w-[150px] m-4 rounded-lg object-contain select-none"
           />
         </button>
-        <div className="h-full w-full flex flex-col justify-center items-center">
-          <Button
-            className="w-full h-[30px] rounded-none p-0 hover:bg-none hover:cursor-pointer"
-            variant="ghost"
-            onClick={() => navigate("/vehicles")}
-          >
-            <div className="w-full h-full flex gap-5">
-              <div className="h-full w-[5px] bg-[#00A0A0]" />
-              <div className="flex gap-2 items-center justify-center">
-                <img
-                  src="/images/car-side-nobg.webp"
-                  alt="vehicle"
-                  className="h-[25px] w-[25px] object-contain"
-                />
-                <p className="text-[#0F172A] text-md">Vehicles</p>
-              </div>
-            </div>
-          </Button>
+        <div className="h-full w-full flex flex-col items-center mt-20">
+          <SidebarItem
+            label="Dashboard"
+            path="/dashboard"
+            imgSrc="/images/dashboard-icon-nobg-gray.webp"
+            imgSrcActive="/images/dashboard-icon-nobg.webp"
+          />
+          <SidebarItem
+            label="Vehicles"
+            path="/vehicles"
+            imgSrc="/images/car-side-nobg-gray.webp"
+            imgSrcActive="/images/car-side-nobg.webp"
+          />
         </div>
       </div>
       <div className="w-full h-full flex flex-col">
-        <div className="w-full h-[80px] flex bg-[#F8FAFC] justify-end items-center">
+        <div className="w-full h-[80px] flex border-b-2 border-[#F8FAFC] justify-end items-center">
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Avatar className="w-[50px] h-[50px] m-4 select-none">
