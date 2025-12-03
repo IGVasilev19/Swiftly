@@ -5,6 +5,7 @@ import { Register, Login } from "./routes/(auth)";
 import Dashboard from "./routes/(root)/Dashboard/Dashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Vehicles from "./routes/(root)/Vehicles/Vehicles";
+import { AddVehicle } from "./routes/(root)/Vehicles/AddVehicle";
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/vehicles" element={<Vehicles />} />
+          <Route path="/vehicles/add" element={<AddVehicle />} />
         </Route>
       </Routes>
     </Suspense>

@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS public.vehicles
+DROP COLUMN IF EXISTS features;

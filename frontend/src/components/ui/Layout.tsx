@@ -72,7 +72,7 @@ export function Layout({ children }: LayoutProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <main className="flex-1 p-6">{children}</main>
+        <main className="h-full w-full overflow-hidden flex flex-col min-h-0">{children}</main>
       </div>
     </div>
   );
