@@ -16,8 +16,34 @@ export const createEnumArraySchema = (values: string[], fieldName: string) =>
     .array(z.string())
     .refine((arr) => arr.every((val) => values.includes(val)), {
       message: `One or more ${fieldName.toLowerCase()} are invalid`,
-    })
-    .default([]);
+    });
+
+export const vehicleSchema = z.object({
+  vin: z
+    .string()
+    .min(1, "VIN is required")
+    .max(17, "VIN must be at most 17 characters"),
+  make: z.string().min(1, "Make is required"),
+  model: z.string().min(1, "Model is required"),
+  color: z.string().min(1, "Color is required"),
+  year: z
+    .number()
+    .int("Year must be an integer")
+    .min(1900, "Year must be at least 1900")
+    .max(new Date().getFullYear() + 1, "Year cannot be in the future"),
+  type: z.string().min(1, "Vehicle type is required"),
+  fuelType: z.string().min(1, "Fuel type is required"),
+  fuelConsumption: z
+    .number()
+    .positive("Fuel consumption must be positive")
+    .min(0.1, "Fuel consumption must be at least 0.1")
+    .optional(),
+  features: z.array(z.string()),
+  country: z.string().min(1, "Country is required"),
+  city: z.string().min(1, "City is required"),
+});
+
+export type VehicleSchemaType = z.infer<typeof vehicleSchema>;
 
 export const createVehicleSchema = (
   vehicleTypes: string[],
@@ -52,20 +78,6 @@ export const createVehicleSchema = (
     country: z.string().min(1, "Country is required"),
     city: z.string().min(1, "City is required"),
   });
-};
-
-export type VehicleSchemaType = {
-  vin: string;
-  make: string;
-  model: string;
-  color: string;
-  year: number;
-  type: string;
-  fuelType: string;
-  fuelConsumption?: number;
-  features: string[];
-  country: string;
-  city: string;
 };
 
 export type VehicleType = string;

@@ -2,14 +2,14 @@ import { Layout } from "@/components/ui/Layout";
 import { AddVehicleForm } from "@/components/vehicle/AddVehicleForm";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
-  createVehicleSchema,
+  vehicleSchema,
   type VehicleSchemaType,
 } from "@/schemas/vehicle/vehicle.schema";
 import { useVehicleEnums } from "@/hooks/useVehicleEnums";
 import { useAddVehicle } from "@/hooks/useAddVehicle";
 import { COUNTRIES } from "@/lib/countries";
-import { type SelectMenuOption } from "@/lib/types";
 import { useState, useEffect, useMemo } from "react";
 import Loading from "@/components/ui/Loading";
 
@@ -25,13 +25,6 @@ export function AddVehicle() {
   const { vehicleTypes, fuelTypes, features, isLoading, error } =
     useVehicleEnums();
   const { addVehicle, isPending } = useAddVehicle();
-
-  const vehicleSchema = useMemo(() => {
-    if (vehicleTypes.length === 0 || fuelTypes.length === 0) {
-      return createVehicleSchema([], [], []);
-    }
-    return createVehicleSchema(vehicleTypes, fuelTypes, features);
-  }, [vehicleTypes, fuelTypes, features]);
 
   const vehicleTypesOptions = useMemo(
     () =>
