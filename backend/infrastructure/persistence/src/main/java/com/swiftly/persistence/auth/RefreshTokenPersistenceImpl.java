@@ -22,17 +22,16 @@ public class RefreshTokenPersistenceImpl implements RefreshTokenRepository {
     {
         Optional<RefreshTokenEntity> tokenEntity = jpaRefreshTokenRepository.findByToken(refreshToken);
 
-        UserEntity userEntity = tokenEntity.get().getUser();
-        // Trigger loading if lazy, though we might need a join fetch in repository for better performance. 
-        // For now, accessing a property should trigger it if session is open, but to be safe and consistent with the plan:
-        // Actually, the plan said "Ensure UserEntity is initialized". 
-        // Since we are in a transaction (likely), accessing it might be enough, but let's see.
-        // The issue is that we are converting to Domain object which might detach.
-        // Let's just use the userEntity we got.
+        if (tokenEntity.isEmpty()) {
+            return null;
+        }
+
+        RefreshTokenEntity entity = tokenEntity.get();
+        UserEntity userEntity = entity.getUser();
         
-        return new RefreshToken(tokenEntity.get().getId(), tokenEntity.get().getToken(), tokenEntity.get().getExpiryDate(), 
+        return new RefreshToken(entity.getId(), entity.getToken(), entity.getExpiryDate(), 
                 new User(userEntity.getId(), userEntity.getEmail(), userEntity.getPasswordHash(), userEntity.getRoles()), 
-                tokenEntity.get().isRevoked());
+                entity.isRevoked());
     }
 
     public void deleteById(Integer userId)
@@ -59,10 +58,10 @@ public class RefreshTokenPersistenceImpl implements RefreshTokenRepository {
         jpaRefreshTokenRepository.delete(refreshTokenEntity);
     }
 
-    public RefreshToken findByUserId(Integer userId)
+    public Optional<RefreshToken> findByUserId(Integer userId)
     {
-        RefreshTokenEntity refreshTokenEntity = jpaRefreshTokenRepository.findByUserId(userId);
+        Optional<RefreshTokenEntity> refreshTokenEntity = jpaRefreshTokenRepository.findByUserId(userId);
 
-        return new RefreshToken(refreshTokenEntity.getId(), refreshTokenEntity.getToken(), refreshTokenEntity.getExpiryDate(), refreshTokenEntity.getUser(), refreshTokenEntity.isRevoked());
+        return refreshTokenEntity.map(entity -> new RefreshToken(entity.getId(), entity.getToken(), entity.getExpiryDate(), entity.getUser(), entity.isRevoked()));
     }
 }

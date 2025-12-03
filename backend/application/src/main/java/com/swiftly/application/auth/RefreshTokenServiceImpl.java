@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,14 +25,23 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private long refreshExpiration;
 
     public RefreshToken createRefreshToken(String email) {
-
         User user = userService.getByEmail(email);
+
+        Optional<RefreshToken> existing = getByUserId(user.getId());
+
+        if (existing.isPresent()) {
+            RefreshToken valid = verifyExpiration(existing.get());
+            if (valid != null) {
+                return valid;
+            }
+        }
 
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshExpiration));
         refreshToken.setRevoked(false);
+
         return refreshTokenRepository.save(refreshToken);
     }
 
@@ -55,7 +65,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return refreshTokenRepository.findByToken(token);
     }
 
-    public RefreshToken getByUserId(Integer userId)
+    public Optional<RefreshToken> getByUserId(Integer userId)
     {
         return refreshTokenRepository.findByUserId(userId);
     }

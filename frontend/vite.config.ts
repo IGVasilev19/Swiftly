@@ -51,6 +51,29 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:8080",
         changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: "localhost",
+        cookiePathRewrite: "/",
+        configure: (proxy, _options) => {
+          proxy.on("proxyReq", (proxyReq, req, _res) => {
+            // Forward cookies from the original request
+            if (req.headers.cookie) {
+              proxyReq.setHeader("Cookie", req.headers.cookie);
+            }
+          });
+          proxy.on("proxyRes", (proxyRes, req, res) => {
+            // Ensure Set-Cookie headers are properly forwarded
+            const setCookieHeaders = proxyRes.headers["set-cookie"];
+            if (setCookieHeaders) {
+              // Rewrite cookie domain and path if needed
+              proxyRes.headers["set-cookie"] = setCookieHeaders.map((cookie) => {
+                return cookie
+                  .replace(/Domain=[^;]+/i, "Domain=localhost")
+                  .replace(/Path=[^;]+/i, "Path=/");
+              });
+            }
+          });
+        },
       },
     },
   },

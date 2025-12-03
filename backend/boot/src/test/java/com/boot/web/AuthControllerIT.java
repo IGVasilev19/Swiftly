@@ -98,10 +98,16 @@ class AuthControllerIT extends Containers {
                 .cookie("refresh_token", refreshToken)
                 .exchange()
                 .expectStatus().isOk()
+                .expectHeader().exists(HttpHeaders.SET_COOKIE)
                 .expectBody(String.class)
                 .consumeWith(result -> {
                     String body = new String(result.getResponseBody());
                     accessToken = JsonPath.read(body, "$.accessToken");
+                    
+                    // Verify that the refresh token cookie is updated
+                    String setCookie = result.getResponseHeaders().getFirst(HttpHeaders.SET_COOKIE);
+                    assertThat(setCookie).isNotNull();
+                    assertThat(setCookie).contains("refresh_token=");
                 })
                 .value(token -> assertThat(token).isNotBlank());
     }

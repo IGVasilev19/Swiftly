@@ -1,8 +1,10 @@
 import axios, { type AxiosInstance, type AxiosResponse } from "axios";
 import { createBrowserHistory } from "history";
 
+// Use proxy in development, direct URL in production
 export const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1";
+  import.meta.env.VITE_API_URL || 
+  (import.meta.env.DEV ? "/api/v1" : "http://localhost:8080/api/v1");
 
 const history = createBrowserHistory();
 
@@ -38,6 +40,11 @@ api.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    // Don't intercept refresh endpoint errors - let useAuth handle them
+    if (originalRequest.url?.includes("/auth/refresh")) {
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {

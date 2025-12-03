@@ -29,10 +29,12 @@ export function useAuth() {
         { withCredentials: true }
       );
       const { accessToken } = res.data;
-      sessionStorage.setItem("accessToken", accessToken);
-      return true;
-    } catch (err) {
-      console.error("Refresh failed:", err);
+      if (accessToken) {
+        sessionStorage.setItem("accessToken", accessToken);
+        return true;
+      }
+      return false;
+    } catch (err: any) {
       sessionStorage.removeItem("accessToken");
       return false;
     }
@@ -58,10 +60,10 @@ export function useAuth() {
         }
       );
     } catch (err) {
-      console.error("Logout failed:", err);
       toast.error("Failed to log out");
     } finally {
       sessionStorage.removeItem("accessToken");
+      setIsAuthenticated(false);
       toast.success("Logged out successfully");
       navigate("/");
     }
@@ -69,6 +71,8 @@ export function useAuth() {
 
   useEffect(() => {
     const checkAuth = async () => {
+      setLoading(true);
+
       const token = getAccessToken();
 
       if (token && isTokenValid(token)) {
@@ -85,5 +89,9 @@ export function useAuth() {
     checkAuth();
   }, []);
 
-  return { isAuthenticated, loading, logout };
+  const setAuthenticated = (value: boolean) => {
+    setIsAuthenticated(value);
+  };
+
+  return { isAuthenticated, loading, logout, setAuthenticated };
 }

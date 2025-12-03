@@ -4,10 +4,12 @@ import api from "@/hooks/api";
 import { useNavigate } from "react-router-dom";
 import type { LoginSchemaType } from "@/schemas/auth/auth.schema";
 import type { AxiosError } from "axios";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 export function useLogin() {
   const [isPending, setIsPending] = useState(false);
   const navigate = useNavigate();
+  const { setAuthenticated } = useAuthContext();
 
   const login = async (data: LoginSchemaType) => {
     try {
@@ -23,6 +25,7 @@ export function useLogin() {
       }
 
       sessionStorage.setItem("accessToken", accessToken);
+      setAuthenticated(true);
       toast.success("Login successful");
       navigate("/dashboard");
     } catch (error: unknown) {

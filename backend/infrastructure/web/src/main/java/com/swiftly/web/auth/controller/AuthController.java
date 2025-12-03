@@ -32,6 +32,32 @@ public class AuthController {
     private final LogInService logInService;
     private final JwtService jwtService;
 
+    private ResponseCookie createRefreshCookie(String refreshToken, HttpServletRequest request) {
+        boolean isSecure = request.isSecure() || "https".equalsIgnoreCase(request.getScheme());
+        
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(isSecure)
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60)
+                .sameSite("Lax");
+
+        return builder.build();
+    }
+
+    private ResponseCookie createDeleteCookie(HttpServletRequest request) {
+        boolean isSecure = request.isSecure() || "https".equalsIgnoreCase(request.getScheme());
+        
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(isSecure)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax");
+
+        return builder.build();
+    }
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest)
     {
@@ -55,18 +81,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LogInRequest logInRequest)
+    public ResponseEntity<?> login(@RequestBody LogInRequest logInRequest, HttpServletRequest request)
     {
         try {
             LogInResponse response = LogInMapper.toLogInResponse(logInService.login(LogInMapper.toUser(logInRequest)));
 
-            ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", response.refreshToken())
-                    .httpOnly(true)
-                    .secure(true)
-                    .path("/")
-                    .maxAge(7 * 24 * 60 * 60)
-                    .sameSite("Strict")
-                    .build();
+            ResponseCookie refreshCookie = createRefreshCookie(response.refreshToken(), request);
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
@@ -80,10 +100,14 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(HttpServletRequest request) {
+    public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing cookies");
+        
+        if (cookies == null || cookies.length == 0) {
+            ResponseCookie deleteCookie = createDeleteCookie(request);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                    .body(Map.of("error", "Missing cookies", "message", "No cookies found in request"));
         }
 
         String refreshToken = Arrays.stream(cookies)
@@ -91,32 +115,44 @@ public class AuthController {
                 .map(Cookie::getValue)
                 .findFirst()
                 .orElse(null);
-
+        
         if (refreshToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing refresh token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Missing refresh token", "message", "Refresh token cookie not found"));
         }
 
-        LogInResponse response = LogInMapper.toLogInResponse(logInService.refreshToken(refreshToken));
-        return ResponseEntity.ok(Map.of("accessToken", response.accessToken()));
+        com.swiftly.domain.User refreshUser = logInService.refreshToken(refreshToken);
+        
+        if (refreshUser == null) {
+            ResponseCookie deleteCookie = createDeleteCookie(request);
+            
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                    .body(Map.of("error", "Invalid or expired refresh token", "message", "Refresh token is invalid or expired"));
+        }
+
+        LogInResponse loginResponse = LogInMapper.toLogInResponse(refreshUser);
+        
+        ResponseCookie refreshCookie = createRefreshCookie(loginResponse.refreshToken(), request);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(Map.of("accessToken", loginResponse.accessToken()));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout( @RequestHeader("Authorization") String authHeader, HttpServletResponse response) {
+    public ResponseEntity<Void> logout(
+            @RequestHeader("Authorization") String authHeader,
+            HttpServletRequest request,
+            HttpServletResponse response) {
 
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
-                .path("/")
-                .maxAge(0)
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        ResponseCookie deleteCookie = createDeleteCookie(request);
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
 
         String accessToken = authHeader.replace("Bearer ", "");
-
         logInService.logout(jwtService.extractUserId(accessToken));
 
         return ResponseEntity.noContent().build();
     }
+
 }
