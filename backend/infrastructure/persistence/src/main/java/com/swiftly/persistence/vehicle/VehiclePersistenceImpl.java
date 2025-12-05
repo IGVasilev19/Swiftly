@@ -5,7 +5,9 @@ import com.swiftly.domain.User;
 import com.swiftly.domain.Vehicle;
 import com.swiftly.persistence.entities.UserEntity;
 import com.swiftly.persistence.entities.VehicleEntity;
+import com.swiftly.persistence.user.JpaUserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -16,12 +18,14 @@ import java.util.Optional;
 @Repository
 public class VehiclePersistenceImpl implements VehicleRepository {
     private final JpaVehicleRepository repository;
+    private final JpaUserRepository userRepository;
 
     public Vehicle save(Vehicle vehicle)
     {
-        UserEntity user = new UserEntity(vehicle.getOwner().getId());
+        UserEntity userEntity = userRepository.getReferenceById(vehicle.getOwner().getId());
 
-        VehicleEntity vehicleEntity = new VehicleEntity(user, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity());
+        VehicleEntity vehicleEntity = new VehicleEntity(userEntity, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity());
+        
         return repository.save(vehicleEntity);
     }
 
@@ -73,6 +77,12 @@ public class VehiclePersistenceImpl implements VehicleRepository {
         VehicleEntity vehicleEntity = repository.findByVin(vin);
 
         return new Vehicle(vehicleEntity.getId(), vehicleEntity.getOwner(), vehicleEntity.getVin(), vehicleEntity.getMake(),vehicleEntity.getModel(), vehicleEntity.getColor(), vehicleEntity.getYear(), vehicleEntity.getType(), vehicleEntity.getFuelType(), vehicleEntity.getFuelConsumption(), vehicleEntity.getFeatures(), vehicleEntity.getCountry(), vehicleEntity.getCity());
+    }
+
+    @Override
+    public Boolean existsByVin(String vin)
+    {
+        return repository.existsByVin(vin);
     }
 
 }

@@ -11,21 +11,8 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import type { UseFormReturn } from "react-hook-form";
-import type { VehicleSchemaType } from "@/schemas/vehicle/vehicle.schema";
 import type { SelectMenuOption } from "@/lib/types";
-
-interface AddVehicleFormProps {
-  addVehicleForm: UseFormReturn<VehicleSchemaType>;
-  handleSubmit: (data: VehicleSchemaType) => void;
-  isPending: boolean;
-  vehicleTypesOptions: { value: string; label: string }[];
-  fuelTypesOptions: { value: string; label: string }[];
-  featuresOptions: { value: string; label: string }[];
-  countryOpen: boolean;
-  setCountryOpen: (open: boolean) => void;
-  selectedCountry: SelectMenuOption | null;
-}
+import type { AddVehicleFormProps } from "@/types/vehicle";
 
 export function AddVehicleForm({
   addVehicleForm,
@@ -299,9 +286,7 @@ export function AddVehicleForm({
                             field.onChange([...currentFeatures, feature.value]);
                           } else {
                             field.onChange(
-                              currentFeatures.filter(
-                                (f) => f !== feature.value
-                              )
+                              currentFeatures.filter((f) => f !== feature.value)
                             );
                           }
                         }}
@@ -317,7 +302,24 @@ export function AddVehicleForm({
             </FormItem>
           )}
         />
-        <FileUpload />
+        <FormField
+          control={addVehicleForm.control}
+          name="images"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-center justify-between">
+                <FormLabel>Images</FormLabel>
+                <FormMessage className="text-right" />
+              </div>
+              <FormControl>
+                <FileUpload
+                  value={field.value || []}
+                  onChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
 
         <div className="flex pt-4 justify-center items-center">
           <Button

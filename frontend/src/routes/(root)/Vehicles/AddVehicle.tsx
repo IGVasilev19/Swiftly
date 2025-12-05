@@ -67,6 +67,7 @@ export function AddVehicle() {
       features: [],
       country: "NL",
       city: "",
+      images: [],
     },
   });
 
@@ -76,6 +77,7 @@ export function AddVehicle() {
         ...form.getValues(),
         type: vehicleTypes[0],
         fuelType: fuelTypes[0],
+        images: [],
       });
     }
   }, [vehicleTypes, fuelTypes, form]);

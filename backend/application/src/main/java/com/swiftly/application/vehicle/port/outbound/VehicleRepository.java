@@ -11,4 +11,5 @@ public interface VehicleRepository {
     List<Vehicle> findAllByOwnerId(Integer ownerId);
     void deleteById(Integer id);
     Vehicle findByVin(String vin);
+    Boolean existsByVin(String vin);
 }

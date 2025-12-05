@@ -12,12 +12,33 @@ export function useAddVehicle() {
   const addVehicle = async (data: VehicleSchemaType) => {
     try {
       setIsPending(true);
-      const response = await api.post("/vehicles", data);
-      toast.success(response.data.message || "Vehicle added successfully");
+
+      const formData = new FormData();
+
+      const { images, ...vehicleData } = data;
+
+      const vehicleDataBlob = new Blob([JSON.stringify(vehicleData)], {
+        type: "application/json",
+      });
+      formData.append("vehicleData", vehicleDataBlob);
+
+      images.forEach((file) => {
+        formData.append("images", file);
+      });
+
+      const response = await api.post("/vehicle/add", formData, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        },
+        withCredentials: true,
+      });
+
+      toast.success(response.data.message);
+
       navigate("/vehicles");
     } catch (error: unknown) {
       const axiosError = error as AxiosError<{ message: string }>;
-      console.error(axiosError);
+
       toast.error(
         axiosError.response?.data?.message || "Failed to add vehicle"
       );
@@ -28,4 +49,3 @@ export function useAddVehicle() {
 
   return { addVehicle, isPending };
 }
-

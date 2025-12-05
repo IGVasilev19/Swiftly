@@ -3,12 +3,17 @@ package com.swiftly.application.vehicleManagement;
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicleImage.port.inbound.VehicleImageService;
 import com.swiftly.application.vehicleManagement.port.inbound.VehicleManagementService;
+import com.swiftly.domain.User;
 import com.swiftly.domain.Vehicle;
 import com.swiftly.domain.VehicleImage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,17 +24,38 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     private final VehicleImageService vehicleImageService;
 
     @Transactional
-    public Vehicle addVehicle(Vehicle vehicle) {
+    public Vehicle addVehicle(Vehicle vehicle, List<MultipartFile> images) {
+        User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        vehicle.setOwner(owner);
+
         Vehicle newVehicle = vehicleService.create(vehicle);
 
-        List<VehicleImage> newImages = new ArrayList<>();
+        List<VehicleImage> vehicleImages = images.stream()
+                .map(file -> {
+                    try {
+                        return new VehicleImage(
+                                null,
+                                vehicle,
+                                file.getBytes(),
+                                file.getContentType(),
+                                file.getOriginalFilename(),
+                                LocalDateTime.now()
+                        );
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
 
-        for(VehicleImage image : vehicle.getImages())
+        List<VehicleImage> newVehicleImages = new ArrayList<>();
+
+        for (VehicleImage vehicleImage : vehicleImages)
         {
-            newImages.add(vehicleImageService.create(image));
+            vehicleImage.setVehicle(newVehicle);
+            newVehicleImages.add(vehicleImageService.create(vehicleImage));
         }
 
-        newVehicle.setImages(newImages);
+        newVehicle.setImages(newVehicleImages);
 
         return newVehicle;
     }

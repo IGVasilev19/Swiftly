@@ -1,9 +1,8 @@
 import axios, { type AxiosInstance, type AxiosResponse } from "axios";
 import { createBrowserHistory } from "history";
 
-// Use proxy in development, direct URL in production
 export const API_URL =
-  import.meta.env.VITE_API_URL || 
+  import.meta.env.VITE_API_URL ||
   (import.meta.env.DEV ? "/api/v1" : "http://localhost:8080/api/v1");
 
 const history = createBrowserHistory();
@@ -33,6 +32,10 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  // Remove Content-Type header for FormData to let axios set multipart/form-data with boundary
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  }
   return config;
 });
 
@@ -41,7 +44,6 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Don't intercept refresh endpoint errors - let useAuth handle them
     if (originalRequest.url?.includes("/auth/refresh")) {
       return Promise.reject(error);
     }

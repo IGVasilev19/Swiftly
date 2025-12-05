@@ -3,7 +3,6 @@ package com.swiftly.application.vehicle;
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicle.port.outbound.VehicleRepository;
 import com.swiftly.domain.Vehicle;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     public Vehicle create(Vehicle vehicle)
     {
-        if(getByVin(vehicle.getVin()) != null)
+        if(repository.existsByVin(vehicle.getVin()))
         {
             throw new IllegalArgumentException("Vehicle already exists");
         }

@@ -79,13 +79,36 @@ public class VehicleEntity extends Vehicle {
         this.id = id;
     }
 
-    public VehicleEntity(User owner, String VIN, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
+    public VehicleEntity(UserEntity owner, String VIN, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
     {
-        super(owner, VIN, make, model, color, year, type, fuelType, fuelConsumption, features, country, city);
+        this.owner = owner;
+        this.vin = VIN;
+        this.make = make;
+        this.model = model;
+        this.color = color;
+        this.year = year;
+        this.type = type;
+        this.fuelType = fuelType;
+        this.fuelConsumption = fuelConsumption;
+        this.features = features;
+        this.country = country;
+        this.city = city;
     }
 
-    public VehicleEntity(Integer id, User owner, String VIN, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
+    public VehicleEntity(Integer id, UserEntity owner, String VIN, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
     {
-        super(id, owner, VIN, make, model, color, year, type, fuelType, fuelConsumption, features, country, city);
+        this.id = id;
+        this.owner = owner;
+        this.vin = VIN;
+        this.make = make;
+        this.model = model;
+        this.color = color;
+        this.year = year;
+        this.type = type;
+        this.fuelType = fuelType;
+        this.fuelConsumption = fuelConsumption;
+        this.features = features;
+        this.country = country;
+        this.city = city;
     }
 }

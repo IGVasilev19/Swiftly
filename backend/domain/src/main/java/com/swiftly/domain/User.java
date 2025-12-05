@@ -50,12 +50,6 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-    public User(Integer id,String email, String passwordHash)
-    {
-        this.id = id;
-        this.email = email;
-        this.passwordHash = passwordHash;
-    }
 
     public User(String email, String passwordHash)
     {

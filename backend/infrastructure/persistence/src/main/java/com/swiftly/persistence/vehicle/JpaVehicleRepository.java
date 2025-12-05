@@ -11,4 +11,5 @@ public interface JpaVehicleRepository extends JpaRepository<VehicleEntity, Integ
     List<VehicleEntity> findAllByOwnerId(Integer ownerId);
     void deleteById(Integer id);
     VehicleEntity findByVin(String vin);
+    Boolean existsByVin(String vin);
 }
