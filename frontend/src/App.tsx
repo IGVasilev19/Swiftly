@@ -4,8 +4,9 @@ import { Route, Routes } from "react-router-dom";
 import { Register, Login } from "./routes/(auth)";
 import Dashboard from "./routes/(root)/Dashboard/Dashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-import Vehicles from "./routes/(root)/Vehicles/Vehicles";
+import { Vehicles } from "./routes/(root)/Vehicles/Vehicles";
 import { AddVehicle } from "./routes/(root)/Vehicles/AddVehicle";
+import VehicleDetails from "./routes/(root)/Vehicles/VehicleDetails";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/vehicles" element={<Vehicles />} />
           <Route path="/vehicles/add" element={<AddVehicle />} />
+          <Route path="/vehicles/details" element={<VehicleDetails />} />
         </Route>
       </Routes>
     </Suspense>

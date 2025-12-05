@@ -1,14 +1,46 @@
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/ui/Layout";
+import Loading from "@/components/ui/Loading";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useGetVehicles } from "@/hooks/useGetVehicles";
+import { VehicleTable } from "@/components/vehicle/VehicleTable";
 
-function Vehicles() {
+export function Vehicles() {
   const navigate = useNavigate();
+  const { vehicles, isLoading, error } = useGetVehicles();
+
+  const handleRowClick = (vehicle: { id?: number }) => {
+    if (vehicle.id) {
+      navigate(`/vehicles/details`);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="w-full h-full flex items-center justify-center">
+          <Loading />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="text-red-500">
+            Error loading vehicles: {error.message}
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
-      <div className="w-full h-full flex flex-col pt-4 pl-4 pr-4">
+      <div className="w-full h-full flex flex-col pt-4 pl-4 pr-4 gap-5">
         <div className="flex justify-end">
           <Button
             variant="default"
@@ -18,10 +50,10 @@ function Vehicles() {
             Add +
           </Button>
         </div>
-        <div className="h-full w-full flex"></div>
+        <div className="h-full w-full flex">
+          <VehicleTable vehicles={vehicles} onRowClick={handleRowClick} />
+        </div>
       </div>
     </Layout>
   );
 }
-
-export default Vehicles;

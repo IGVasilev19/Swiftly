@@ -13,3 +13,27 @@ export interface AddVehicleFormProps {
   setCountryOpen: (open: boolean) => void;
   selectedCountry: SelectMenuOption | null;
 }
+
+export interface Vehicle {
+  id?: number;
+  vin: string;
+  make: string;
+  model: string;
+  color?: string;
+  year?: number;
+  type?: string;
+  fuelType?: string;
+  fuelConsumption?: number;
+  features?: string[];
+  country?: string;
+  city?: string;
+  listed?: boolean;
+  [key: string]: unknown;
+}
+
+export interface VehicleTableProps {
+  vehicles: Vehicle[];
+  onRowClick?: (vehicle: Vehicle) => void;
+  maxHeight?: string;
+  itemsPerPage?: number;
+}

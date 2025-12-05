@@ -1,8 +1,11 @@
 package com.swiftly.web.vehicle.controller;
 
+import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicleManagement.port.inbound.VehicleManagementService;
+import com.swiftly.domain.User;
+import com.swiftly.domain.Vehicle;
 import com.swiftly.web.vehicle.dto.VehicleCreateRequest;
-import com.swiftly.web.vehicle.dto.VehicleCreateResponse;
+import com.swiftly.web.vehicle.dto.VehicleResponse;
 import com.swiftly.web.vehicle.mapper.VehicleMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -11,12 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import java.util.Map;
 @Tag(name="vehicles")
 public class VehicleController {
     private final VehicleManagementService service;
+    private final VehicleService vehicleService;
 
 
     @PreAuthorize("hasRole('OWNER')")
@@ -35,7 +37,7 @@ public class VehicleController {
     {
         try
         {
-            VehicleCreateResponse response = VehicleMapper.toVehicleCreateResponse(service.addVehicle(VehicleMapper.toVehicle(newVehicle), images));
+            VehicleResponse response = VehicleMapper.toVehicleResponse(service.addVehicle(VehicleMapper.toVehicle(newVehicle), images));
 
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                     "message", "Vehicle created successfully",
@@ -47,6 +49,30 @@ public class VehicleController {
                     "success", false,
                     "message", e.getMessage()
             ));
+        }
+    }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @GetMapping("/owned")
+    public ResponseEntity<?> getOwnedVehicles()
+    {
+        try
+        {
+            User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            List<VehicleResponse> ownedVehicles = new ArrayList<>();
+
+            List<Vehicle> vehicles = vehicleService.getAllByOwnerId(owner.getId());
+
+            for(Vehicle vehicle : vehicles)
+            {
+                ownedVehicles.add(VehicleMapper.toVehicleResponse(vehicle));
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(ownedVehicles);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,
+                    "message", e.getMessage()));
         }
     }
 }
