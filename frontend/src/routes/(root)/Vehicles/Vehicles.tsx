@@ -5,15 +5,16 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetVehicles } from "@/hooks/useGetVehicles";
 import { VehicleTable } from "@/components/vehicle/VehicleTable";
+import { useVehicleContext } from "@/contexts/VehicleContext";
 
 export function Vehicles() {
   const navigate = useNavigate();
   const { vehicles, isLoading, error } = useGetVehicles();
+  const { setSelectedVehicleId } = useVehicleContext();
 
   const handleRowClick = (vehicle: { id?: number }) => {
-    if (vehicle.id) {
-      navigate(`/vehicles/details`);
-    }
+    setSelectedVehicleId(vehicle.id ?? null);
+    navigate(`/vehicles/details`);
   };
 
   if (isLoading) {

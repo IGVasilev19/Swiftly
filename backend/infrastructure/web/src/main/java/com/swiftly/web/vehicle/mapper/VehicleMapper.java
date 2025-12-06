@@ -1,14 +1,14 @@
 package com.swiftly.web.vehicle.mapper;
 
 import com.swiftly.domain.Vehicle;
-import com.swiftly.web.vehicle.dto.VehicleCreateRequest;
+import com.swiftly.web.vehicle.dto.VehicleRequest;
 import com.swiftly.web.vehicle.dto.VehicleResponse;
 
 public class VehicleMapper {
 
-    public static Vehicle toVehicle(VehicleCreateRequest vehicleCreateRequest)
+    public static Vehicle toVehicle(VehicleRequest vehicleRequest)
     {
-        return new Vehicle(vehicleCreateRequest.vin(), vehicleCreateRequest.make(), vehicleCreateRequest.model(), vehicleCreateRequest.color(), vehicleCreateRequest.year(), vehicleCreateRequest.type(), vehicleCreateRequest.fuelType(), vehicleCreateRequest.fuelConsumption(), vehicleCreateRequest.features(), vehicleCreateRequest.country(), vehicleCreateRequest.city());
+        return new Vehicle(vehicleRequest.vin(), vehicleRequest.make(), vehicleRequest.model(), vehicleRequest.color(), vehicleRequest.year(), vehicleRequest.type(), vehicleRequest.fuelType(), vehicleRequest.fuelConsumption(), vehicleRequest.features(), vehicleRequest.country(), vehicleRequest.city());
     }
 
     public static VehicleResponse toVehicleResponse(Vehicle vehicle)

@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { Vehicles } from "./routes/(root)/Vehicles/Vehicles";
 import { AddVehicle } from "./routes/(root)/Vehicles/AddVehicle";
 import VehicleDetails from "./routes/(root)/Vehicles/VehicleDetails";
+import { VehicleLayout } from "./components/layout/VehicleLayout";
 
 const App = () => {
   return (
@@ -15,10 +16,12 @@ const App = () => {
         <Route path="/auth/register" element={<Register />} />
         <Route path="/" element={<Login />} />
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/vehicles" element={<Vehicles />} />
-          <Route path="/vehicles/add" element={<AddVehicle />} />
-          <Route path="/vehicles/details" element={<VehicleDetails />} />
+          <Route element={<VehicleLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/vehicles" element={<Vehicles />} />
+            <Route path="/vehicles/add" element={<AddVehicle />} />
+            <Route path="/vehicles/details" element={<VehicleDetails />} />
+          </Route>
         </Route>
       </Routes>
     </Suspense>

@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "@/hooks/api";
-import type { Vehicle } from "@/types/vehicle";
-
-interface UseGetVehiclesReturn {
-  vehicles: Vehicle[];
-  isLoading: boolean;
-  error: Error | null;
-  refetch: () => void;
-}
+import type { UseGetVehiclesReturn, Vehicle } from "@/types/vehicle";
 
 export function useGetVehicles(): UseGetVehiclesReturn {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);

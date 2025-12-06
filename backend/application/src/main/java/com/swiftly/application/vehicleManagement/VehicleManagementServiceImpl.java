@@ -59,4 +59,16 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
 
         return newVehicle;
     }
+
+    @Transactional
+    public Vehicle getFullVehicleById(Integer id)
+    {
+        Vehicle existingVehicle = vehicleService.getById(id);
+
+        List<VehicleImage> images = vehicleImageService.getAllByVehicleId(id);
+
+        existingVehicle.setImages(images);
+
+        return existingVehicle;
+    }
 }

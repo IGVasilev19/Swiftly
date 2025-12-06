@@ -52,6 +52,10 @@ public class Vehicle {
     private List<VehicleImage> images;
 
 
+    public Vehicle(Integer id)
+    {
+        this.id = id;
+    }
 
     public Vehicle (String vin, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
     {

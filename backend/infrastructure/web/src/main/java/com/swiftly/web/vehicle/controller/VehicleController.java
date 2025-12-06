@@ -4,7 +4,7 @@ import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicleManagement.port.inbound.VehicleManagementService;
 import com.swiftly.domain.User;
 import com.swiftly.domain.Vehicle;
-import com.swiftly.web.vehicle.dto.VehicleCreateRequest;
+import com.swiftly.web.vehicle.dto.VehicleRequest;
 import com.swiftly.web.vehicle.dto.VehicleResponse;
 import com.swiftly.web.vehicle.mapper.VehicleMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +33,7 @@ public class VehicleController {
 
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping(value ="/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> addVehicle(@RequestPart("vehicleData") VehicleCreateRequest newVehicle, @RequestPart("images") List<MultipartFile> images)
+    public ResponseEntity<?> addVehicle(@RequestPart("vehicleData") VehicleRequest newVehicle, @RequestPart("images") List<MultipartFile> images)
     {
         try
         {
@@ -70,6 +70,20 @@ public class VehicleController {
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(ownedVehicles);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,
+                    "message", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getVehicle(@PathVariable("id") Integer id)
+    {
+        try
+        {
+           VehicleResponse vehicle = VehicleMapper.toVehicleResponse(service.getFullVehicleById(id));
+
+           return ResponseEntity.status(HttpStatus.OK).body(vehicle);
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,
                     "message", e.getMessage()));

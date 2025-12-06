@@ -22,26 +22,25 @@ export function useAddVehicle() {
       });
       formData.append("vehicleData", vehicleDataBlob);
 
-      images.forEach((file) => {
-        formData.append("images", file);
-      });
+      if (images && Array.isArray(images)) {
+        images.forEach((file) => {
+          formData.append("images", file);
+        });
+      }
 
-      const response = await api.post("/vehicle/add", formData, {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-        },
-        withCredentials: true,
-      });
+      const response = await api.post("/vehicle/add", formData);
 
       toast.success(response.data.message);
-
       navigate("/vehicles");
     } catch (error: unknown) {
-      const axiosError = error as AxiosError<{ message: string }>;
-
-      toast.error(
-        axiosError.response?.data?.message || "Failed to add vehicle"
-      );
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as AxiosError<{ message?: string }>;
+        toast.error(
+          axiosError.response?.data?.message || "Failed to add vehicle"
+        );
+      } else {
+        toast.error("Failed to add vehicle. Please try again.");
+      }
     } finally {
       setIsPending(false);
     }

@@ -14,6 +14,15 @@ export interface AddVehicleFormProps {
   selectedCountry: SelectMenuOption | null;
 }
 
+export interface VehicleImage {
+  id?: number;
+  fileName?: string;
+  mimeType?: string;
+  uploadedAt?: string;
+  data?: string;
+  [key: string]: unknown;
+}
+
 export interface Vehicle {
   id?: number;
   vin: string;
@@ -28,6 +37,7 @@ export interface Vehicle {
   country?: string;
   city?: string;
   listed?: boolean;
+  images?: VehicleImage[];
   [key: string]: unknown;
 }
 
@@ -36,4 +46,18 @@ export interface VehicleTableProps {
   onRowClick?: (vehicle: Vehicle) => void;
   maxHeight?: string;
   itemsPerPage?: number;
+}
+
+export interface UseGetVehiclesReturn {
+  vehicles: Vehicle[];
+  isLoading: boolean;
+  error: Error | null;
+  refetch: () => void;
+}
+
+export interface UseGetVehicleReturn {
+  vehicle: Vehicle | null;
+  isLoading: boolean;
+  error: Error | null;
+  refetch: () => void;
 }
