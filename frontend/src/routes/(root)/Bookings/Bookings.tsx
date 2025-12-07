@@ -1,12 +1,10 @@
 import { Layout } from "@/components/layout/Layout";
 import React from "react";
 
-const Dashboard = () => {
+export function Bookings() {
   return (
     <Layout>
-      <div>Dashboard Page</div>
+      <div>Bookings</div>
     </Layout>
   );
-};
-
-export default Dashboard;
+}

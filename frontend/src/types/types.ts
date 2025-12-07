@@ -20,4 +20,8 @@ export interface DecodedToken {
   exp: number;
   sub: string;
   email?: string;
+  roles?: string[];
+  authorities?: string[];
+  role?: string;
+  [key: string]: unknown; // Allow for other JWT claims
 }

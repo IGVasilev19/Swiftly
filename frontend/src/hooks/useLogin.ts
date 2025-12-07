@@ -27,7 +27,7 @@ export function useLogin() {
       sessionStorage.setItem("accessToken", accessToken);
       setAuthenticated(true);
       toast.success("Login successful");
-      navigate("/dashboard");
+      navigate("/app");
     } catch (error: unknown) {
       const axiosError = error as AxiosError<{ message?: string }>;
       toast.error(

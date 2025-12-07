@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Layout } from "@/components/ui/Layout";
+import { Layout } from "@/components/layout/Layout";
 import Loading from "@/components/ui/Loading";
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +14,7 @@ export function Vehicles() {
 
   const handleRowClick = (vehicle: { id?: number }) => {
     setSelectedVehicleId(vehicle.id ?? null);
-    navigate(`/vehicles/details`);
+    navigate("/app/vehicles/details");
   };
 
   if (isLoading) {
@@ -46,7 +46,7 @@ export function Vehicles() {
           <Button
             variant="default"
             className="w-50px bg-[#0F172A] hover:bg-[#0f172adc] select-none"
-            onClick={() => navigate("/vehicles/add")}
+            onClick={() => navigate("/app/vehicles/add")}
           >
             Add +
           </Button>

@@ -31,7 +31,7 @@ export function useAddVehicle() {
       const response = await api.post("/vehicle/add", formData);
 
       toast.success(response.data.message);
-      navigate("/vehicles");
+      navigate("/app/vehicles");
     } catch (error: unknown) {
       if (error && typeof error === "object" && "response" in error) {
         const axiosError = error as AxiosError<{ message?: string }>;

@@ -17,20 +17,13 @@ export function useGetVehicle(
 
       const response = await api.get<Vehicle>(`/vehicle/${vehicleId}`);
 
+      console.log("Fetched vehicle:", response.data);
       setVehicle(response.data);
     } catch (err) {
-      if (err && typeof err === "object" && "response" in err) {
-        const axiosError = err as {
-          response?: { status?: number; data?: { message?: string } };
-        };
-        const errorMessage =
-          axiosError.response?.data?.message || "Failed to fetch vehicle";
-        setError(new Error(errorMessage));
-      } else {
-        setError(
-          err instanceof Error ? err : new Error("Failed to fetch vehicle")
-        );
-      }
+      setError(
+        err instanceof Error ? err : new Error("Failed to fetch vehicle")
+      );
+
       console.error("Error fetching vehicle:", err);
     } finally {
       setIsLoading(false);

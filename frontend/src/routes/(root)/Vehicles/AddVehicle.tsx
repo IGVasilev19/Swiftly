@@ -1,4 +1,4 @@
-import { Layout } from "@/components/ui/Layout";
+import { Layout } from "@/components/layout/Layout";
 import { AddVehicleForm } from "@/components/vehicle/AddVehicleForm";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

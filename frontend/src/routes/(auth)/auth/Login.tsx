@@ -15,7 +15,7 @@ const Login = () => {
     },
   });
 
-  useAuthRedirect("/dashboard");
+  useAuthRedirect("/app");
 
   return (
     <div className="min-h-screen w-screen flex flex-col justify-center items-center gap-10">
