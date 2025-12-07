@@ -32,7 +32,6 @@ public class RegisterServiceImplTest {
 
     @Test
     void register_successfullyRegistersNewUser() {
-        // Arrange
         List<Role> roles = List.of(Role.OWNER);
 
         User user = new User(
@@ -65,10 +64,8 @@ public class RegisterServiceImplTest {
         when(registerRepository.saveNewUserAndProfile(any(User.class), any(Profile.class)))
                 .thenReturn(savedUser);
 
-        // Act
         User result = registerServiceImpl.register(command);
 
-        // Assert
         assertNotNull(result);
         assertEquals(user.getEmail(), result.getEmail());
         assertEquals(user.getRoles(), result.getRoles());
@@ -81,7 +78,6 @@ public class RegisterServiceImplTest {
 
     @Test
     void register_throwsWhenUserAlreadyExists() {
-        // Arrange
         List<Role> roles = List.of(Role.RENTER);
 
         User user = new User(
@@ -99,7 +95,6 @@ public class RegisterServiceImplTest {
 
         when(userService.existsByEmail(user.getEmail())).thenReturn(true);
 
-        // Act + Assert
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> registerServiceImpl.register(command));
 

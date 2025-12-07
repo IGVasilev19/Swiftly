@@ -32,7 +32,6 @@ class UserServiceImplTest {
 
     @Test
     void getByEmail_returnsUser() {
-        // Arrange
         List<Role> roles = List.of(Role.RENTER);
 
         String email = "test@example.com";
@@ -40,10 +39,8 @@ class UserServiceImplTest {
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
-        // Act
         User result = userServiceImpl.getByEmail(email);
 
-        // Assert
         assertNotNull(result);
         assertEquals(email, result.getEmail());
         verify(userRepository).findByEmail(email);
@@ -51,11 +48,9 @@ class UserServiceImplTest {
 
     @Test
     void getByEmail_userNotFound_throwsException() {
-        // Arrange
         String email = "missing@example.com";
         when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
-        // Act + Assert
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> userServiceImpl.getByEmail(email));
 
@@ -65,28 +60,22 @@ class UserServiceImplTest {
 
     @Test
     void existsByEmail_returnsTrue() {
-        // Arrange
         String email = "exists@example.com";
         when(userRepository.existsByEmail(email)).thenReturn(true);
 
-        // Act
         boolean result = userServiceImpl.existsByEmail(email);
 
-        // Assert
         assertTrue(result);
         verify(userRepository).existsByEmail(email);
     }
 
     @Test
     void existsByEmail_returnsFalse() {
-        // Arrange
         String email = "notfound@example.com";
         when(userRepository.existsByEmail(email)).thenReturn(false);
 
-        // Act
         boolean result = userServiceImpl.existsByEmail(email);
 
-        // Assert
         assertFalse(result);
         verify(userRepository).existsByEmail(email);
     }

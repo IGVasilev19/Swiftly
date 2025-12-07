@@ -10,19 +10,20 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import wiremock.com.google.common.net.HttpHeaders;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(classes = BootApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class AuthControllerIT extends Containers {
 
     @LocalServerPort
@@ -33,10 +34,7 @@ class AuthControllerIT extends Containers {
 
     WebTestClient webTestClient;
 
-    private static String refreshToken;
-    private static String accessToken;
-
-    private static String extractCookie(String header, String name) {
+    private String extractCookie(String header, String name) {
         return Arrays.stream(header.split(";"))
                 .map(String::trim)
                 .filter(c -> c.startsWith(name + "="))
@@ -54,10 +52,10 @@ class AuthControllerIT extends Containers {
     }
 
     @Test
-    @Order(1)
     void register_ShouldPersistAndReturnCreated() {
+        String uniqueEmail = "test" + UUID.randomUUID() + "@gmail.com";
         List<Role> roles = List.of(Role.OWNER);
-        RegisterRequest payload = new RegisterRequest("mock123@gmail.com", "@MockPassword123", "Mocking Testing Name", "+123456789012", roles);
+        RegisterRequest payload = new RegisterRequest(uniqueEmail, "@MockPassword123", "Mocking Testing Name", "+123456789012", roles);
 
         webTestClient.post()
                 .uri("/api/v1/auth/register")
@@ -70,54 +68,157 @@ class AuthControllerIT extends Containers {
     }
 
     @Test
-    @Order(2)
+    void register_ShouldReturnBadRequestWhenUserAlreadyExists() {
+        String uniqueEmail = "test" + UUID.randomUUID() + "@gmail.com";
+        List<Role> roles = List.of(Role.OWNER);
+        RegisterRequest payload = new RegisterRequest(uniqueEmail, "@MockPassword123", "Mocking Testing Name", "+123456789012", roles);
+
+        webTestClient.post()
+                .uri("/api/v1/auth/register")
+                .bodyValue(payload)
+                .exchange()
+                .expectStatus().isCreated();
+
+        webTestClient.post()
+                .uri("/api/v1/auth/register")
+                .bodyValue(payload)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(false)
+                .jsonPath("$.message").isEqualTo("User already exists");
+    }
+
+    @Test
     void login_ShouldReturnAccessToken() {
-        LogInRequest payload = new LogInRequest("mock123@gmail.com", "@MockPassword123");
+        String uniqueEmail = "test" + UUID.randomUUID() + "@gmail.com";
+        List<Role> roles = List.of(Role.OWNER);
+        RegisterRequest registerPayload = new RegisterRequest(uniqueEmail, "@MockPassword123", "Mocking Testing Name", "+123456789012", roles);
+        
+        webTestClient.post()
+                .uri("/api/v1/auth/register")
+                .bodyValue(registerPayload)
+                .exchange()
+                .expectStatus().isCreated();
+
+        LogInRequest loginPayload = new LogInRequest(uniqueEmail, "@MockPassword123");
 
         webTestClient.post()
                 .uri("/api/v1/auth/login")
-                .bodyValue(payload)
+                .bodyValue(loginPayload)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().exists(HttpHeaders.SET_COOKIE)
                 .expectBody(String.class)
-                .consumeWith(result -> {
-                    String setCookie = result.getResponseHeaders().getFirst(HttpHeaders.SET_COOKIE);
-                    refreshToken = extractCookie(setCookie, "refresh_token");
-                    String tokenBody = result.getResponseBody();
-                    accessToken = tokenBody;
-                })
                 .value(token -> assertThat(token).isNotBlank());
     }
 
     @Test
-    @Order(3)
+    void login_ShouldReturnBadRequestWithWrongPassword() {
+        String uniqueEmail = "test" + UUID.randomUUID() + "@gmail.com";
+        List<Role> roles = List.of(Role.OWNER);
+        RegisterRequest registerPayload = new RegisterRequest(uniqueEmail, "@MockPassword123", "Mocking Testing Name", "+123456789012", roles);
+        
+        webTestClient.post()
+                .uri("/api/v1/auth/register")
+                .bodyValue(registerPayload)
+                .exchange()
+                .expectStatus().isCreated();
+
+        LogInRequest loginPayload = new LogInRequest(uniqueEmail, "WrongPassword123");
+
+        webTestClient.post()
+                .uri("/api/v1/auth/login")
+                .bodyValue(loginPayload)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(false)
+                .jsonPath("$.message").isEqualTo("Wrong password");
+    }
+
+    @Test
     void refresh_ShouldReturnNewAccessToken() {
+        String uniqueEmail = "test" + UUID.randomUUID() + "@gmail.com";
+        List<Role> roles = List.of(Role.OWNER);
+        RegisterRequest registerPayload = new RegisterRequest(uniqueEmail, "@MockPassword123", "Mocking Testing Name", "+123456789012", roles);
+        
+        webTestClient.post()
+                .uri("/api/v1/auth/register")
+                .bodyValue(registerPayload)
+                .exchange()
+                .expectStatus().isCreated();
+
+        LogInRequest loginPayload = new LogInRequest(uniqueEmail, "@MockPassword123");
+        String[] refreshTokenHolder = new String[1];
+        
+        webTestClient.post()
+                .uri("/api/v1/auth/login")
+                .bodyValue(loginPayload)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(result -> {
+                    String setCookie = result.getResponseHeaders().getFirst(HttpHeaders.SET_COOKIE);
+                    refreshTokenHolder[0] = extractCookie(setCookie, "refresh_token");
+                });
+
         webTestClient.post()
                 .uri("/api/v1/auth/refresh")
-                .cookie("refresh_token", refreshToken)
+                .cookie("refresh_token", refreshTokenHolder[0])
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().exists(HttpHeaders.SET_COOKIE)
                 .expectBody(String.class)
                 .consumeWith(result -> {
                     String body = new String(result.getResponseBody());
-                    accessToken = JsonPath.read(body, "$.accessToken");
-                    
-                    // Verify that the refresh token cookie is updated
+                    String accessToken = JsonPath.read(body, "$.accessToken");
+                    assertThat(accessToken).isNotBlank();
+
                     String setCookie = result.getResponseHeaders().getFirst(HttpHeaders.SET_COOKIE);
                     assertThat(setCookie).isNotNull();
                     assertThat(setCookie).contains("refresh_token=");
-                })
-                .value(token -> assertThat(token).isNotBlank());
+                });
     }
 
     @Test
-    @Order(4)
+    void refresh_ShouldReturnUnauthorizedWhenNoCookie() {
+        webTestClient.post()
+                .uri("/api/v1/auth/refresh")
+                .exchange()
+                .expectStatus().isUnauthorized()
+                .expectBody()
+                .jsonPath("$.error").exists();
+    }
+
+    @Test
     void logout_ShouldClearRefreshCookieAndInvalidateSession() {
+        String uniqueEmail = "test" + UUID.randomUUID() + "@gmail.com";
+        List<Role> roles = List.of(Role.OWNER);
+        RegisterRequest registerPayload = new RegisterRequest(uniqueEmail, "@MockPassword123", "Mocking Testing Name", "+123456789012", roles);
+        
+        webTestClient.post()
+                .uri("/api/v1/auth/register")
+                .bodyValue(registerPayload)
+                .exchange()
+                .expectStatus().isCreated();
+
+        LogInRequest loginPayload = new LogInRequest(uniqueEmail, "@MockPassword123");
+        String[] accessTokenHolder = new String[1];
+        
+        webTestClient.post()
+                .uri("/api/v1/auth/login")
+                .bodyValue(loginPayload)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(result -> {
+                    accessTokenHolder[0] = result.getResponseBody();
+                });
+
         webTestClient.post()
                 .uri("/api/v1/auth/logout")
-                .header("Authorization", "Bearer " + accessToken)
+                .header("Authorization", "Bearer " + accessTokenHolder[0])
                 .exchange()
                 .expectStatus().isNoContent()
                 .expectHeader().exists(HttpHeaders.SET_COOKIE)

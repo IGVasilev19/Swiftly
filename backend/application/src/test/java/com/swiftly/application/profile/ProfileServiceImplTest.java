@@ -34,7 +34,6 @@ class ProfileServiceImplTest {
 
     @Test
     void getById_profileExists() {
-        // Arrange
         Integer profileId = 42;
 
         Profile mockProfile = new Profile(
@@ -44,12 +43,10 @@ class ProfileServiceImplTest {
 
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(mockProfile));
 
-        ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(profileRepository); // make sure this isn't null!
+        ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(profileRepository);
 
-        // Act
         Optional<Profile> result = profileServiceImpl.getById(profileId);
 
-        // Assert
         assertNotNull(result);
         assertEquals("Ada Lovelace", result.get().getFullName());
         verify(profileRepository).findById(profileId);
@@ -60,10 +57,8 @@ class ProfileServiceImplTest {
     void getById_profileNotFound_throwsException() {
         Integer profileId = 999;
 
-        // Arrange: return empty to simulate "not found"
         when(profileRepository.findById(profileId)).thenReturn(Optional.empty());
 
-        // Act + Assert
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
             profileServiceImpl.getById(profileId);
         });
