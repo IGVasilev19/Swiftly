@@ -1,8 +1,6 @@
 package com.swiftly.domain;
 
-import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -29,4 +27,15 @@ public class Listing {
     private Instant startAvailability;
 
     private Instant endAvailability;
+
+    public Listing(Vehicle vehicle, String title, String description, BigDecimal basePricePerDay, Boolean instantBook, Instant startAvailability, Instant endAvailability)
+    {
+        this.vehicle = vehicle;
+        this.title = title;
+        this.description = description;
+        this.basePricePerDay = basePricePerDay;
+        this.instantBook = instantBook;
+        this.startAvailability = startAvailability;
+        this.endAvailability = endAvailability;
+    }
 }

@@ -23,5 +23,5 @@ export interface DecodedToken {
   roles?: string[];
   authorities?: string[];
   role?: string;
-  [key: string]: unknown; // Allow for other JWT claims
+  [key: string]: unknown;
 }

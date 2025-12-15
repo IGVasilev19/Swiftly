@@ -28,7 +28,7 @@ export function useAddVehicle() {
         });
       }
 
-      const response = await api.post("/vehicle/add", formData);
+      const response = await api.post("/vehicle", formData);
 
       toast.success(response.data.message);
       navigate("/app/vehicles");

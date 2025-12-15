@@ -34,7 +34,7 @@ public class VehiclePersistenceImpl implements VehicleRepository {
         Optional<VehicleEntity> vehicleEntity = repository.findById(id);
 
 
-        return new Vehicle(vehicleEntity.get().getOwner(), vehicleEntity.get().getVin(), vehicleEntity.get().getMake(),vehicleEntity.get().getModel(), vehicleEntity.get().getColor(), vehicleEntity.get().getYear(), vehicleEntity.get().getType(), vehicleEntity.get().getFuelType(), vehicleEntity.get().getFuelConsumption(), vehicleEntity.get().getFeatures(), vehicleEntity.get().getCountry(), vehicleEntity.get().getCity());
+        return new Vehicle(id, vehicleEntity.get().getOwner(), vehicleEntity.get().getVin(), vehicleEntity.get().getMake(),vehicleEntity.get().getModel(), vehicleEntity.get().getColor(), vehicleEntity.get().getYear(), vehicleEntity.get().getType(), vehicleEntity.get().getFuelType(), vehicleEntity.get().getFuelConsumption(), vehicleEntity.get().getFeatures(), vehicleEntity.get().getCountry(), vehicleEntity.get().getCity());
     }
 
 

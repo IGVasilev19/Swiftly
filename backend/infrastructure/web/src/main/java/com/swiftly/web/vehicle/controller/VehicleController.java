@@ -9,6 +9,7 @@ import com.swiftly.web.vehicle.dto.VehicleResponse;
 import com.swiftly.web.vehicle.mapper.VehicleMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class VehicleController {
 
 
     @PreAuthorize("hasRole('OWNER')")
-    @PostMapping(value ="/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addVehicle(@RequestPart("vehicleData") VehicleRequest newVehicle, @RequestPart("images") List<MultipartFile> images)
     {
         try

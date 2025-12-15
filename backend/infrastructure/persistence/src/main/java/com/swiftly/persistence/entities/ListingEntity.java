@@ -53,4 +53,15 @@ public class ListingEntity extends Listing {
     void onCreate() {
         if (creationDate == null) creationDate = Instant.now();
     }
+
+    public ListingEntity(VehicleEntity vehicle, String title, String description, BigDecimal basePricePerDay, Boolean instantBook,  Instant startAvailability, Instant endAvailability)
+    {
+        this.vehicle = vehicle;
+        this.title = title;
+        this.description = description;
+        this.basePricePerDay = basePricePerDay;
+        this.instantBook = instantBook;
+        this.startAvailability = startAvailability;
+        this.endAvailability = endAvailability;
+    }
 }
