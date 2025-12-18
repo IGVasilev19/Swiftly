@@ -3,6 +3,7 @@ import type {
   LoginSchemaType,
   RegisterSchemaType,
 } from "@/schemas/auth/auth.schema";
+import { Card } from "@/components/ui/card";
 
 export interface LoginFormProps {
   loginForm: UseFormReturn<LoginSchemaType>;

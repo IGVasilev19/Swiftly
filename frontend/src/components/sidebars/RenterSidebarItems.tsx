@@ -7,14 +7,14 @@ export function RenterSidebarItems() {
       <SidebarItem
         label="Catalogue"
         path="/app/catalogue"
-        imgSrc="/images/dashboard-icon-nobg-gray.webp"
-        imgSrcActive="/images/dashboard-icon-nobg.webp"
+        imgSrc="/images/layout-grid-gray.webp"
+        imgSrcActive="/images/layout-grid.webp"
       />
       <SidebarItem
         label="Bookings"
         path="/app/bookings"
-        imgSrc="/images/car-side-nobg-gray.webp"
-        imgSrcActive="/images/car-side-nobg.webp"
+        imgSrc="/images/notebook-pen-gray.webp"
+        imgSrcActive="/images/notebook-pen.webp"
       />
     </>
   );

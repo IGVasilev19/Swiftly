@@ -8,6 +8,7 @@ import type { Listing } from "@/types/listing";
 export function useAddListing() {
   const navigate = useNavigate();
   const [isPending, setIsPending] = useState(false);
+
   const addListing = async (data: Listing) => {
     console.log("Adding listing with data:", data);
     try {

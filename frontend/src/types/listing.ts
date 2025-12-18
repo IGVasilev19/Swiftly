@@ -17,3 +17,17 @@ export interface AddListingFromProps {
   handleSubmit: (data: ListingSchemaType) => void;
   isPending: boolean;
 }
+
+export interface UseGetListingsReturn {
+  listings: Listing[];
+  isLoading: boolean;
+  error: Error | null;
+  refetch: () => void;
+}
+
+export interface UseGetListingReturn {
+  listing: Listing | null;
+  isLoading: boolean;
+  error: Error | null;
+  refetch: () => void;
+}

@@ -1,11 +1,13 @@
 import { Layout } from "@/components/layout/Layout";
 import React from "react";
-import ExpandableCardDemoGrid from "@/components/ui/expandable-card-demo-grid";
+import CatalogueGrid from "@/components/ui/CatalogueGrid";
 
 export function Catalogue() {
   return (
     <Layout>
-      <ExpandableCardDemoGrid />
+      <div className="w-full h-full p-4">
+        <CatalogueGrid />
+      </div>
     </Layout>
   );
 }

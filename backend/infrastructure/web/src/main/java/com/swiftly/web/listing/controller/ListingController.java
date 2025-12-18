@@ -1,6 +1,8 @@
 package com.swiftly.web.listing.controller;
 
+import com.swiftly.application.ListingManagement.port.inbound.ListingManagementService;
 import com.swiftly.application.listing.inbound.ListingService;
+import com.swiftly.domain.Listing;
 import com.swiftly.web.listing.dto.ListingRequest;
 import com.swiftly.web.listing.dto.ListingResponse;
 import com.swiftly.web.listing.mapper.ListingMapper;
@@ -8,11 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -21,18 +22,51 @@ import java.util.Map;
 @PreAuthorize("isAuthenticated()")
 public class ListingController {
     private final ListingService service;
+    private final ListingManagementService listingManagementService;
 
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping
     public ResponseEntity<?> addListing(@RequestBody ListingRequest request)
     {
-        ListingResponse response = ListingMapper.toResponse(service.create(ListingMapper.toListing(request)));
+        try
+        {
+            ListingResponse response = ListingMapper.toResponse(service.create(ListingMapper.toListing(request)));
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(Map.of(
-                        "message", "Listing created successfully",
-                        "data", response
-                ));
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(Map.of(
+                            "message", "Listing created successfully",
+                            "data", response
+                    ));
+        }catch(Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,
+                    "message", e.getMessage()));
+        }
+    }
+
+    @PreAuthorize("hasRole('RENTER')")
+    @GetMapping
+    public ResponseEntity<?> getAllListings()
+    {
+        try
+        {
+            List<ListingResponse> listingsResponse = new ArrayList<>();
+
+            List<Listing> listings = listingManagementService.getFullListings();
+
+            for (Listing listing : listings)
+            {
+                listingsResponse.add(ListingMapper.toResponse(listing));
+            }
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(listingsResponse);
+        }catch (Exception e)
+            {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,
+                        "message", e.getMessage()));
+            }
     }
 }
