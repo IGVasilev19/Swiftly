@@ -7,4 +7,10 @@ import com.swiftly.domain.enums.vehicle.VehicleType;
 
 import java.util.List;
 
-public record VehicleResponse(Integer id, Integer owner, String vin, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city, List<VehicleImage> images) { }
+public record VehicleResponse(Integer id, Integer owner, String vin, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city, List<VehicleImage> images, Boolean listed)
+{
+    public VehicleResponse withListed(Boolean listed)
+    {
+        return new VehicleResponse(id, owner, vin, make, model, color, year, type, fuelType, fuelConsumption, features, country, city, images, listed);
+    }
+}

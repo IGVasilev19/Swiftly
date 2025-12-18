@@ -22,6 +22,7 @@ import java.util.Map;
 public class ListingController {
     private final ListingService service;
 
+    @PreAuthorize("hasRole('OWNER')")
     @PostMapping
     public ResponseEntity<?> addListing(@RequestBody ListingRequest request)
     {

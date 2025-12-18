@@ -4,7 +4,15 @@ import React, { useState } from "react";
 import { Button } from "./button";
 import { VehicleDetailPlaceholder } from "./VehicleDetailPlaceholder";
 import { useNavigate } from "react-router-dom";
-import AddListingForm from "../listing/AddListingForm";
+import { AddListingForm } from "../listing/AddListingForm";
+import { useAddListing } from "@/hooks/useAddListing";
+import {
+  listingSchema,
+  type ListingSchemaType,
+} from "@/schemas/listing/listing.schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { Listing } from "@/types/listing";
 
 const formatEnumLabel = (value: string): string => {
   return value
@@ -28,13 +36,32 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
   const vehicleImages: VehicleImage[] =
     vehicle?.images && Array.isArray(vehicle.images) ? vehicle.images : [];
 
-  const handleListVehicle = async () => {
-    return;
-  };
+  const form = useForm<ListingSchemaType>({
+    resolver: zodResolver(listingSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      basePricePerDay: 0,
+      instantBook: true,
+    },
+  });
 
   const [state, setState] = useState(0);
   const navigate = useNavigate();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const { addListing, isPending } = useAddListing();
+
+  const handleListingSubmit = (data: ListingSchemaType) => {
+    const listing: Listing = {
+      vehicle: vehicle,
+      title: data.title,
+      description: data.description,
+      basePricePerDay: data.basePricePerDay,
+      instantBook: data.instantBook,
+    };
+
+    addListing(listing);
+  };
 
   return (
     <div className="flex-1 overflow-y-auto hide-scrollbar min-h-0">
@@ -52,17 +79,23 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
             <h1 className="text-3xl font-bold text-[#0F172A]">
               {state === 0 ? "Vehicle Details" : "Listing Details"}
             </h1>
-            <Button
-              variant="default"
-              className={
-                state === 0
-                  ? "bg-[#0F172A] hover:bg-[#0f172adc]"
-                  : "bg-red-700 hover:bg-red-800"
-              }
-              onClick={() => setState(state === 0 ? 1 : 0)}
-            >
-              {state === 0 ? "List Vehicle +" : "Cancel 𐌗"}
-            </Button>
+            {!vehicle.listed ? (
+              <Button
+                variant="default"
+                className={
+                  state === 0
+                    ? "bg-[#0F172A] hover:bg-[#0f172adc]"
+                    : "bg-red-700 hover:bg-red-800"
+                }
+                onClick={() => setState(state === 0 ? 1 : 0)}
+              >
+                {state === 0 ? "List Vehicle +" : "Cancel 𐌗"}
+              </Button>
+            ) : (
+              <Button variant="default" className="bg-red-700 hover:bg-red-800">
+                Remove Listing
+              </Button>
+            )}
           </div>
         </div>
         {state === 0 ? (
@@ -204,10 +237,11 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <AddListingForm />
-            <Button variant="default" onClick={handleListVehicle}>
-              Confirm Listing
-            </Button>
+            <AddListingForm
+              addListingFrom={form}
+              handleSubmit={handleListingSubmit}
+              isPending={isPending}
+            />
           </div>
         )}
       </div>

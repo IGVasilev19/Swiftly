@@ -9,7 +9,6 @@ import com.swiftly.web.vehicle.dto.VehicleResponse;
 import com.swiftly.web.vehicle.mapper.VehicleMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -67,7 +66,16 @@ public class VehicleController {
 
             for(Vehicle vehicle : vehicles)
             {
-                ownedVehicles.add(VehicleMapper.toVehicleResponse(vehicle));
+                if(service.vehicleHasListing(vehicle.getId()))
+                {
+                  VehicleResponse response = VehicleMapper.toVehicleResponse(vehicle);
+                  VehicleResponse listedVehicle =  response.withListed(true);
+                  ownedVehicles.add(listedVehicle);
+                }
+                else
+                {
+                    ownedVehicles.add(VehicleMapper.toVehicleResponse(vehicle));
+                }
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(ownedVehicles);
@@ -84,7 +92,17 @@ public class VehicleController {
         {
            VehicleResponse vehicle = VehicleMapper.toVehicleResponse(service.getFullVehicleById(id));
 
-           return ResponseEntity.status(HttpStatus.OK).body(vehicle);
+            if(service.vehicleHasListing(vehicle.id()))
+            {
+                VehicleResponse listedvehicle = vehicle.withListed(true);
+
+                return ResponseEntity.status(HttpStatus.OK).body(listedvehicle);
+            }
+            else
+            {
+                return ResponseEntity.status(HttpStatus.OK).body(vehicle);
+            }
+
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,
                     "message", e.getMessage()));

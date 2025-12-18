@@ -8,4 +8,6 @@ public interface ListingService {
     Listing create(Listing listing);
     List<Listing> getAll();
     Listing getById(Integer id);
+    Listing getByVehicleId(Integer id);
+    Boolean checkExistsByVehicleId(Integer id);
 }

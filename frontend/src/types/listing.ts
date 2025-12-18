@@ -3,19 +3,17 @@ import type { Vehicle } from "./vehicle";
 import type { UseFormReturn } from "react-hook-form/dist/types/form";
 
 export interface Listing {
-  id: number;
+  id?: number;
   vehicle: Vehicle;
   title: string;
   description: string;
-  creationDate: string;
+  creationDate?: string;
   basePricePerDay: number;
   instantBook: boolean;
-  availabilityStart: string;
-  availabilityEnd: string;
 }
 
 export interface AddListingFromProps {
-  addVehicleForm: UseFormReturn<ListingSchemaType>;
+  addListingFrom: UseFormReturn<ListingSchemaType>;
   handleSubmit: (data: ListingSchemaType) => void;
   isPending: boolean;
 }

@@ -17,7 +17,6 @@ export function useGetVehicle(
 
       const response = await api.get<Vehicle>(`/vehicle/${vehicleId}`);
 
-      console.log("Fetched vehicle:", response.data);
       setVehicle(response.data);
     } catch (err) {
       setError(

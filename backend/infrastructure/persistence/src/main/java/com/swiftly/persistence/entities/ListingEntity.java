@@ -42,26 +42,18 @@ public class ListingEntity extends Listing {
     @ColumnDefault("false")
     private Boolean instantBook = false;
 
-    @Column
-    private Instant startAvailability;
-
-    @Column
-    private Instant endAvailability;
-
 
     @PrePersist
     void onCreate() {
         if (creationDate == null) creationDate = Instant.now();
     }
 
-    public ListingEntity(VehicleEntity vehicle, String title, String description, BigDecimal basePricePerDay, Boolean instantBook,  Instant startAvailability, Instant endAvailability)
+    public ListingEntity(VehicleEntity vehicle, String title, String description, BigDecimal basePricePerDay, Boolean instantBook)
     {
         this.vehicle = vehicle;
         this.title = title;
         this.description = description;
         this.basePricePerDay = basePricePerDay;
         this.instantBook = instantBook;
-        this.startAvailability = startAvailability;
-        this.endAvailability = endAvailability;
     }
 }

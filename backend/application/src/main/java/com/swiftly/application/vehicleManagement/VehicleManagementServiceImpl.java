@@ -1,5 +1,6 @@
 package com.swiftly.application.vehicleManagement;
 
+import com.swiftly.application.listing.inbound.ListingService;
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicleImage.port.inbound.VehicleImageService;
 import com.swiftly.application.vehicleManagement.port.inbound.VehicleManagementService;
@@ -22,6 +23,7 @@ import java.util.List;
 public class VehicleManagementServiceImpl implements VehicleManagementService {
     private final VehicleService vehicleService;
     private final VehicleImageService vehicleImageService;
+    private final ListingService listingService;
 
     @Transactional
     public Vehicle addVehicle(Vehicle vehicle, List<MultipartFile> images) {
@@ -70,5 +72,10 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
         existingVehicle.setImages(images);
 
         return existingVehicle;
+    }
+
+    public Boolean vehicleHasListing(Integer id)
+    {
+        return listingService.checkExistsByVehicleId(id);
     }
 }

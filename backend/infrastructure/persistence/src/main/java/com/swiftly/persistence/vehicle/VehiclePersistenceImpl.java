@@ -79,7 +79,6 @@ public class VehiclePersistenceImpl implements VehicleRepository {
         return new Vehicle(vehicleEntity.getId(), vehicleEntity.getOwner(), vehicleEntity.getVin(), vehicleEntity.getMake(),vehicleEntity.getModel(), vehicleEntity.getColor(), vehicleEntity.getYear(), vehicleEntity.getType(), vehicleEntity.getFuelType(), vehicleEntity.getFuelConsumption(), vehicleEntity.getFeatures(), vehicleEntity.getCountry(), vehicleEntity.getCity());
     }
 
-    @Override
     public Boolean existsByVin(String vin)
     {
         return repository.existsByVin(vin);

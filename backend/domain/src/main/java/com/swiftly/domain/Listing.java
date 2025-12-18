@@ -24,18 +24,17 @@ public class Listing {
 
     private Boolean instantBook = false;
 
-    private Instant startAvailability;
+    public Listing(Integer id)
+    {
+        this.id = id;
+    }
 
-    private Instant endAvailability;
-
-    public Listing(Vehicle vehicle, String title, String description, BigDecimal basePricePerDay, Boolean instantBook, Instant startAvailability, Instant endAvailability)
+    public Listing(Vehicle vehicle, String title, String description, BigDecimal basePricePerDay, Boolean instantBook)
     {
         this.vehicle = vehicle;
         this.title = title;
         this.description = description;
         this.basePricePerDay = basePricePerDay;
         this.instantBook = instantBook;
-        this.startAvailability = startAvailability;
-        this.endAvailability = endAvailability;
     }
 }

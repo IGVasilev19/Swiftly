@@ -8,4 +8,6 @@ public interface ListingRepository {
     Listing save(Listing listing);
     List<Listing> findAll();
     Listing findById(Integer id);
+    Listing findByVehicleId(Integer id);
+    Boolean existsByVehicleId(Integer id);
 }
