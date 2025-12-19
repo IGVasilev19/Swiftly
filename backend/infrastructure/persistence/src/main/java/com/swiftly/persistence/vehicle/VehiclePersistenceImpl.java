@@ -5,9 +5,7 @@ import com.swiftly.domain.User;
 import com.swiftly.domain.Vehicle;
 import com.swiftly.persistence.entities.UserEntity;
 import com.swiftly.persistence.entities.VehicleEntity;
-import com.swiftly.persistence.user.JpaUserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -18,11 +16,10 @@ import java.util.Optional;
 @Repository
 public class VehiclePersistenceImpl implements VehicleRepository {
     private final JpaVehicleRepository repository;
-    private final JpaUserRepository userRepository;
 
     public Vehicle save(Vehicle vehicle)
     {
-        UserEntity userEntity = userRepository.getReferenceById(vehicle.getOwner().getId());
+        UserEntity userEntity = new UserEntity(vehicle.getOwner().getId());
 
         VehicleEntity vehicleEntity = new VehicleEntity(userEntity, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity());
         

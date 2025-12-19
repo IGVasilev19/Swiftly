@@ -1,5 +1,6 @@
 package com.swiftly.web.enums.controller;
 
+import com.swiftly.domain.enums.booking.Status;
 import com.swiftly.domain.enums.vehicle.Feature;
 import com.swiftly.domain.enums.vehicle.FuelType;
 import com.swiftly.domain.enums.vehicle.VehicleType;
@@ -24,5 +25,11 @@ public class EnumController {
     @GetMapping("/features")
     public Feature[] features() {
         return Feature.values();
+    }
+
+    @GetMapping("/booking-statuses")
+    public Status[] bookingStatuses()
+    {
+        return Status.values();
     }
 }

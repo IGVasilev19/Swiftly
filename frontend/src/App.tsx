@@ -14,6 +14,7 @@ import { RequireRenter } from "./guards/RequireRenter";
 import { Catalogue } from "./routes/(root)/Catalogue/Catalogue";
 import { Bookings } from "./routes/(root)/Bookings/Bookings";
 import { Unauthorized } from "./routes/(root)/Unauthorized/Unauthorized";
+import AddBooking from "./routes/(root)/Bookings/AddBooking";
 
 const App = () => {
   return (
@@ -70,6 +71,14 @@ const App = () => {
                 element={
                   <RequireRenter>
                     <Bookings />
+                  </RequireRenter>
+                }
+              />
+              <Route
+                path="bookings/add"
+                element={
+                  <RequireRenter>
+                    <AddBooking />
                   </RequireRenter>
                 }
               />

@@ -1,4 +1,4 @@
-package com.swiftly.application.ListingManagement.port.inbound;
+package com.swiftly.application.listingManagement.port.inbound;
 
 import com.swiftly.domain.Listing;
 

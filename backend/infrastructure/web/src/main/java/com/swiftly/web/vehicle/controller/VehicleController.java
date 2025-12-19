@@ -25,7 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/vehicle")
 @PreAuthorize("isAuthenticated()")
-@Tag(name="vehicles")
+@Tag(name="Vehicle")
 public class VehicleController {
     private final VehicleManagementService service;
     private final VehicleService vehicleService;

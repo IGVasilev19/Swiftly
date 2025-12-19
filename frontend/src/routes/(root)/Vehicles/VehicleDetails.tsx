@@ -37,7 +37,7 @@ export function VehicleDetails() {
   }
 
   return (
-    <div className="w-full h-full overflow-y-hidden flex flex-col">
+    <div className="w-full h-full flex flex-col overflow-y-auto hide-scrollbar">
       <VehicleDetailsCard vehicle={vehicle} />
     </div>
   );

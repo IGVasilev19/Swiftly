@@ -27,4 +27,27 @@ public class Booking {
 
     private User renter;
 
+    public Booking(Integer id)
+    {
+        this.id = id;
+    }
+
+    public Booking(Listing listing, User renter, Instant startAt, Instant endAt, Status status)
+    {
+        this.listing = listing;
+        this.renter = renter;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.status = status;
+    }
+
+    public Booking(Listing listing, User renter, Instant startAt, Instant endAt, Status status,  BigDecimal totalPrice)
+    {
+        this.listing = listing;
+        this.renter = renter;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.status = status;
+        this.totalPrice = totalPrice;
+    }
 }

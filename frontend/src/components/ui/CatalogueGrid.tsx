@@ -8,12 +8,16 @@ import type { VehicleImage } from "@/types/vehicle";
 import { useGetListings } from "@/hooks/useGetListings";
 import Loading from "@/components/ui/Loading";
 import { VehicleImageGallery } from "./VehicleImageGallery";
+import { Button } from "./button";
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
+import { useNavigate } from "react-router-dom";
 
 export default function CatalogueGrid() {
   const [active, setActive] = useState<Listing | null>(null);
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
   const { listings, isLoading, error } = useGetListings();
+  const navigate = useNavigate();
 
   const getImageUrl = (image?: VehicleImage): string | null | undefined => {
     if (!image) {
@@ -103,7 +107,7 @@ export default function CatalogueGrid() {
             <motion.div
               layoutId={`card-${active.title}-${id}`}
               ref={ref}
-              className="w-full max-w-[500px] h-full md:h-fit md:max-h-[90%] flex flex-col bg-white sm:rounded-3xl overflow-y-auto"
+              className="w-full max-w-[500px] h-full md:h-fit md:max-h-[90%] flex flex-col bg-white sm:rounded-3xl overflow-y-auto hide-scrollbar"
             >
               <div className="p-4">
                 <VehicleImageGallery vehicle={active.vehicle} />
@@ -114,29 +118,24 @@ export default function CatalogueGrid() {
                   <div className="">
                     <motion.h3
                       layoutId={`title-${active.title}-${active.id}`}
-                      className="font-medium text-neutral-700 "
+                      className="font-medium text-[#0F172A]"
                     >
                       {active.title}
                     </motion.h3>
                     <motion.p
                       layoutId={`description-${active.vehicle.make} ${active.vehicle.model} ${active.vehicle.year} - ${active.id}`}
-                      className="text-neutral-600  text-base"
+                      className="text-[#0f172a9a]  text-base"
                     >
                       {`${active.vehicle.make} ${active.vehicle.model} ${active.vehicle.year}`}
                     </motion.p>
                   </div>
 
-                  <motion.a
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    href={"/app/listings/" + active.id}
-                    target="_blank"
-                    className="px-4 py-3 text-sm rounded-full font-bold bg-green-500 text-white"
+                  <Button
+                    className="bg-[#00A0A0] hover:bg-[#00a0a0ba]"
+                    onClick={() => navigate("/app/bookings/add")}
                   >
                     Book Now
-                  </motion.a>
+                  </Button>
                 </div>
                 <div className="pt-4 relative px-4">
                   <motion.div
@@ -144,10 +143,35 @@ export default function CatalogueGrid() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="text-neutral-600 text-xs md:text-sm lg:text-base h-40 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto dark:text-neutral-400 [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
+                    className="text-[#0f172a9a] text-xs md:text-sm lg:text-base h-40 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
                   >
                     {active.description}
                   </motion.div>
+                  <div className="flex justify-between items-center mb-4">
+                    <p className="text-[#0f172a9a] text-xs md:text-sm lg:text-base md:h-fit text-start">
+                      {active.creationDate &&
+                        new Date(active.creationDate).toLocaleString("en-GB", {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                          timeZone: "UTC",
+                        })}
+                    </p>
+                    <div className="flex gap-2 justify-center items-center">
+                      <p className="text-[#0f172a9a] text-xs md:text-sm lg:text-base md:h-fit text-start">
+                        Posted By:
+                      </p>
+                      <Avatar
+                        title="User"
+                        className="w-[50px] h-[50px] select-none rounded-full"
+                      >
+                        <AvatarImage
+                          src="https://github.com/shadcn.png"
+                          alt="User Avatar"
+                        />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -186,13 +210,13 @@ export default function CatalogueGrid() {
               <div className="flex justify-center items-center flex-col">
                 <motion.h3
                   layoutId={`title-${listing.title}-${id}`}
-                  className="font-medium text-neutral-800  text-center md:text-left text-base"
+                  className="font-medium text-[#0F172A] text-center md:text-left text-base"
                 >
                   {listing.title}
                 </motion.h3>
                 <motion.p
                   layoutId={`description-${listing.vehicle.make} ${listing.vehicle.model} ${listing.vehicle.year} - ${id}`}
-                  className="text-neutral-600 text-base"
+                  className="text-[#0f172a9a] text-base"
                 >
                   {`${listing.vehicle.make} ${listing.vehicle.model} ${listing.vehicle.year}`}
                 </motion.p>
@@ -229,7 +253,7 @@ export const CloseIcon = () => {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-4 w-4 text-black"
+      className="h-4 w-4 text-[#0F172A]"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M18 6l-12 12" />

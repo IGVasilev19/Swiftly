@@ -1,8 +1,7 @@
-package com.swiftly.application.ListingManagement.port;
+package com.swiftly.application.listingManagement;
 
-import com.swiftly.application.ListingManagement.port.inbound.ListingManagementService;
+import com.swiftly.application.listingManagement.port.inbound.ListingManagementService;
 import com.swiftly.application.listing.inbound.ListingService;
-import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicleManagement.port.inbound.VehicleManagementService;
 import com.swiftly.domain.Listing;
 import lombok.RequiredArgsConstructor;

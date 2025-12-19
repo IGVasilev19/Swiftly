@@ -50,4 +50,18 @@ public class BookingEntity extends Booking {
         if (creationDate == null) creationDate = Instant.now();
     }
 
+    public BookingEntity(Integer id)
+    {
+        this.id = id;
+    }
+
+    public BookingEntity(ListingEntity listing, UserEntity renter, Instant startAt, Instant endAt, Status status, BigDecimal totalPrice)
+    {
+        this.listing = listing;
+        this.renter = renter;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.status = status;
+        this.totalPrice = totalPrice;
+    }
 }

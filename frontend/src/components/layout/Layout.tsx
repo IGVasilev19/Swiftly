@@ -32,7 +32,7 @@ export function Layout({ children }: LayoutProps) {
     roles.some((role) => String(role).toUpperCase() === "RENTER");
 
   return (
-    <div className="h-screen w-screen flex">
+    <div className="h-screen w-screen flex hide-scrollbar">
       <div className="h-full w-[200px] flex flex-col items-center bg-[#F8FAFC]">
         <button
           className="hover:cursor-pointer"

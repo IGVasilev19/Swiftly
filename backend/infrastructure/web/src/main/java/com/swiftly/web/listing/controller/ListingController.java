@@ -1,11 +1,12 @@
 package com.swiftly.web.listing.controller;
 
-import com.swiftly.application.ListingManagement.port.inbound.ListingManagementService;
+import com.swiftly.application.listingManagement.port.inbound.ListingManagementService;
 import com.swiftly.application.listing.inbound.ListingService;
 import com.swiftly.domain.Listing;
 import com.swiftly.web.listing.dto.ListingRequest;
 import com.swiftly.web.listing.dto.ListingResponse;
 import com.swiftly.web.listing.mapper.ListingMapper;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/listing")
 @PreAuthorize("isAuthenticated()")
+@Tag(name="Listing")
 public class ListingController {
     private final ListingService service;
     private final ListingManagementService listingManagementService;

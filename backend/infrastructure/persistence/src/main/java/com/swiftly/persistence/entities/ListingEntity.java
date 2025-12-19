@@ -48,6 +48,11 @@ public class ListingEntity extends Listing {
         if (creationDate == null) creationDate = Instant.now();
     }
 
+    public ListingEntity(Integer id)
+    {
+        this.id = id;
+    }
+
     public ListingEntity(VehicleEntity vehicle, String title, String description, BigDecimal basePricePerDay, Boolean instantBook)
     {
         this.vehicle = vehicle;

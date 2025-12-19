@@ -23,8 +23,6 @@ const formatEnumLabel = (value: string): string => {
 };
 
 export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
-
-
   const vehicleImages: VehicleImage[] =
     vehicle?.images && Array.isArray(vehicle.images) ? vehicle.images : [];
 
