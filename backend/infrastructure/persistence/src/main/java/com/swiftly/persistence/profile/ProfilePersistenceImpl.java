@@ -16,11 +16,11 @@ public class ProfilePersistenceImpl implements ProfileRepository {
     private final JpaProfileRepository repository;
 
 
-    public Optional<Profile> findById(Integer id)
+    public Profile findById(Integer id)
     {
         Optional<ProfileEntity> profileEntity = repository.findById(id);
 
-        return Optional.of(profileEntity.get());
+        return new Profile(profileEntity.get().getId(), profileEntity.get().getFullName(), profileEntity.get().getPhone(), profileEntity.get().getAvatarUrl());
     }
 
     public Profile save(Profile profile)

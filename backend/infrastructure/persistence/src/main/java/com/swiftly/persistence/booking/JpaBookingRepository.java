@@ -12,5 +12,5 @@ public interface JpaBookingRepository extends JpaRepository<BookingEntity, Integ
     BookingEntity findByRenterId(Integer renterId);
     List<BookingEntity> findAllByRenterId(Integer renterId);
     List<BookingEntity> findAllByListingId(Integer listingId);
-    Boolean existsByListingIdAndStartDateLessThanAndEndDateGreaterThan(Integer listingId, Instant end, Instant start);
+    Boolean existsByListingIdAndStartAtLessThanAndEndAtGreaterThan(Integer listingId, Instant endAt, Instant startAt);
 }

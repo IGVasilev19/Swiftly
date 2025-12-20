@@ -25,14 +25,14 @@ public class Booking {
 
     private Listing listing;
 
-    private User renter;
+    private Profile renter;
 
     public Booking(Integer id)
     {
         this.id = id;
     }
 
-    public Booking(Listing listing, User renter, Instant startAt, Instant endAt, Status status)
+    public Booking(Listing listing, Profile renter, Instant startAt, Instant endAt, Status status)
     {
         this.listing = listing;
         this.renter = renter;
@@ -41,7 +41,7 @@ public class Booking {
         this.status = status;
     }
 
-    public Booking(Listing listing, User renter, Instant startAt, Instant endAt, Status status,  BigDecimal totalPrice)
+    public Booking(Listing listing, Profile renter, Instant startAt, Instant endAt, Status status,  BigDecimal totalPrice)
     {
         this.listing = listing;
         this.renter = renter;

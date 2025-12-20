@@ -3,7 +3,7 @@ package com.swiftly.persistence.listing;
 import com.swiftly.application.listing.outbound.ListingRepository;
 import com.swiftly.domain.Listing;
 import com.swiftly.persistence.entities.ListingEntity;
-import com.swiftly.persistence.entities.UserEntity;
+import com.swiftly.persistence.entities.ProfileEntity;
 import com.swiftly.persistence.entities.VehicleEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,7 +19,7 @@ public class ListingPersistenceImpl implements ListingRepository {
 
     public Listing save(Listing listing) {
 
-        UserEntity owner = new UserEntity(listing.getVehicle().getOwner().getId());
+        ProfileEntity owner = new ProfileEntity(listing.getVehicle().getOwner().getId());
         VehicleEntity vehicleEntity = new VehicleEntity(listing.getVehicle().getId(), owner, listing.getVehicle().getVin(), listing.getVehicle().getMake(),listing.getVehicle().getModel(),listing.getVehicle().getColor(),listing.getVehicle().getYear(),listing.getVehicle().getType(),listing.getVehicle().getFuelType(),listing.getVehicle().getFuelConsumption(),listing.getVehicle().getFeatures(),listing.getVehicle().getCountry(),listing.getVehicle().getCity());
 
         return repository.save(new ListingEntity(vehicleEntity, listing.getTitle(), listing.getDescription(), listing.getBasePricePerDay(), listing.getInstantBook()));

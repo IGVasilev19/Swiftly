@@ -1,7 +1,7 @@
 package com.swiftly.web.listing.controller;
 
-import com.swiftly.application.listingManagement.port.inbound.ListingManagementService;
 import com.swiftly.application.listing.inbound.ListingService;
+import com.swiftly.application.listingManagement.port.inbound.ListingManagementService;
 import com.swiftly.domain.Listing;
 import com.swiftly.web.listing.dto.ListingRequest;
 import com.swiftly.web.listing.dto.ListingResponse;

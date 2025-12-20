@@ -1,7 +1,7 @@
 package com.swiftly.application.listingManagement;
 
-import com.swiftly.application.listingManagement.port.inbound.ListingManagementService;
 import com.swiftly.application.listing.inbound.ListingService;
+import com.swiftly.application.listingManagement.port.inbound.ListingManagementService;
 import com.swiftly.application.vehicleManagement.port.inbound.VehicleManagementService;
 import com.swiftly.domain.Listing;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class ListingManagementServiceImpl implements ListingManagementService {
 
         for(Listing listing : listings)
         {
-           listing.setVehicle( vehicleService.getFullVehicleById(listing.getVehicle().getId()));
+            listing.setVehicle( vehicleService.getFullVehicleById(listing.getVehicle().getId()));
         }
 
         return listings;

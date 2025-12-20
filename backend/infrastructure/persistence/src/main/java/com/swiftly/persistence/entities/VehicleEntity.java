@@ -24,7 +24,7 @@ public class VehicleEntity extends Vehicle {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
-    private UserEntity owner;
+    private ProfileEntity owner;
 
     @Column(nullable = false,  length = 17, unique = true)
     private String vin;
@@ -79,7 +79,7 @@ public class VehicleEntity extends Vehicle {
         this.id = id;
     }
 
-    public VehicleEntity(UserEntity owner, String VIN, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
+    public VehicleEntity(ProfileEntity owner, String VIN, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
     {
         this.owner = owner;
         this.vin = VIN;
@@ -95,7 +95,7 @@ public class VehicleEntity extends Vehicle {
         this.city = city;
     }
 
-    public VehicleEntity(Integer id, UserEntity owner, String VIN, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
+    public VehicleEntity(Integer id, ProfileEntity owner, String VIN, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
     {
         this.id = id;
         this.owner = owner;

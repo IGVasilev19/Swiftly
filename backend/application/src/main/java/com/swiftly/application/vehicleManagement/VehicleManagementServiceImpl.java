@@ -1,9 +1,11 @@
 package com.swiftly.application.vehicleManagement;
 
 import com.swiftly.application.listing.inbound.ListingService;
+import com.swiftly.application.profile.port.inbound.ProfileService;
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicleImage.port.inbound.VehicleImageService;
 import com.swiftly.application.vehicleManagement.port.inbound.VehicleManagementService;
+import com.swiftly.domain.Profile;
 import com.swiftly.domain.User;
 import com.swiftly.domain.Vehicle;
 import com.swiftly.domain.VehicleImage;
@@ -24,10 +26,12 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     private final VehicleService vehicleService;
     private final VehicleImageService vehicleImageService;
     private final ListingService listingService;
+    private final ProfileService profileService;
 
     @Transactional
     public Vehicle addVehicle(Vehicle vehicle, List<MultipartFile> images) {
-        User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Profile owner = profileService.getById(loggedUser.getId());
         vehicle.setOwner(owner);
 
         Vehicle newVehicle = vehicleService.create(vehicle);

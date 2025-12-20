@@ -6,5 +6,5 @@ import java.util.Optional;
 
 
 public interface ProfileService {
-    Optional<Profile> getById(Integer id);
+    Profile getById(Integer id);
 }

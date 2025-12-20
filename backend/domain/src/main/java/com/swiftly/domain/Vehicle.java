@@ -19,7 +19,7 @@ public class Vehicle {
 
     private Integer id;
 
-    private User owner;
+    private Profile owner;
 
     private String vin;
 
@@ -72,7 +72,7 @@ public class Vehicle {
         this.city = city;
     }
 
-    public Vehicle (Integer id,User owner, String vin, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
+    public Vehicle (Integer id, Profile owner, String vin, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
     {
         this.id = id;
         this.owner = owner;
@@ -89,7 +89,7 @@ public class Vehicle {
         this.city = city;
     }
 
-    public Vehicle (User owner, String vin, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
+    public Vehicle (Profile owner, String vin, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city)
     {
         this.owner = owner;
         this.vin = vin;
@@ -105,7 +105,7 @@ public class Vehicle {
         this.city = city;
     }
 
-    public Vehicle (User owner, String vin, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city, List<VehicleImage> images)
+    public Vehicle (Profile owner, String vin, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city, List<VehicleImage> images)
     {
         this.owner = owner;
         this.vin = vin;
@@ -122,7 +122,7 @@ public class Vehicle {
         this.images = images;
     }
 
-    public Vehicle (Integer id,User owner, String vin, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city, List<VehicleImage> images)
+    public Vehicle (Integer id, Profile owner, String vin, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city, List<VehicleImage> images)
     {
         this.id = id;
         this.owner = owner;

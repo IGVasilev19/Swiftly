@@ -1,5 +1,6 @@
 package com.swiftly.persistence.entities;
 import com.swiftly.domain.Booking;
+import com.swiftly.domain.Profile;
 import com.swiftly.domain.enums.booking.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,7 +27,7 @@ public class BookingEntity extends Booking {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "renter_id", nullable = false)
-    private UserEntity renter;
+    private ProfileEntity renter;
 
     @Column(name = "start_at", nullable = false)
     private Instant startAt;
@@ -39,7 +40,7 @@ public class BookingEntity extends Booking {
     private Instant creationDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 16)
+    @Column(nullable = true)
     private Status status;
 
     @Column(nullable = false, precision = 12, scale = 2)
@@ -55,7 +56,7 @@ public class BookingEntity extends Booking {
         this.id = id;
     }
 
-    public BookingEntity(ListingEntity listing, UserEntity renter, Instant startAt, Instant endAt, Status status, BigDecimal totalPrice)
+    public BookingEntity(ListingEntity listing, ProfileEntity renter, Instant startAt, Instant endAt, Status status, BigDecimal totalPrice)
     {
         this.listing = listing;
         this.renter = renter;

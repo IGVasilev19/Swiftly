@@ -17,6 +17,15 @@ public class Profile {
 
     private String avatarUrl;
 
+
+    public Profile(Integer id, String fullName, String phone, String avatarUrl)
+    {
+        this.id = id;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.avatarUrl = avatarUrl;
+    }
+
     public Profile( String fullName, String phone)
     {
         this.fullName = fullName;

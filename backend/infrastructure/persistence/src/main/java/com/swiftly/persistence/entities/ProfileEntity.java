@@ -29,6 +29,11 @@ public class ProfileEntity extends Profile {
     @Column
     private String avatarUrl;
 
+    public ProfileEntity(Integer id)
+    {
+        this.id = id;
+    }
+
     public ProfileEntity(UserEntity userEntity, String fullName, String phone, String avatarUrl) {
         this.user = userEntity;
         this.fullName = fullName;

@@ -4,7 +4,7 @@ import com.swiftly.application.booking.port.outbound.BookingRepository;
 import com.swiftly.domain.Booking;
 import com.swiftly.persistence.entities.BookingEntity;
 import com.swiftly.persistence.entities.ListingEntity;
-import com.swiftly.persistence.entities.UserEntity;
+import com.swiftly.persistence.entities.ProfileEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -21,7 +21,7 @@ public class BookingPersistenceImpl implements BookingRepository {
     public Booking save(Booking booking) {
         ListingEntity listingEntity = new ListingEntity(booking.getListing().getId());
 
-        UserEntity renter = new UserEntity(booking.getRenter().getId());
+        ProfileEntity renter = new ProfileEntity(booking.getRenter().getId());
 
         BookingEntity bookingEntity = new BookingEntity(listingEntity, renter, booking.getStartAt(), booking.getEndAt(), booking.getStatus(), booking.getTotalPrice());
 
@@ -82,8 +82,8 @@ public class BookingPersistenceImpl implements BookingRepository {
         return bookings;
     }
 
-    public Boolean existsByListingIdAndStartDateLessThanAndEndDateGreaterThan(Integer listingId, Instant end, Instant start)
+    public Boolean existsByListingIdAndStartDateLessThanAndEndDateGreaterThan(Integer listingId, Instant endAt, Instant startAt)
     {
-        return repository.existsByListingIdAndStartDateLessThanAndEndDateGreaterThan(listingId, end, start);
+        return repository.existsByListingIdAndStartAtLessThanAndEndAtGreaterThan(listingId, endAt, startAt);
     }
 }

@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS public.bookings
+    ALTER COLUMN status DROP NOT NULL;

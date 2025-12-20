@@ -1,9 +1,9 @@
 package com.swiftly.persistence.vehicle;
 
 import com.swiftly.application.vehicle.port.outbound.VehicleRepository;
-import com.swiftly.domain.User;
+import com.swiftly.domain.Profile;
 import com.swiftly.domain.Vehicle;
-import com.swiftly.persistence.entities.UserEntity;
+import com.swiftly.persistence.entities.ProfileEntity;
 import com.swiftly.persistence.entities.VehicleEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,9 +19,9 @@ public class VehiclePersistenceImpl implements VehicleRepository {
 
     public Vehicle save(Vehicle vehicle)
     {
-        UserEntity userEntity = new UserEntity(vehicle.getOwner().getId());
+        ProfileEntity profileEntity = new ProfileEntity(vehicle.getOwner().getId());
 
-        VehicleEntity vehicleEntity = new VehicleEntity(userEntity, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity());
+        VehicleEntity vehicleEntity = new VehicleEntity(profileEntity, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity());
         
         return repository.save(vehicleEntity);
     }
@@ -41,9 +41,9 @@ public class VehiclePersistenceImpl implements VehicleRepository {
 
         for (VehicleEntity vehicleEntity : vehicleList)
         {
-            User user = new User(vehicleEntity.getOwner().getId());
+            Profile profile = new Profile(vehicleEntity.getOwner().getId());
 
-            vehicles.add(new Vehicle(vehicleEntity.getId(), user, vehicleEntity.getVin(), vehicleEntity.getMake(),vehicleEntity.getModel(), vehicleEntity.getColor(), vehicleEntity.getYear(), vehicleEntity.getType(), vehicleEntity.getFuelType(), vehicleEntity.getFuelConsumption(), vehicleEntity.getFeatures(), vehicleEntity.getCountry(), vehicleEntity.getCity()));
+            vehicles.add(new Vehicle(vehicleEntity.getId(), profile, vehicleEntity.getVin(), vehicleEntity.getMake(),vehicleEntity.getModel(), vehicleEntity.getColor(), vehicleEntity.getYear(), vehicleEntity.getType(), vehicleEntity.getFuelType(), vehicleEntity.getFuelConsumption(), vehicleEntity.getFeatures(), vehicleEntity.getCountry(), vehicleEntity.getCity()));
         }
 
         return vehicles;
@@ -56,9 +56,9 @@ public class VehiclePersistenceImpl implements VehicleRepository {
 
         for (VehicleEntity vehicleEntity : vehicleList)
         {
-            User user = new User(vehicleEntity.getOwner().getId());
+            Profile profile = new Profile(vehicleEntity.getOwner().getId());
 
-            vehicles.add(new Vehicle(vehicleEntity.getId(), user, vehicleEntity.getVin(), vehicleEntity.getMake(),vehicleEntity.getModel(), vehicleEntity.getColor(), vehicleEntity.getYear(), vehicleEntity.getType(), vehicleEntity.getFuelType(), vehicleEntity.getFuelConsumption(), vehicleEntity.getFeatures(), vehicleEntity.getCountry(), vehicleEntity.getCity()));
+            vehicles.add(new Vehicle(vehicleEntity.getId(), profile, vehicleEntity.getVin(), vehicleEntity.getMake(),vehicleEntity.getModel(), vehicleEntity.getColor(), vehicleEntity.getYear(), vehicleEntity.getType(), vehicleEntity.getFuelType(), vehicleEntity.getFuelConsumption(), vehicleEntity.getFeatures(), vehicleEntity.getCountry(), vehicleEntity.getCity()));
         }
 
         return vehicles;

@@ -14,8 +14,8 @@ public class ProfileServiceImpl implements ProfileService {
     private final ProfileRepository profileRepository;
 
 
-    public Optional<Profile> getById(Integer id)
+    public Profile getById(Integer id)
     {
-        return Optional.ofNullable(profileRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Profile not found")));
+        return profileRepository.findById(id);
     }
 }
