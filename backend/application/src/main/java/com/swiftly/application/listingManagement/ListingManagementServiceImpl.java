@@ -26,4 +26,13 @@ public class ListingManagementServiceImpl implements ListingManagementService {
 
         return listings;
     }
+
+    public Listing getFullListing(Integer id)
+    {
+        Listing listing = listingService.getById(id);
+
+        listing.setVehicle( vehicleService.getFullVehicleById(listing.getVehicle().getId()));
+
+        return listing;
+    }
 }

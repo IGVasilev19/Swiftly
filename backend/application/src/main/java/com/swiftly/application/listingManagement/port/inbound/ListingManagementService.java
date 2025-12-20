@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ListingManagementService {
     List<Listing> getFullListings();
+    Listing getFullListing(Integer id);
 }

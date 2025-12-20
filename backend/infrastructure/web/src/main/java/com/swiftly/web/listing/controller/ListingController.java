@@ -71,4 +71,21 @@ public class ListingController {
                         "message", e.getMessage()));
             }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getListing(@PathVariable("id") Integer id)
+    {
+        try
+        {
+            ListingResponse response = ListingMapper.toResponse(listingManagementService.getFullListing(id));
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(response);
+        }catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,
+                    "message", e.getMessage()));
+        }
+    }
 }
