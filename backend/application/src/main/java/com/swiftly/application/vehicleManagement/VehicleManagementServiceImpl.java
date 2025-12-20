@@ -71,6 +71,8 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     {
         Vehicle existingVehicle = vehicleService.getById(id);
 
+        existingVehicle.setOwner(profileService.getById(existingVehicle.getOwner().getId()));
+
         List<VehicleImage> images = vehicleImageService.getAllByVehicleId(id);
 
         existingVehicle.setImages(images);

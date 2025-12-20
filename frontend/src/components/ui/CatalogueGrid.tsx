@@ -161,13 +161,10 @@ export default function CatalogueGrid() {
                         Posted By:
                       </p>
                       <Avatar
-                        title="User"
+                        title={active.vehicle.owner?.fullName ?? "User"}
                         className="w-[50px] h-[50px] select-none rounded-full"
                       >
-                        <AvatarImage
-                          src="https://github.com/shadcn.png"
-                          alt="User Avatar"
-                        />
+                        <AvatarImage src="https://github.com/shadcn.png" />
                         <AvatarFallback>CN</AvatarFallback>
                       </Avatar>
                     </div>

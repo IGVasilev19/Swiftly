@@ -1,6 +1,7 @@
 import type { SelectMenuOption } from "@/lib/types";
 import type { VehicleSchemaType } from "@/schemas/vehicle/vehicle.schema";
 import type { UseFormReturn } from "react-hook-form/dist/types/form";
+import type { Profile } from "./profile";
 
 export interface AddVehicleFormProps {
   addVehicleForm: UseFormReturn<VehicleSchemaType>;
@@ -25,6 +26,7 @@ export interface VehicleImage {
 
 export interface Vehicle {
   id?: number;
+  owner?: Profile;
   vin: string;
   make: string;
   model: string;
