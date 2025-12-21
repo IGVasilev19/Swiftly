@@ -8,5 +8,5 @@ import java.util.List;
 public interface VehicleManagementService {
     Vehicle addVehicle(Vehicle vehicle, List<MultipartFile> images);
     Vehicle getFullVehicleById(Integer id);
-    Boolean vehicleHasListing(Integer id);
+    void populateVehicleWithImages(Vehicle vehicle);
 }

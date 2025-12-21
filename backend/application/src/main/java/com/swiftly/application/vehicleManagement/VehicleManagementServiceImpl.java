@@ -1,6 +1,5 @@
 package com.swiftly.application.vehicleManagement;
 
-import com.swiftly.application.listing.inbound.ListingService;
 import com.swiftly.application.profile.port.inbound.ProfileService;
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicleImage.port.inbound.VehicleImageService;
@@ -25,7 +24,6 @@ import java.util.List;
 public class VehicleManagementServiceImpl implements VehicleManagementService {
     private final VehicleService vehicleService;
     private final VehicleImageService vehicleImageService;
-    private final ListingService listingService;
     private final ProfileService profileService;
 
     @Transactional
@@ -71,17 +69,15 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     {
         Vehicle existingVehicle = vehicleService.getById(id);
 
-        existingVehicle.setOwner(profileService.getById(existingVehicle.getOwner().getId()));
-
-        List<VehicleImage> images = vehicleImageService.getAllByVehicleId(id);
-
-        existingVehicle.setImages(images);
+        populateVehicleWithImages(existingVehicle);
 
         return existingVehicle;
     }
 
-    public Boolean vehicleHasListing(Integer id)
+    public void populateVehicleWithImages(Vehicle vehicle)
     {
-        return listingService.checkExistsByVehicleId(id);
+        List<VehicleImage> images = vehicleImageService.getAllByVehicleId(vehicle.getId());
+
+        vehicle.setImages(images);
     }
 }

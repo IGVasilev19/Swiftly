@@ -1,7 +1,6 @@
 package com.swiftly.web.listing.controller;
 
 import com.swiftly.application.listing.inbound.ListingService;
-import com.swiftly.application.listingManagement.port.inbound.ListingManagementService;
 import com.swiftly.domain.Listing;
 import com.swiftly.web.listing.dto.ListingRequest;
 import com.swiftly.web.listing.dto.ListingResponse;
@@ -24,7 +23,6 @@ import java.util.Map;
 @Tag(name="Listing")
 public class ListingController {
     private final ListingService service;
-    private final ListingManagementService listingManagementService;
 
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping
@@ -55,7 +53,7 @@ public class ListingController {
         {
             List<ListingResponse> listingsResponse = new ArrayList<>();
 
-            List<Listing> listings = listingManagementService.getFullListings();
+            List<Listing> listings = service.getAll();
 
             for (Listing listing : listings)
             {
@@ -77,7 +75,7 @@ public class ListingController {
     {
         try
         {
-            ListingResponse response = ListingMapper.toResponse(listingManagementService.getFullListing(id));
+            ListingResponse response = ListingMapper.toResponse(service.getById(id));
 
             return ResponseEntity
                     .status(HttpStatus.OK)

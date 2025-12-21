@@ -24,7 +24,7 @@ public class UserEntity extends User {
     @Column(nullable = false, length = 255)
     private String passwordHash;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id")

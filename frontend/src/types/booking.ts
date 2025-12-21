@@ -12,3 +12,4 @@ export interface Booking {
   totalPrice: number;
   [key: string]: unknown;
 }
+//Implement Listing Details page, make a getLisitng hook, make a booking zod schema and form, implement create booking

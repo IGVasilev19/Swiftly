@@ -50,7 +50,7 @@ public class VehicleEntity extends Vehicle {
     @Column(nullable = false)
     private Double fuelConsumption;
 
-    @ElementCollection(targetClass = Feature.class, fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = Feature.class, fetch = FetchType.LAZY)
     @CollectionTable(
             name = "vehicle_features",
             joinColumns = @JoinColumn(name = "vehicle_id")

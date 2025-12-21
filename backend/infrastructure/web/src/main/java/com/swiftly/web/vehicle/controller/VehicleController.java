@@ -1,5 +1,6 @@
 package com.swiftly.web.vehicle.controller;
 
+import com.swiftly.application.listing.inbound.ListingService;
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicleManagement.port.inbound.VehicleManagementService;
 import com.swiftly.domain.User;
@@ -29,6 +30,7 @@ import java.util.Map;
 public class VehicleController {
     private final VehicleManagementService service;
     private final VehicleService vehicleService;
+    private final ListingService listingService;
 
 
     @PreAuthorize("hasRole('OWNER')")
@@ -66,7 +68,7 @@ public class VehicleController {
 
             for(Vehicle vehicle : vehicles)
             {
-                if(service.vehicleHasListing(vehicle.getId()))
+                if(listingService.checkExistsByVehicleId(vehicle.getId()))
                 {
                   VehicleResponse response = VehicleMapper.toVehicleResponse(vehicle);
                   VehicleResponse listedVehicle =  response.withListed(true);
@@ -92,7 +94,7 @@ public class VehicleController {
         {
            VehicleResponse vehicle = VehicleMapper.toVehicleResponse(service.getFullVehicleById(id));
 
-            if(service.vehicleHasListing(vehicle.id()))
+            if(listingService.checkExistsByVehicleId(vehicle.id()))
             {
                 VehicleResponse listedvehicle = vehicle.withListed(true);
 
