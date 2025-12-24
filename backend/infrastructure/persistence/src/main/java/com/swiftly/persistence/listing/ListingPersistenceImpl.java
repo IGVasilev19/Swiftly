@@ -2,8 +2,8 @@ package com.swiftly.persistence.listing;
 
 import com.swiftly.application.listing.outbound.ListingRepository;
 import com.swiftly.domain.Listing;
+import com.swiftly.domain.Vehicle;
 import com.swiftly.persistence.entities.ListingEntity;
-import com.swiftly.persistence.entities.ProfileEntity;
 import com.swiftly.persistence.entities.VehicleEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -16,13 +16,19 @@ import java.util.Optional;
 @Repository
 public class ListingPersistenceImpl implements ListingRepository {
     private final JpaListingRepository repository;
+    private final com.swiftly.persistence.vehicle.JpaVehicleRepository vehicleRepository;
 
     public Listing save(Listing listing) {
+        VehicleEntity vehicleEntity = vehicleRepository.findById(listing.getVehicle().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
 
-        ProfileEntity owner = new ProfileEntity(listing.getVehicle().getOwner().getId());
-        VehicleEntity vehicleEntity = new VehicleEntity(listing.getVehicle().getId(), owner, listing.getVehicle().getVin(), listing.getVehicle().getMake(),listing.getVehicle().getModel(),listing.getVehicle().getColor(),listing.getVehicle().getYear(),listing.getVehicle().getType(),listing.getVehicle().getFuelType(),listing.getVehicle().getFuelConsumption(),listing.getVehicle().getFeatures(),listing.getVehicle().getCountry(),listing.getVehicle().getCity());
+        ListingEntity listingEntity = new ListingEntity(vehicleEntity, listing.getTitle(), listing.getDescription(), listing.getBasePricePerDay(), listing.getInstantBook());
+        
+        if (listing.getId() != null) {
+            listingEntity.setId(listing.getId());
+        }
 
-        return repository.save(new ListingEntity(vehicleEntity, listing.getTitle(), listing.getDescription(), listing.getBasePricePerDay(), listing.getInstantBook()));
+        return mapToListing(repository.save(listingEntity));
     }
 
 
@@ -32,7 +38,7 @@ public class ListingPersistenceImpl implements ListingRepository {
 
         for (ListingEntity listingEntity : existingListings)
         {
-            listingsToReturn.add(new Listing(listingEntity.getId(), listingEntity.getVehicle(), listingEntity.getTitle(), listingEntity.getDescription(), listingEntity.getCreationDate(), listingEntity.getBasePricePerDay(), listingEntity.getInstantBook()));
+            listingsToReturn.add(mapToListing(listingEntity));
         }
 
        return listingsToReturn;
@@ -41,19 +47,43 @@ public class ListingPersistenceImpl implements ListingRepository {
 
     public Listing findById(Integer id) {
         Optional<ListingEntity> existingListing = repository.findById(id);
+        if (existingListing.isEmpty()) return null;
 
-        return new Listing(existingListing.get().getId(), existingListing.get().getVehicle(), existingListing.get().getTitle(), existingListing.get().getDescription(), existingListing.get().getCreationDate(), existingListing.get().getBasePricePerDay(), existingListing.get().getInstantBook());
+        return mapToListing(existingListing.get());
     }
 
     public Listing findByVehicleId(Integer vehicleId)
     {
         ListingEntity existingListing = repository.findByVehicleId(vehicleId);
+        if (existingListing == null) return null;
 
-        return new Listing(existingListing.getId());
+        return mapToListing(existingListing);
     }
 
     public Boolean existsByVehicleId(Integer vehicleId)
     {
         return repository.existsByVehicleId(vehicleId);
+    }
+    
+    private Listing mapToListing(ListingEntity entity) {
+        if (entity == null) return null;
+        Vehicle vehicle = mapToVehicle(entity.getVehicle());
+        return new Listing(entity.getId(), vehicle, entity.getTitle(), entity.getDescription(), entity.getCreationDate(), entity.getBasePricePerDay(), entity.getInstantBook());
+    }
+
+    private Vehicle mapToVehicle(VehicleEntity entity) {
+        if (entity == null) return null;
+        com.swiftly.domain.Profile owner = new com.swiftly.domain.Profile(entity.getOwner().getId(), entity.getOwner().getFullName(), entity.getOwner().getPhone(), entity.getOwner().getAvatarUrl());
+        
+        List<com.swiftly.domain.VehicleImage> images = new ArrayList<>();
+        if (entity.getImages() != null) {
+            for (com.swiftly.persistence.entities.VehicleImageEntity imgEntity : entity.getImages()) {
+                 com.swiftly.domain.Vehicle shallowVehicle = new com.swiftly.domain.Vehicle(entity.getId());
+                 
+                 images.add(new com.swiftly.domain.VehicleImage(imgEntity.getId(), shallowVehicle, imgEntity.getData(), imgEntity.getMimeType(), imgEntity.getFileName(), imgEntity.getUploadedAt()));
+            }
+        }
+
+        return new com.swiftly.domain.Vehicle(entity.getId(), owner, entity.getVin(), entity.getMake(), entity.getModel(), entity.getColor(), entity.getYear(), entity.getType(), entity.getFuelType(), entity.getFuelConsumption(), entity.getFeatures(), entity.getCountry(), entity.getCity(), images);
     }
 }

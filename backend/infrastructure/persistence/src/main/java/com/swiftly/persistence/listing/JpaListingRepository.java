@@ -9,11 +9,11 @@ import java.util.Optional;
 
 
 public interface JpaListingRepository extends JpaRepository<ListingEntity, Integer> {
-    @EntityGraph(attributePaths = {"vehicle", "vehicle.owner", "vehicle.features"})
+    @EntityGraph(attributePaths = {"vehicle", "vehicle.owner", "vehicle.features", "vehicle.images"})
     ListingEntity findByVehicleId(Integer vehicleId);
-    @EntityGraph(attributePaths = {"vehicle", "vehicle.owner", "vehicle.features"})
+    @EntityGraph(attributePaths = {"vehicle", "vehicle.owner", "vehicle.features", "vehicle.images"})
     Optional<ListingEntity> findById(Integer id);
-    @EntityGraph(attributePaths = {"vehicle", "vehicle.owner", "vehicle.features"})
+    @EntityGraph(attributePaths = {"vehicle", "vehicle.owner", "vehicle.features", "vehicle.images"})
     List<ListingEntity> findAll();
     Boolean existsByVehicleId(Integer vehicleId);
 }

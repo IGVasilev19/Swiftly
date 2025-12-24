@@ -1,9 +1,7 @@
 package com.swiftly.application.vehicle;
 
 import com.swiftly.application.vehicle.port.outbound.VehicleRepository;
-import com.swiftly.domain.User;
 import com.swiftly.domain.Vehicle;
-import com.swiftly.domain.enums.user.Role;
 import com.swiftly.domain.enums.vehicle.FuelType;
 import com.swiftly.domain.enums.vehicle.VehicleType;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +14,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,14 +30,14 @@ class VehicleServiceImplTest {
     private VehicleServiceImpl vehicleService;
 
     private Vehicle testVehicle;
-    private User testOwner;
+    private com.swiftly.domain.Profile testOwner;
 
     @BeforeEach
     void setUp() {
-        testOwner = new User();
+        testOwner = new com.swiftly.domain.Profile();
         testOwner.setId(1);
-        testOwner.setEmail("owner@example.com");
-        testOwner.setRoles(List.of(Role.OWNER));
+        testOwner.setFullName("Test Owner");
+        testOwner.setPhone("1234567890");
 
         testVehicle = new Vehicle();
         testVehicle.setId(1);

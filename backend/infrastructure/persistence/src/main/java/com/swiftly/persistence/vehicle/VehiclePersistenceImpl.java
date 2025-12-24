@@ -7,8 +7,10 @@ import com.swiftly.domain.VehicleImage;
 import com.swiftly.persistence.entities.ProfileEntity;
 import com.swiftly.persistence.entities.VehicleEntity;
 import com.swiftly.persistence.entities.VehicleImageEntity;
+import com.swiftly.persistence.profile.JpaProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,27 +19,41 @@ import java.util.Optional;
 @Repository
 public class VehiclePersistenceImpl implements VehicleRepository {
     private final JpaVehicleRepository repository;
+    private final JpaProfileRepository profileRepository;
+
+    private Profile mapToProfile(ProfileEntity entity) {
+        return new Profile(entity.getId(), entity.getFullName(), entity.getPhone(), entity.getAvatarUrl());
+    }
+
+    private List<VehicleImage> mapToVehicleImages(List<VehicleImageEntity> vehicleImages) {
+        List<VehicleImage> images = new ArrayList<>();
+
+        for (VehicleImageEntity vehicleImage : vehicleImages) {
+            Vehicle vehicle = new Vehicle(vehicleImage.getVehicle().getId());
+            images.add(new VehicleImage(vehicleImage.getId(), vehicle, vehicleImage.getData(), vehicleImage.getMimeType(), vehicleImage.getFileName(), vehicleImage.getUploadedAt()));
+        }
+
+        return images;
+    }
+
 
     public Vehicle save(Vehicle vehicle)
     {
-        ProfileEntity profileEntity = new ProfileEntity(vehicle.getOwner().getId());
+        ProfileEntity profileEntity = profileRepository.findById(vehicle.getOwner().getId()).orElseThrow(() -> new IllegalArgumentException("Profile not found for id " + vehicle.getOwner().getId()));
 
         VehicleEntity vehicleEntity = new VehicleEntity(profileEntity, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity());
-        
-        return repository.save(vehicleEntity);
+
+        VehicleEntity saved = repository.save(vehicleEntity);
+
+        return mapToVehicle(saved);
     }
+
 
     public Vehicle findById(Integer id)
     {
-        Optional<VehicleEntity> vehicleEntity = repository.findById(id);
-        List<VehicleImage> images = new ArrayList<>();
+        Optional<VehicleEntity> vehicleEntityOptional = repository.findById(id);
 
-        for(VehicleImage vehicleImage : vehicleEntity.get().getImages())
-        {
-            images.add(new VehicleImage(vehicleImage.getId(), vehicleImage.getVehicle(), vehicleImage.getData(), vehicleImage.getMimeType(), vehicleImage.getFileName(), vehicleImage.getUploadedAt()));
-        }
-
-        return new Vehicle(id, vehicleEntity.get().getOwner(), vehicleEntity.get().getVin(), vehicleEntity.get().getMake(),vehicleEntity.get().getModel(), vehicleEntity.get().getColor(), vehicleEntity.get().getYear(), vehicleEntity.get().getType(), vehicleEntity.get().getFuelType(), vehicleEntity.get().getFuelConsumption(), vehicleEntity.get().getFeatures(), vehicleEntity.get().getCountry(), vehicleEntity.get().getCity(), images);
+        return mapToVehicle(vehicleEntityOptional.get());
     }
 
 
@@ -47,38 +63,22 @@ public class VehiclePersistenceImpl implements VehicleRepository {
 
         for (VehicleEntity vehicleEntity : vehicleList)
         {
-            Profile profile = new Profile(vehicleEntity.getOwner().getId());
-
-            List<VehicleImage> images = new ArrayList<>();
-
-            for(VehicleImage vehicleImage : vehicleEntity.getImages())
-            {
-                images.add(new VehicleImage(vehicleImage.getId(), vehicleImage.getVehicle(), vehicleImage.getData(), vehicleImage.getMimeType(), vehicleImage.getFileName(), vehicleImage.getUploadedAt()));
-            }
-
-            vehicles.add(new Vehicle(vehicleEntity.getId(), profile, vehicleEntity.getVin(), vehicleEntity.getMake(),vehicleEntity.getModel(), vehicleEntity.getColor(), vehicleEntity.getYear(), vehicleEntity.getType(), vehicleEntity.getFuelType(), vehicleEntity.getFuelConsumption(), vehicleEntity.getFeatures(), vehicleEntity.getCountry(), vehicleEntity.getCity(), images));
+            vehicles.add(mapToVehicle(vehicleEntity));
         }
 
         return vehicles;
     }
 
 
-    public List<Vehicle> findAllByOwnerId(Integer ownerId) {
-        List<VehicleEntity> vehicleList = repository.findAllByOwnerId(ownerId);
+
+    @Transactional(readOnly = true)
+    public List<Vehicle> findAllByOwner(Profile owner) {
+        List<VehicleEntity> vehicleList = repository.findAllByOwner(owner.getId());
         List<Vehicle> vehicles = new ArrayList<>();
 
         for (VehicleEntity vehicleEntity : vehicleList)
         {
-            Profile profile = new Profile(vehicleEntity.getOwner().getId());
-
-            List<VehicleImage> images = new ArrayList<>();
-
-            for(VehicleImage vehicleImage : vehicleEntity.getImages())
-            {
-                images.add(new VehicleImage(vehicleImage.getId(), vehicleImage.getVehicle(), vehicleImage.getData(), vehicleImage.getMimeType(), vehicleImage.getFileName(), vehicleImage.getUploadedAt()));
-            }
-
-            vehicles.add(new Vehicle(vehicleEntity.getId(), profile, vehicleEntity.getVin(), vehicleEntity.getMake(),vehicleEntity.getModel(), vehicleEntity.getColor(), vehicleEntity.getYear(), vehicleEntity.getType(), vehicleEntity.getFuelType(), vehicleEntity.getFuelConsumption(), vehicleEntity.getFeatures(), vehicleEntity.getCountry(), vehicleEntity.getCity(), images));
+            vehicles.add(mapToVehicle(vehicleEntity));
         }
 
         return vehicles;
@@ -92,15 +92,7 @@ public class VehiclePersistenceImpl implements VehicleRepository {
 
     public Vehicle findByVin(String vin) {
         VehicleEntity vehicleEntity = repository.findByVin(vin);
-
-        List<VehicleImage> images = new ArrayList<>();
-
-        for(VehicleImage vehicleImage : vehicleEntity.getImages())
-        {
-            images.add(new VehicleImage(vehicleImage.getId(), vehicleImage.getVehicle(), vehicleImage.getData(), vehicleImage.getMimeType(), vehicleImage.getFileName(), vehicleImage.getUploadedAt()));
-        }
-
-        return new Vehicle(vehicleEntity.getId(), vehicleEntity.getOwner(), vehicleEntity.getVin(), vehicleEntity.getMake(),vehicleEntity.getModel(), vehicleEntity.getColor(), vehicleEntity.getYear(), vehicleEntity.getType(), vehicleEntity.getFuelType(), vehicleEntity.getFuelConsumption(), vehicleEntity.getFeatures(), vehicleEntity.getCountry(), vehicleEntity.getCity(), images);
+        return mapToVehicle(vehicleEntity);
     }
 
     public Boolean existsByVin(String vin)
@@ -110,18 +102,28 @@ public class VehiclePersistenceImpl implements VehicleRepository {
 
     public void addNewImage(Vehicle vehicle, VehicleImage vehicleImage)
     {
-        VehicleEntity vehicleEntity = new VehicleEntity(vehicle.getId());
+        VehicleEntity vehicleEntity = repository.findById(vehicle.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
+        
         VehicleImageEntity vehicleImageEntity = new VehicleImageEntity(vehicleImage.getData(), vehicleImage.getMimeType(), vehicleImage.getFileName(), vehicleImage.getUploadedAt());
-
+        
         vehicleEntity.addImage(vehicleImageEntity);
+        repository.save(vehicleEntity);
     }
 
     public void removeImage(VehicleImage vehicleImage)
     {
-        VehicleEntity vehicleEntity = new VehicleEntity(vehicleImage.getVehicle().getId());
+        VehicleEntity vehicleEntity = repository.findById(vehicleImage.getVehicle().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
 
-        VehicleImageEntity imageEntity = new VehicleImageEntity(vehicleImage.getId(), vehicleEntity, vehicleImage.getData(), vehicleImage.getMimeType(), vehicleImage.getFileName(), vehicleImage.getUploadedAt());
-
-        vehicleEntity.removeImage(imageEntity);
+        vehicleEntity.removeImageById(vehicleImage.getId());
+        repository.save(vehicleEntity);
+    }
+    
+    private Vehicle mapToVehicle(VehicleEntity vehicle) {
+        Profile profile = mapToProfile(vehicle.getOwner());
+        List<VehicleImage> images = mapToVehicleImages(vehicle.getImages());
+        
+        return new Vehicle(vehicle.getId(), profile, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity(), images);
     }
 }

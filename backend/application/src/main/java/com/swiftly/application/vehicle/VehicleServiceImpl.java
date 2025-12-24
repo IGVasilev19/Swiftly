@@ -2,8 +2,10 @@ package com.swiftly.application.vehicle;
 
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicle.port.outbound.VehicleRepository;
+import com.swiftly.domain.Profile;
 import com.swiftly.domain.Vehicle;
 import com.swiftly.domain.VehicleImage;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class VehicleServiceImpl implements VehicleService {
     private final VehicleRepository repository;
 
@@ -37,9 +40,9 @@ public class VehicleServiceImpl implements VehicleService {
         return repository.findAll();
     }
 
-    public List<Vehicle> getAllByOwnerId(Integer ownerId)
+    public List<Vehicle> getAllByOwner(Profile owner)
     {
-        return repository.findAllByOwnerId(ownerId);
+        return repository.findAllByOwner(owner);
     }
 
     public void deleteById(Integer id)

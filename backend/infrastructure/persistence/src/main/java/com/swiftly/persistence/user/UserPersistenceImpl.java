@@ -4,7 +4,6 @@ import com.swiftly.application.user.port.outbound.UserRepository;
 import com.swiftly.domain.User;
 import com.swiftly.persistence.entities.UserEntity;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -23,22 +22,35 @@ public class UserPersistenceImpl implements UserRepository {
 
     public Optional<User> findByEmail(String email)
     {
-        Optional<UserEntity> userEntity = repository.findByEmail(email);
+        Optional<UserEntity> userEntityOptional = repository.findByEmail(email);
 
-        return Optional.of(new User(userEntity.get().getId(), userEntity.get().getEmail(), userEntity.get().getPasswordHash(), userEntity.get().getRoles()));
+        if (userEntityOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        UserEntity userEntity = userEntityOptional.get();
+        return Optional.of(new User(userEntity.getId(), userEntity.getEmail(), userEntity.getPasswordHash(), userEntity.getRoles()));
     }
 
-    public UserEntity save(User user)
+    public User save(User user)
     {
         UserEntity userEntity = new UserEntity(user.getEmail(), user.getPasswordHash(), user.getRoles());
+        if (user.getId() != null) {
+            userEntity.setId(user.getId());
+        }
 
-        return repository.save(userEntity);
+        UserEntity savedEntity = repository.save(userEntity);
+        return new User(savedEntity.getId(), savedEntity.getEmail(), savedEntity.getPasswordHash(), savedEntity.getRoles());
     }
 
     public User findById(Integer id)
     {
-        Optional<UserEntity> userEntity = repository.findById(id);
+        Optional<UserEntity> userEntityOptional = repository.findById(id);
 
-        return new User(userEntity.get().getId(), userEntity.get().getEmail(), userEntity.get().getPasswordHash(), userEntity.get().getRoles());
+        if (userEntityOptional.isEmpty()) {
+            return null;
+        }
+        UserEntity userEntity = userEntityOptional.get();
+        return new User(userEntity.getId(), userEntity.getEmail(), userEntity.getPasswordHash(), userEntity.getRoles());
     }
 }

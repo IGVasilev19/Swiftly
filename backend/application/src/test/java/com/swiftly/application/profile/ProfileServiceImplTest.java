@@ -12,8 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -41,14 +39,14 @@ class ProfileServiceImplTest {
                 "+31612345678"
         );
 
-        when(profileRepository.findById(profileId)).thenReturn(Optional.of(mockProfile));
+        when(profileRepository.findById(profileId)).thenReturn(mockProfile);
 
         ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(profileRepository);
 
-        Optional<Profile> result = profileServiceImpl.getById(profileId);
+        Profile result = profileServiceImpl.getById(profileId);
 
         assertNotNull(result);
-        assertEquals("Ada Lovelace", result.get().getFullName());
+        assertEquals("Ada Lovelace", result.getFullName());
         verify(profileRepository).findById(profileId);
     }
 
@@ -57,7 +55,7 @@ class ProfileServiceImplTest {
     void getById_profileNotFound_throwsException() {
         Integer profileId = 999;
 
-        when(profileRepository.findById(profileId)).thenReturn(Optional.empty());
+        when(profileRepository.findById(profileId)).thenReturn(null);
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
             profileServiceImpl.getById(profileId);

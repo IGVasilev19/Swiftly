@@ -1,6 +1,5 @@
 package com.swiftly.persistence.entities;
 
-import com.swiftly.domain.User;
 import com.swiftly.domain.enums.user.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,7 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity extends User {
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

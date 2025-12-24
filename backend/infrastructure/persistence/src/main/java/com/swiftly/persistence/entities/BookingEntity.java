@@ -1,6 +1,4 @@
 package com.swiftly.persistence.entities;
-import com.swiftly.domain.Booking;
-import com.swiftly.domain.Profile;
 import com.swiftly.domain.enums.booking.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +13,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Entity
 @Table(name = "bookings", indexes = @Index(name = "idx_bookings_listing_start", columnList = "listing_id,start_at"))
-public class BookingEntity extends Booking {
+public class BookingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

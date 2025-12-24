@@ -1,10 +1,8 @@
 package com.swiftly.persistence.entities;
 
 
-import com.swiftly.domain.Blackout;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
@@ -18,7 +16,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @Getter
 @Setter
-public class BlackoutEntity extends Blackout {
+public class BlackoutEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,5 +40,14 @@ public class BlackoutEntity extends Blackout {
     void onCreate() {
         if (creationDate == null) creationDate = Instant.now();
     }
+    
+    public BlackoutEntity(Integer id) {
+        this.id = id;
+    }
 
+    public BlackoutEntity(ListingEntity listing, Instant startAt, Instant endAt) {
+        this.listing = listing;
+        this.startAt = startAt;
+        this.endAt = endAt;
+    }
 }

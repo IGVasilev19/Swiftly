@@ -1,8 +1,10 @@
 package com.swiftly.web.vehicle.controller;
 
 import com.swiftly.application.listing.inbound.ListingService;
+import com.swiftly.application.profile.port.inbound.ProfileService;
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicleManagement.port.inbound.VehicleManagementService;
+import com.swiftly.domain.Profile;
 import com.swiftly.domain.User;
 import com.swiftly.domain.Vehicle;
 import com.swiftly.web.vehicle.dto.VehicleRequest;
@@ -31,6 +33,7 @@ public class VehicleController {
     private final VehicleManagementService service;
     private final VehicleService vehicleService;
     private final ListingService listingService;
+    private final ProfileService profileService;
 
 
     @PreAuthorize("hasRole('OWNER')")
@@ -62,9 +65,11 @@ public class VehicleController {
         {
             User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+            Profile ownerProfile = profileService.getById(owner.getId());
+
             List<VehicleResponse> ownedVehicles = new ArrayList<>();
 
-            List<Vehicle> vehicles = vehicleService.getAllByOwnerId(owner.getId());
+            List<Vehicle> vehicles = vehicleService.getAllByOwner(ownerProfile);
 
             for(Vehicle vehicle : vehicles)
             {
@@ -82,6 +87,7 @@ public class VehicleController {
 
             return ResponseEntity.status(HttpStatus.OK).body(ownedVehicles);
         }catch(Exception e){
+            e.printStackTrace(); // TODO: Replace with proper logging
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,
                     "message", e.getMessage()));
         }

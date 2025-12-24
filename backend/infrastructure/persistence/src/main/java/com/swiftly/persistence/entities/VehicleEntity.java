@@ -1,6 +1,4 @@
 package com.swiftly.persistence.entities;
-import com.swiftly.domain.Vehicle;
-import com.swiftly.domain.VehicleImage;
 import com.swiftly.domain.enums.vehicle.Feature;
 import com.swiftly.domain.enums.vehicle.FuelType;
 import com.swiftly.domain.enums.vehicle.VehicleType;
@@ -17,7 +15,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "vehicles")
-public class VehicleEntity extends Vehicle {
+public class VehicleEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -76,48 +74,28 @@ public class VehicleEntity extends Vehicle {
     private Instant locationTimeStamp;
 
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<VehicleImageEntity> images;
+    private List<VehicleImageEntity> images = new ArrayList<>();
 
     public void addImage(VehicleImageEntity image) {
+        if (images == null) {
+            images = new ArrayList<>();
+        }
         images.add(image);
         image.setVehicle(this);
     }
 
     public void removeImage(VehicleImageEntity image) {
-        images.remove(image);
-        image.setVehicle(null);
+        if (images != null) {
+            images.remove(image);
+            image.setVehicle(null);
+        }
     }
 
     public void removeImageById(Integer imageId) {
-        images.removeIf(img -> img.getId().equals(imageId));
-    }
-
-    @Override
-    public List<VehicleImage> getImages() {
-        List<VehicleImage> images = new ArrayList<>();
-
-        for(VehicleImageEntity vehicleImage : this.images)
-        {
-            images.add(new VehicleImage(vehicleImage.getId(),vehicleImage.getVehicle(),vehicleImage.getData(), vehicleImage.getMimeType(),vehicleImage.getFileName(), vehicleImage.getUploadedAt()));
+        if (images != null) {
+            images.removeIf(img -> img.getId().equals(imageId));
         }
-
-        return images;
     }
-
-    @Override
-    public void setImages(List<VehicleImage> images) {
-        List<VehicleImageEntity> vehicleImages = new ArrayList<>();
-
-        for(VehicleImage vehicleImage : images)
-        {
-            VehicleEntity vehicleEntity = new VehicleEntity(vehicleImage.getVehicle().getId());
-
-            vehicleImages.add(new VehicleImageEntity(vehicleImage.getId(), vehicleEntity, vehicleImage.getData(), vehicleImage.getMimeType(), vehicleImage.getFileName(), vehicleImage.getUploadedAt()));
-        }
-
-        this.images = vehicleImages;
-    }
-
 
     public VehicleEntity(Integer id)
     {

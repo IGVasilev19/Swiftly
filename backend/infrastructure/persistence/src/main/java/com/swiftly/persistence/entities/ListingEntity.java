@@ -1,7 +1,5 @@
 package com.swiftly.persistence.entities;
 
-import com.swiftly.domain.Listing;
-import com.swiftly.domain.Vehicle;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -15,7 +13,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ListingEntity extends Listing {
+public class ListingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

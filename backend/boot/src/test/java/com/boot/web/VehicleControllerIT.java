@@ -113,6 +113,11 @@ class VehicleControllerIT extends Containers {
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
+                .consumeWith(result -> {
+                    if (result.getStatus().is4xxClientError() || result.getStatus().is5xxServerError()) {
+                        System.out.println("DEBUG FAILURE: " + new String(result.getResponseBody()));
+                    }
+                })
                 .jsonPath("$.message").isEqualTo("Vehicle created successfully")
                 .jsonPath("$.vehicle").exists()
                 .jsonPath("$.vehicle.vin").isEqualTo(uniqueVin);

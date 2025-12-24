@@ -1,6 +1,5 @@
 package com.swiftly.persistence.entities;
 
-import com.swiftly.domain.Profile;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ProfileEntity extends Profile {
+public class ProfileEntity {
 
     @Id
     private Integer id;
