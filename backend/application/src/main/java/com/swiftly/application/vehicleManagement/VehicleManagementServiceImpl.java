@@ -2,7 +2,7 @@ package com.swiftly.application.vehicleManagement;
 
 import com.swiftly.application.profile.port.inbound.ProfileService;
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
-import com.swiftly.application.vehicleImage.port.inbound.VehicleImageService;
+import com.swiftly.application.vehicle.port.outbound.VehicleRepository;
 import com.swiftly.application.vehicleManagement.port.inbound.VehicleManagementService;
 import com.swiftly.domain.Profile;
 import com.swiftly.domain.User;
@@ -19,14 +19,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
 @RequiredArgsConstructor
+@Service
+@Transactional
 public class VehicleManagementServiceImpl implements VehicleManagementService {
     private final VehicleService vehicleService;
-    private final VehicleImageService vehicleImageService;
     private final ProfileService profileService;
+    private final VehicleRepository vehicleRepository;
 
-    @Transactional
     public Vehicle addVehicle(Vehicle vehicle, List<MultipartFile> images) {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Profile owner = profileService.getById(loggedUser.getId());
@@ -55,8 +55,7 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
 
         for (VehicleImage vehicleImage : vehicleImages)
         {
-            vehicleImage.setVehicle(newVehicle);
-            newVehicleImages.add(vehicleImageService.create(vehicleImage));
+            addImage(newVehicle, vehicleImage);
         }
 
         newVehicle.setImages(newVehicleImages);
@@ -64,20 +63,14 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
         return newVehicle;
     }
 
-    @Transactional
-    public Vehicle getFullVehicleById(Integer id)
+    public void addImage(Vehicle vehicle, VehicleImage image)
     {
-        Vehicle existingVehicle = vehicleService.getById(id);
 
-        populateVehicleWithImages(existingVehicle);
-
-        return existingVehicle;
+            vehicleRepository.addNewImage(vehicle, image);
     }
 
-    public void populateVehicleWithImages(Vehicle vehicle)
+    public void deleteImage(VehicleImage vehicleImage)
     {
-        List<VehicleImage> images = vehicleImageService.getAllByVehicleId(vehicle.getId());
-
-        vehicle.setImages(images);
+        vehicleRepository.removeImage(vehicleImage);
     }
 }

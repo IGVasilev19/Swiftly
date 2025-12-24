@@ -36,9 +36,8 @@ public class VehicleImageEntity extends VehicleImage {
         @Column(name = "uploaded_at", nullable = false)
         private LocalDateTime uploadedAt = LocalDateTime.now();
 
-        public VehicleImageEntity (VehicleEntity vehicle, byte[] data, String mimeType, String fileName,  LocalDateTime uploadedAt)
+        public VehicleImageEntity (byte[] data, String mimeType, String fileName,  LocalDateTime uploadedAt)
         {
-            this.vehicle = vehicle;
             this.data = data;
             this.mimeType = mimeType;
             this.fileName = fileName;

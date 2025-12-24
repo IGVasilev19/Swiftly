@@ -9,12 +9,12 @@ import java.util.Optional;
 
 
 public interface JpaVehicleRepository extends JpaRepository<VehicleEntity, Integer> {
-    @EntityGraph(attributePaths = {"owner", "features"})
+    @EntityGraph(attributePaths = {"owner", "features", "images"})
     List<VehicleEntity> findAllByOwnerId(Integer ownerId);
     void deleteById(Integer id);
-    @EntityGraph(attributePaths = {"owner", "features"})
+    @EntityGraph(attributePaths = {"owner", "features", "images"})
     VehicleEntity findByVin(String vin);
-    @EntityGraph(attributePaths = {"owner", "features"})
+    @EntityGraph(attributePaths = {"owner", "features", "images"})
     Optional<VehicleEntity> findById(Integer id);
     Boolean existsByVin(String vin);
 }

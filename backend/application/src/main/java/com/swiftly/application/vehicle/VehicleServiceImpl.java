@@ -3,9 +3,13 @@ package com.swiftly.application.vehicle;
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicle.port.outbound.VehicleRepository;
 import com.swiftly.domain.Vehicle;
+import com.swiftly.domain.VehicleImage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -47,5 +51,4 @@ public class VehicleServiceImpl implements VehicleService {
     {
        return repository.findByVin(vin);
     }
-
 }

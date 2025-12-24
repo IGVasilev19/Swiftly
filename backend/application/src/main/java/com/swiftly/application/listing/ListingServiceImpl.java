@@ -2,8 +2,6 @@ package com.swiftly.application.listing;
 
 import com.swiftly.application.listing.inbound.ListingService;
 import com.swiftly.application.listing.outbound.ListingRepository;
-import com.swiftly.application.vehicle.port.outbound.VehicleRepository;
-import com.swiftly.application.vehicleManagement.port.inbound.VehicleManagementService;
 import com.swiftly.domain.Listing;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +13,6 @@ import java.util.List;
 @Service
 public class ListingServiceImpl implements ListingService {
     private final ListingRepository repository;
-    private final VehicleManagementService vehicleManagementService;
 
     @Transactional
     public Listing create(Listing listing) {

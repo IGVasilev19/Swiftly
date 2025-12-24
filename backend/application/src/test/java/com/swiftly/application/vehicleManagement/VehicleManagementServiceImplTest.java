@@ -1,7 +1,6 @@
 package com.swiftly.application.vehicleManagement;
 
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
-import com.swiftly.application.vehicleImage.port.inbound.VehicleImageService;
 import com.swiftly.domain.User;
 import com.swiftly.domain.Vehicle;
 import com.swiftly.domain.VehicleImage;

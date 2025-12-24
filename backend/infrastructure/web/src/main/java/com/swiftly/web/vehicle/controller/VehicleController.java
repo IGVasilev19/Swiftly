@@ -92,7 +92,7 @@ public class VehicleController {
     {
         try
         {
-           VehicleResponse vehicle = VehicleMapper.toVehicleResponse(service.getFullVehicleById(id));
+           VehicleResponse vehicle = VehicleMapper.toVehicleResponse(vehicleService.getById(id));
 
             if(listingService.checkExistsByVehicleId(vehicle.id()))
             {
