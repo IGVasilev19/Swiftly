@@ -7,8 +7,10 @@ import com.swiftly.domain.VehicleImage;
 import com.swiftly.persistence.entities.ProfileEntity;
 import com.swiftly.persistence.entities.VehicleEntity;
 import com.swiftly.persistence.entities.VehicleImageEntity;
+import com.swiftly.persistence.helpers.Helper;
 import com.swiftly.persistence.profile.JpaProfileRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
@@ -20,21 +22,8 @@ import java.util.Optional;
 public class VehiclePersistenceImpl implements VehicleRepository {
     private final JpaVehicleRepository repository;
     private final JpaProfileRepository profileRepository;
+    private final Helper helper;
 
-    private Profile mapToProfile(ProfileEntity entity) {
-        return new Profile(entity.getId(), entity.getFullName(), entity.getPhone(), entity.getAvatarUrl());
-    }
-
-    private List<VehicleImage> mapToVehicleImages(List<VehicleImageEntity> vehicleImages) {
-        List<VehicleImage> images = new ArrayList<>();
-
-        for (VehicleImageEntity vehicleImage : vehicleImages) {
-            Vehicle vehicle = new Vehicle(vehicleImage.getVehicle().getId());
-            images.add(new VehicleImage(vehicleImage.getId(), vehicle, vehicleImage.getData(), vehicleImage.getMimeType(), vehicleImage.getFileName(), vehicleImage.getUploadedAt()));
-        }
-
-        return images;
-    }
 
 
     public Vehicle save(Vehicle vehicle)
@@ -45,15 +34,20 @@ public class VehiclePersistenceImpl implements VehicleRepository {
 
         VehicleEntity saved = repository.save(vehicleEntity);
 
-        return mapToVehicle(saved);
+        return helper.mapToVehicle(saved);
     }
 
 
+    @Transactional(readOnly = true)
     public Vehicle findById(Integer id)
     {
         Optional<VehicleEntity> vehicleEntityOptional = repository.findById(id);
-
-        return mapToVehicle(vehicleEntityOptional.get());
+        if (vehicleEntityOptional.isPresent()) {
+            VehicleEntity vehicleEntity = vehicleEntityOptional.get();
+            Hibernate.initialize(vehicleEntity.getFeatures());
+            return helper.mapToVehicle(vehicleEntity);
+        }
+        return null;
     }
 
 
@@ -63,7 +57,7 @@ public class VehiclePersistenceImpl implements VehicleRepository {
 
         for (VehicleEntity vehicleEntity : vehicleList)
         {
-            vehicles.add(mapToVehicle(vehicleEntity));
+            vehicles.add(helper.mapToVehicle(vehicleEntity));
         }
 
         return vehicles;
@@ -78,7 +72,8 @@ public class VehiclePersistenceImpl implements VehicleRepository {
 
         for (VehicleEntity vehicleEntity : vehicleList)
         {
-            vehicles.add(mapToVehicle(vehicleEntity));
+            Hibernate.initialize(vehicleEntity.getFeatures());
+            vehicles.add(helper.mapToVehicle(vehicleEntity));
         }
 
         return vehicles;
@@ -90,9 +85,14 @@ public class VehiclePersistenceImpl implements VehicleRepository {
     }
 
 
+    @Transactional(readOnly = true)
     public Vehicle findByVin(String vin) {
         VehicleEntity vehicleEntity = repository.findByVin(vin);
-        return mapToVehicle(vehicleEntity);
+        if (vehicleEntity != null) {
+            Hibernate.initialize(vehicleEntity.getFeatures());
+            return helper.mapToVehicle(vehicleEntity);
+        }
+        return null;
     }
 
     public Boolean existsByVin(String vin)
@@ -118,12 +118,5 @@ public class VehiclePersistenceImpl implements VehicleRepository {
 
         vehicleEntity.removeImageById(vehicleImage.getId());
         repository.save(vehicleEntity);
-    }
-    
-    private Vehicle mapToVehicle(VehicleEntity vehicle) {
-        Profile profile = mapToProfile(vehicle.getOwner());
-        List<VehicleImage> images = mapToVehicleImages(vehicle.getImages());
-        
-        return new Vehicle(vehicle.getId(), profile, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity(), images);
     }
 }

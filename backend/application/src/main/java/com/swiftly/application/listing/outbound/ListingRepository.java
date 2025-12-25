@@ -10,4 +10,5 @@ public interface ListingRepository {
     Listing findById(Integer id);
     Listing findByVehicleId(Integer id);
     Boolean existsByVehicleId(Integer id);
+    List<Listing> findAllWithVehicle();
 }

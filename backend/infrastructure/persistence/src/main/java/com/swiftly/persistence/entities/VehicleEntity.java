@@ -49,6 +49,7 @@ public class VehicleEntity {
     @Column(nullable = false)
     private Double fuelConsumption;
 
+    @org.hibernate.annotations.Fetch(org.hibernate.annotations.FetchMode.SUBSELECT)
     @ElementCollection(targetClass = Feature.class, fetch = FetchType.LAZY)
     @CollectionTable(
             name = "vehicle_features",
@@ -73,6 +74,7 @@ public class VehicleEntity {
     @Column(length = 100)
     private Instant locationTimeStamp;
 
+    @org.hibernate.annotations.Fetch(org.hibernate.annotations.FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<VehicleImageEntity> images = new ArrayList<>();
 

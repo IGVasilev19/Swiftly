@@ -24,8 +24,9 @@ public class ListingServiceImpl implements ListingService {
         return repository.save(listing);
     }
 
+    @Transactional
     public List<Listing> getAll() {
-        return repository.findAll();
+        return repository.findAllWithVehicle();
     }
 
     public Listing getById(Integer id) {
