@@ -10,7 +10,6 @@ import com.swiftly.persistence.entities.VehicleImageEntity;
 import com.swiftly.persistence.helpers.Helper;
 import com.swiftly.persistence.profile.JpaProfileRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
@@ -42,12 +41,10 @@ public class VehiclePersistenceImpl implements VehicleRepository {
     public Vehicle findById(Integer id)
     {
         Optional<VehicleEntity> vehicleEntityOptional = repository.findById(id);
-        if (vehicleEntityOptional.isPresent()) {
-            VehicleEntity vehicleEntity = vehicleEntityOptional.get();
-            Hibernate.initialize(vehicleEntity.getFeatures());
-            return helper.mapToVehicle(vehicleEntity);
-        }
-        return null;
+
+        VehicleEntity vehicleEntity = vehicleEntityOptional.get();
+
+        return helper.mapToVehicle(vehicleEntity);
     }
 
 
@@ -72,7 +69,6 @@ public class VehiclePersistenceImpl implements VehicleRepository {
 
         for (VehicleEntity vehicleEntity : vehicleList)
         {
-            Hibernate.initialize(vehicleEntity.getFeatures());
             vehicles.add(helper.mapToVehicle(vehicleEntity));
         }
 
@@ -88,11 +84,8 @@ public class VehiclePersistenceImpl implements VehicleRepository {
     @Transactional(readOnly = true)
     public Vehicle findByVin(String vin) {
         VehicleEntity vehicleEntity = repository.findByVin(vin);
-        if (vehicleEntity != null) {
-            Hibernate.initialize(vehicleEntity.getFeatures());
-            return helper.mapToVehicle(vehicleEntity);
-        }
-        return null;
+
+        return helper.mapToVehicle(vehicleEntity);
     }
 
     public Boolean existsByVin(String vin)

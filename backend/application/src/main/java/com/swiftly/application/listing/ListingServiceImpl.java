@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class ListingServiceImpl implements ListingService {
     private final ListingRepository repository;
 
-    @Transactional
     public Listing create(Listing listing) {
         if(getByVehicleId(listing.getVehicle().getId()) != null)
         {
@@ -24,7 +24,6 @@ public class ListingServiceImpl implements ListingService {
         return repository.save(listing);
     }
 
-    @Transactional
     public List<Listing> getAll() {
         return repository.findAllWithVehicle();
     }

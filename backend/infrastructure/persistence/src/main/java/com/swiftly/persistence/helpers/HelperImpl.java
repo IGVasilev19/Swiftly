@@ -16,32 +16,31 @@ import java.util.List;
 
 @Component
 public class HelperImpl implements Helper {
-    public Vehicle mapToVehicle(VehicleEntity vehicle) {
-        if (vehicle == null) {
-            return null;
-        }
-        Profile profile = vehicle.getOwner() != null ? mapToProfile(vehicle.getOwner()) : null;
-        List<VehicleImage> images = vehicle.getImages() != null ? mapToVehicleImages(vehicle.getImages()) : new ArrayList<>();
+    public Vehicle mapToVehicle(VehicleEntity vehicle)
+    {
+        Profile profile = mapToProfile(vehicle.getOwner());
 
-        List<Feature> features = vehicle.getFeatures() != null ? new ArrayList<>(vehicle.getFeatures()) : new ArrayList<>();
+        List<VehicleImage> images = mapToVehicleImages(vehicle.getImages());
+
+        List<Feature> features = new ArrayList<>(vehicle.getFeatures());
+
         return new Vehicle(vehicle.getId(), profile, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), features, vehicle.getCountry(), vehicle.getCity(), images);
     }
 
-    public Profile mapToProfile(ProfileEntity entity) {
+    public Profile mapToProfile(ProfileEntity entity)
+    {
         return new Profile(entity.getId(), entity.getFullName(), entity.getPhone(), entity.getAvatarUrl());
     }
 
-    public List<VehicleImage> mapToVehicleImages(List<VehicleImageEntity> vehicleImages) {
+    public List<VehicleImage> mapToVehicleImages(List<VehicleImageEntity> vehicleImages)
+    {
         List<VehicleImage> images = new ArrayList<>();
-        if (vehicleImages == null) {
-            return images;
-        }
 
-        for (VehicleImageEntity vehicleImage : vehicleImages) {
-            if (vehicleImage != null) {
-                Vehicle vehicle = vehicleImage.getVehicle() != null ? new Vehicle(vehicleImage.getVehicle().getId()) : null;
-                images.add(new VehicleImage(vehicleImage.getId(), vehicle, vehicleImage.getData(), vehicleImage.getMimeType(), vehicleImage.getFileName(), vehicleImage.getUploadedAt()));
-            }
+        for (VehicleImageEntity vehicleImage : vehicleImages)
+        {
+           Vehicle vehicle = new Vehicle(vehicleImage.getVehicle().getId());
+
+            images.add(new VehicleImage(vehicleImage.getId(), vehicle, vehicleImage.getData(), vehicleImage.getMimeType(), vehicleImage.getFileName(), vehicleImage.getUploadedAt()));
         }
 
         return images;
@@ -49,11 +48,7 @@ public class HelperImpl implements Helper {
 
     public Listing mapToListing(ListingEntity entity)
     {
-        if (entity == null) {
-            return null;
-        }
-
-        Vehicle vehicle = entity.getVehicle() != null ? mapToVehicle(entity.getVehicle()) : null;
+        Vehicle vehicle = mapToVehicle(entity.getVehicle());
 
         return new Listing(entity.getId(), vehicle, entity.getTitle(), entity.getDescription(), entity.getCreationDate(), entity.getBasePricePerDay(), entity.getInstantBook());
     }
