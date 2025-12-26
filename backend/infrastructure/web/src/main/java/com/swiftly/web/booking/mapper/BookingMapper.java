@@ -1,6 +1,7 @@
 package com.swiftly.web.booking.mapper;
 
 import com.swiftly.domain.Booking;
+import com.swiftly.domain.enums.booking.Status;
 import com.swiftly.web.booking.dto.BookingRequest;
 import com.swiftly.web.booking.dto.BookingResponse;
 import com.swiftly.web.listing.mapper.ListingMapper;
@@ -9,7 +10,7 @@ import com.swiftly.web.profile.mapper.ProfileMapper;
 public class BookingMapper {
     public static Booking toBooking(BookingRequest request)
     {
-        return new Booking(request.listing(), request.renter(), request.startAt(), request.endAt(), request.status());
+        return new Booking(request.listing(), request.startAt(), request.endAt(), request.totalPrice());
     }
 
     public static BookingResponse toBookingResponse(Booking booking)

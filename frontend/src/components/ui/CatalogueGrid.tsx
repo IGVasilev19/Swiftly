@@ -11,13 +11,20 @@ import { VehicleImageGallery } from "./VehicleImageGallery";
 import { Button } from "./button";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { useNavigate } from "react-router-dom";
+import { useListingContext } from "@/contexts/ListingContext";
 
 export default function CatalogueGrid() {
   const [active, setActive] = useState<Listing | null>(null);
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
   const { listings, isLoading, error } = useGetListings();
+  const { setSelectedListingId } = useListingContext();
   const navigate = useNavigate();
+
+  const handleListingClick = (listing: { id?: number }) => {
+    setSelectedListingId(listing.id ?? null);
+    navigate("/app/listing/details");
+  };
 
   const getImageUrl = (image?: VehicleImage): string | null | undefined => {
     if (!image) {
@@ -132,7 +139,7 @@ export default function CatalogueGrid() {
 
                   <Button
                     className="bg-[#00A0A0] hover:bg-[#00a0a0ba]"
-                    onClick={() => navigate("/app/bookings/add")}
+                    onClick={() => handleListingClick(active)}
                   >
                     Book Now
                   </Button>

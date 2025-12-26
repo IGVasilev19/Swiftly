@@ -5,25 +5,20 @@ import { type DateRange } from "react-day-picker";
 
 import { Calendar } from "@/components/ui/calendar";
 
-export function Calendar05() {
-  const today = new Date();
-  const tomorrow = new Date();
+type Calendar05Props = {
+  value?: DateRange;
+  onChange: (range: DateRange | undefined) => void;
+};
 
-  tomorrow.setDate(today.getDate() + 1);
-
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
-    from: today,
-    to: tomorrow,
-  });
-
+export function Calendar05({ value, onChange }: Calendar05Props) {
   return (
     <Calendar
       mode="range"
-      defaultMonth={dateRange?.from}
-      selected={dateRange}
-      onSelect={setDateRange}
+      defaultMonth={value?.from}
+      selected={value}
+      onSelect={onChange}
       numberOfMonths={2}
-      disabled={{ before: today }}
+      disabled={{ before: value?.from || new Date() }}
       className="rounded-lg border shadow-sm w-full"
     />
   );

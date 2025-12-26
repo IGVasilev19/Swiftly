@@ -127,9 +127,6 @@ export function AddListingForm({
             disabled={isPending}
             type="submit"
             className="w-1/2 h-full bg-[#0F172A] hover:bg-[#16213b]"
-            onClick={() => {
-              console.log("Submit listing");
-            }}
           >
             {isPending ? (
               <div className="flex items-center justify-center gap-2">

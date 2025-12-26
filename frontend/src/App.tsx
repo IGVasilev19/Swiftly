@@ -14,7 +14,8 @@ import { RequireRenter } from "./guards/RequireRenter";
 import { Catalogue } from "./routes/(root)/Catalogue/Catalogue";
 import { Bookings } from "./routes/(root)/Bookings/Bookings";
 import { Unauthorized } from "./routes/(root)/Unauthorized/Unauthorized";
-import AddBooking from "./routes/(root)/Bookings/AddBooking";
+import { ListingDetails } from "./routes/(root)/Catalogue/ListingDetails";
+import { ListingLayout } from "./guards/ListingLayout";
 
 const App = () => {
   return (
@@ -25,63 +26,65 @@ const App = () => {
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route element={<ProtectedRoute />}>
           <Route element={<VehicleLayout />}>
-            <Route path="/app" element={<RoleRouter />}>
-              <Route
-                path="dashboard"
-                element={
-                  <RequireOwner>
-                    <Dashboard />
-                  </RequireOwner>
-                }
-              />
-              <Route
-                path="vehicles"
-                element={
-                  <RequireOwner>
-                    <Vehicles />
-                  </RequireOwner>
-                }
-              />
-              <Route
-                path="vehicles/add"
-                element={
-                  <RequireOwner>
-                    <AddVehicle />
-                  </RequireOwner>
-                }
-              />
-              <Route
-                path="vehicles/details"
-                element={
-                  <RequireOwner>
-                    <VehicleDetails />
-                  </RequireOwner>
-                }
-              />
-              <Route
-                path="catalogue"
-                element={
-                  <RequireRenter>
-                    <Catalogue />
-                  </RequireRenter>
-                }
-              />
-              <Route
-                path="bookings"
-                element={
-                  <RequireRenter>
-                    <Bookings />
-                  </RequireRenter>
-                }
-              />
-              <Route
-                path="bookings/add"
-                element={
-                  <RequireRenter>
-                    <AddBooking />
-                  </RequireRenter>
-                }
-              />
+            <Route element={<ListingLayout />}>
+              <Route path="/app" element={<RoleRouter />}>
+                <Route
+                  path="dashboard"
+                  element={
+                    <RequireOwner>
+                      <Dashboard />
+                    </RequireOwner>
+                  }
+                />
+                <Route
+                  path="vehicles"
+                  element={
+                    <RequireOwner>
+                      <Vehicles />
+                    </RequireOwner>
+                  }
+                />
+                <Route
+                  path="vehicles/add"
+                  element={
+                    <RequireOwner>
+                      <AddVehicle />
+                    </RequireOwner>
+                  }
+                />
+                <Route
+                  path="vehicles/details"
+                  element={
+                    <RequireOwner>
+                      <VehicleDetails />
+                    </RequireOwner>
+                  }
+                />
+                <Route
+                  path="catalogue"
+                  element={
+                    <RequireRenter>
+                      <Catalogue />
+                    </RequireRenter>
+                  }
+                />
+                <Route
+                  path="bookings"
+                  element={
+                    <RequireRenter>
+                      <Bookings />
+                    </RequireRenter>
+                  }
+                />
+                <Route
+                  path="listing/details"
+                  element={
+                    <RequireRenter>
+                      <ListingDetails />
+                    </RequireRenter>
+                  }
+                />
+              </Route>
             </Route>
           </Route>
         </Route>

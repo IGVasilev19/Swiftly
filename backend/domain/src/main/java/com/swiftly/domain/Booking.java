@@ -50,4 +50,12 @@ public class Booking {
         this.status = status;
         this.totalPrice = totalPrice;
     }
+
+    public Booking (Listing listing, Instant startAt, Instant endAt, BigDecimal totalPrice)
+    {
+        this.listing = listing;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.totalPrice = totalPrice;
+    }
 }

@@ -17,4 +17,3 @@ public class BootApplication {
         SpringApplication.run(BootApplication.class, args);
     }
 }
-//Working version with Vehicle and Listing features, partial Booking implementation
