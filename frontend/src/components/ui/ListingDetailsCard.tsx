@@ -11,7 +11,6 @@ import {
   bookingSchema,
   type BookingSchemaType,
 } from "@/schemas/booking/booking.schema";
-import z from "zod";
 import type { Booking } from "@/types/booking";
 import { useAddBooking } from "@/hooks/useAddBooking";
 import { AddBookingForm } from "../booking/AddBookingForm";
@@ -77,71 +76,66 @@ export function ListingDetailsCard({ listing }: { listing: Listing }) {
             </h1>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="w-full h-full flex flex-col gap-5">
-            {vehicleImages.length > 0 && (
-              <VehicleImageGallery vehicle={listing.vehicle} />
-            )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <VehicleDetailPlaceholder label="VIN">
-                {listing.vehicle.vin}
-              </VehicleDetailPlaceholder>
-              <VehicleDetailPlaceholder label="Make">
-                {listing.vehicle.make}
-              </VehicleDetailPlaceholder>
-              <VehicleDetailPlaceholder label="Model">
-                {listing.vehicle.model}
-              </VehicleDetailPlaceholder>
-              <VehicleDetailPlaceholder label="Year">
-                {listing.vehicle.year || "N/A"}
-              </VehicleDetailPlaceholder>
-              <VehicleDetailPlaceholder label="Color">
-                {listing.vehicle.color || "N/A"}
-              </VehicleDetailPlaceholder>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 w-full flex flex-col gap-5">
+          {vehicleImages.length > 0 && (
+            <VehicleImageGallery vehicle={listing.vehicle} />
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <VehicleDetailPlaceholder label="VIN">
+              {listing.vehicle.vin}
+            </VehicleDetailPlaceholder>
+            <VehicleDetailPlaceholder label="Make">
+              {listing.vehicle.make}
+            </VehicleDetailPlaceholder>
+            <VehicleDetailPlaceholder label="Model">
+              {listing.vehicle.model}
+            </VehicleDetailPlaceholder>
+            <VehicleDetailPlaceholder label="Year">
+              {listing.vehicle.year || "N/A"}
+            </VehicleDetailPlaceholder>
+            <VehicleDetailPlaceholder label="Color">
+              {listing.vehicle.color || "N/A"}
+            </VehicleDetailPlaceholder>
 
-              <VehicleDetailPlaceholder label="Type">
-                {listing.vehicle.type
-                  ? formatEnumLabel(listing.vehicle.type)
-                  : "N/A"}
-              </VehicleDetailPlaceholder>
-              <VehicleDetailPlaceholder label="Fuel Type">
-                {listing.vehicle.fuelType
-                  ? formatEnumLabel(listing.vehicle.fuelType)
-                  : "N/A"}
-              </VehicleDetailPlaceholder>
-              <VehicleDetailPlaceholder label="Fuel Consumption">
-                {listing.vehicle.fuelConsumption
-                  ? `${listing.vehicle.fuelConsumption} L/100km`
-                  : "N/A"}
-              </VehicleDetailPlaceholder>
+            <VehicleDetailPlaceholder label="Type">
+              {listing.vehicle.type
+                ? formatEnumLabel(listing.vehicle.type)
+                : "N/A"}
+            </VehicleDetailPlaceholder>
+            <VehicleDetailPlaceholder label="Fuel Type">
+              {listing.vehicle.fuelType
+                ? formatEnumLabel(listing.vehicle.fuelType)
+                : "N/A"}
+            </VehicleDetailPlaceholder>
+            <VehicleDetailPlaceholder label="Fuel Consumption">
+              {listing.vehicle.fuelConsumption
+                ? `${listing.vehicle.fuelConsumption} L/100km`
+                : "N/A"}
+            </VehicleDetailPlaceholder>
 
-              <VehicleDetailPlaceholder label="Location">
-                {listing.vehicle.city || "N/A"}
-                {listing.vehicle.country && `, ${listing.vehicle.country}`}
-              </VehicleDetailPlaceholder>
-            </div>
-
-            {listing.vehicle.features &&
-              listing.vehicle.features.length > 0 && (
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-500 mb-3">
-                    Features
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {listing.vehicle.features.map((feature, index) => (
-                      <span
-                        key={index}
-                        className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                      >
-                        {formatEnumLabel(feature)}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+            <VehicleDetailPlaceholder label="Location">
+              {listing.vehicle.city || "N/A"}
+              {listing.vehicle.country && `, ${listing.vehicle.country}`}
+            </VehicleDetailPlaceholder>
           </div>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+
+          {listing.vehicle.features && listing.vehicle.features.length > 0 && (
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <h3 className="text-sm font-medium text-gray-500 mb-3">
+                Features
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {listing.vehicle.features.map((feature, index) => (
+                  <span
+                    key={index}
+                    className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                  >
+                    {formatEnumLabel(feature)}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
           <AddBookingForm
             addBookingForm={form}
             handleSubmit={handleBookingSubmit}

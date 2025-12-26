@@ -4,13 +4,20 @@ import Loading from "@/components/ui/Loading";
 import { useListingContext } from "@/contexts/ListingContext";
 import { useGetListing } from "@/hooks/useGetLisitng";
 import { Layout } from "lucide-react";
-import React from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export function ListingDetails() {
   const navigate = useNavigate();
   const { selectedListingId } = useListingContext();
   const { listing, isLoading, error } = useGetListing(selectedListingId);
+
+  useEffect(() => {
+    document.body.style.overflow = "auto";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
 
   if (isLoading) {
     return (
@@ -43,4 +50,3 @@ export function ListingDetails() {
     </div>
   );
 }
-//Fix Listing details to be scrollable when content overflows
