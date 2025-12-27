@@ -6,4 +6,6 @@ import com.swiftly.web.profile.dto.ProfileResponse;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-public record BookingResponse(Integer id, ListingResponse listing, ProfileResponse renter, Instant startAt, Instant endAt, Status status, Instant creationDate, BigDecimal totalPrice) { }
+import java.time.LocalDate;
+
+public record BookingResponse(Integer id, ListingResponse listing, ProfileResponse renter, LocalDate startAt, LocalDate  endAt, Status status, Instant creationDate, BigDecimal totalPrice) { }

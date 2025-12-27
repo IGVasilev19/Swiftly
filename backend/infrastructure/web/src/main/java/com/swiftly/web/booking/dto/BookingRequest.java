@@ -8,5 +8,6 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 
-public record BookingRequest(@NotNull Listing listing, @NotNull Instant startAt, @NotNull Instant endAt, @NotNull BigDecimal totalPrice) { }
+public record BookingRequest(@NotNull Listing listing, @NotNull LocalDate startAt, @NotNull LocalDate endAt, @NotNull BigDecimal totalPrice) { }

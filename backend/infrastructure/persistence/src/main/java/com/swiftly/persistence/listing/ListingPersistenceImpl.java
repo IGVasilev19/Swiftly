@@ -6,7 +6,6 @@ import com.swiftly.persistence.entities.ListingEntity;
 import com.swiftly.persistence.entities.VehicleEntity;
 import com.swiftly.persistence.helpers.Helper;
 import com.swiftly.persistence.vehicle.JpaVehicleRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -30,7 +29,6 @@ public class ListingPersistenceImpl implements ListingRepository {
         return helper.mapToListing(repository.save(listingEntity));
     }
 
-    @Transactional
     public List<Listing> findAll() {
         List<Listing> listingsToReturn = new ArrayList<>();
         List<ListingEntity> existingListings =  repository.findAll();
@@ -43,7 +41,6 @@ public class ListingPersistenceImpl implements ListingRepository {
        return listingsToReturn;
     }
 
-    @Transactional
     public List<Listing> findAllWithVehicle() {
         List<Listing> listingsToReturn = new ArrayList<>();
         List<ListingEntity> existingListings =  repository.findAllWithVehicle();
@@ -56,7 +53,6 @@ public class ListingPersistenceImpl implements ListingRepository {
         return listingsToReturn;
     }
 
-    @Transactional
     public Listing findById(Integer id) {
         Optional<ListingEntity> existingListing = repository.findById(id);
 
@@ -65,7 +61,6 @@ public class ListingPersistenceImpl implements ListingRepository {
         return helper.mapToListing(listingEntity);
     }
 
-    @Transactional
     public Listing findByVehicleId(Integer vehicleId)
     {
         ListingEntity existingListing = repository.findByVehicleId(vehicleId);

@@ -13,7 +13,7 @@ public class BookingMapper {
         return new Booking(request.listing(), request.startAt(), request.endAt(), request.totalPrice());
     }
 
-    public static BookingResponse toBookingResponse(Booking booking)
+    public static BookingResponse toResponse(Booking booking)
     {
         return new BookingResponse(booking.getId(), ListingMapper.toResponse(booking.getListing()), ProfileMapper.toResponse(booking.getRenter()),booking.getStartAt(),booking.getEndAt(),booking.getStatus(),booking.getCreationDate(),booking.getTotalPrice());
     }

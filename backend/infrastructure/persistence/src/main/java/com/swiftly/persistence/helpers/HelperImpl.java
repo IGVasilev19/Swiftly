@@ -1,14 +1,8 @@
 package com.swiftly.persistence.helpers;
 
-import com.swiftly.domain.Listing;
-import com.swiftly.domain.Profile;
-import com.swiftly.domain.Vehicle;
-import com.swiftly.domain.VehicleImage;
+import com.swiftly.domain.*;
 import com.swiftly.domain.enums.vehicle.Feature;
-import com.swiftly.persistence.entities.ListingEntity;
-import com.swiftly.persistence.entities.ProfileEntity;
-import com.swiftly.persistence.entities.VehicleEntity;
-import com.swiftly.persistence.entities.VehicleImageEntity;
+import com.swiftly.persistence.entities.*;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -51,5 +45,13 @@ public class HelperImpl implements Helper {
         Vehicle vehicle = mapToVehicle(entity.getVehicle());
 
         return new Listing(entity.getId(), vehicle, entity.getTitle(), entity.getDescription(), entity.getCreationDate(), entity.getBasePricePerDay(), entity.getInstantBook());
+    }
+
+    public Booking mapToBooking(BookingEntity entity)
+    {
+        Listing listing = mapToListing(entity.getListing());
+        Profile renter = mapToProfile(entity.getRenter());
+
+        return new Booking(entity.getId(), entity.getStartAt(), entity.getEndAt(), entity.getCreationDate(), entity.getStatus(), entity.getTotalPrice(), listing, renter);
     }
 }

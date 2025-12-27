@@ -12,7 +12,7 @@ export function useAddBooking() {
   const addBooking = async (data: Booking) => {
     try {
       setIsPending(true);
-
+      console.log(data);
       const response = await api.post("/booking", data);
 
       toast.success(response.data.message);
@@ -20,6 +20,7 @@ export function useAddBooking() {
     } catch (error: unknown) {
       const axiosError = error as AxiosError<{ message: string }>;
       console.error(axiosError);
+      console.log(axiosError.response?.data?.message);
       toast.error(
         axiosError.response?.data?.message || "Failed to add booking"
       );

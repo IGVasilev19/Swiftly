@@ -19,6 +19,7 @@ public interface JpaListingRepository extends JpaRepository<ListingEntity, Integ
         WHERE v.id = :vehicleId
         """)
     ListingEntity findByVehicleId(@Param("vehicleId") Integer vehicleId);
+
     @Query("""
         SELECT DISTINCT l 
         FROM ListingEntity l 
@@ -28,6 +29,7 @@ public interface JpaListingRepository extends JpaRepository<ListingEntity, Integ
         WHERE l.id = :id
         """)
     Optional<ListingEntity> findById(@Param("id") Integer id);
+
     @Query("""
         SELECT DISTINCT l 
         FROM ListingEntity l 
@@ -37,5 +39,6 @@ public interface JpaListingRepository extends JpaRepository<ListingEntity, Integ
         ORDER BY l.creationDate
         """)
     List<ListingEntity> findAllWithVehicle();
+
     Boolean existsByVehicleId(Integer vehicleId);
 }

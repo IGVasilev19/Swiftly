@@ -1,13 +1,7 @@
 package com.swiftly.persistence.helpers;
 
-import com.swiftly.domain.Listing;
-import com.swiftly.domain.Profile;
-import com.swiftly.domain.Vehicle;
-import com.swiftly.domain.VehicleImage;
-import com.swiftly.persistence.entities.ListingEntity;
-import com.swiftly.persistence.entities.ProfileEntity;
-import com.swiftly.persistence.entities.VehicleEntity;
-import com.swiftly.persistence.entities.VehicleImageEntity;
+import com.swiftly.domain.*;
+import com.swiftly.persistence.entities.*;
 
 import java.util.List;
 
@@ -16,4 +10,5 @@ public interface Helper {
     Profile mapToProfile(ProfileEntity entity);
     List<VehicleImage> mapToVehicleImages(List<VehicleImageEntity> vehicleImages);
     Listing mapToListing(ListingEntity entity);
+    Booking mapToBooking(BookingEntity entity);
 }

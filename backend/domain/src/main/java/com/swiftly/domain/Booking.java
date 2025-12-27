@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,9 +14,9 @@ public class Booking {
 
     private Integer id;
 
-    private Instant startAt;
+    private LocalDate startAt;
 
-    private Instant endAt;
+    private LocalDate  endAt;
 
     private Instant creationDate;
 
@@ -32,7 +33,7 @@ public class Booking {
         this.id = id;
     }
 
-    public Booking(Listing listing, Profile renter, Instant startAt, Instant endAt, Status status)
+    public Booking(Listing listing, Profile renter, LocalDate  startAt, LocalDate  endAt, Status status)
     {
         this.listing = listing;
         this.renter = renter;
@@ -41,7 +42,7 @@ public class Booking {
         this.status = status;
     }
 
-    public Booking(Listing listing, Profile renter, Instant startAt, Instant endAt, Status status,  BigDecimal totalPrice)
+    public Booking(Listing listing, Profile renter, LocalDate  startAt, LocalDate  endAt, Status status,  BigDecimal totalPrice)
     {
         this.listing = listing;
         this.renter = renter;
@@ -51,7 +52,7 @@ public class Booking {
         this.totalPrice = totalPrice;
     }
 
-    public Booking (Listing listing, Instant startAt, Instant endAt, BigDecimal totalPrice)
+    public Booking (Listing listing, LocalDate  startAt, LocalDate  endAt, BigDecimal totalPrice)
     {
         this.listing = listing;
         this.startAt = startAt;

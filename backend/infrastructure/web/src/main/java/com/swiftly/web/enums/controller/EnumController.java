@@ -26,10 +26,4 @@ public class EnumController {
     public Feature[] features() {
         return Feature.values();
     }
-
-    @GetMapping("/booking-statuses")
-    public Status[] bookingStatuses()
-    {
-        return Status.values();
-    }
 }

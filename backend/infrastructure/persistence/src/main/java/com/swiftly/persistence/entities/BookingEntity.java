@@ -6,6 +6,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -28,10 +29,10 @@ public class BookingEntity {
     private ProfileEntity renter;
 
     @Column(name = "start_at", nullable = false)
-    private Instant startAt;
+    private LocalDate  startAt;
 
     @Column(name = "end_at", nullable = false)
-    private Instant endAt;
+    private LocalDate  endAt;
 
     @Column(nullable = false, updatable = false)
     @ColumnDefault("CURRENT_TIMESTAMP")
@@ -54,7 +55,7 @@ public class BookingEntity {
         this.id = id;
     }
 
-    public BookingEntity(ListingEntity listing, ProfileEntity renter, Instant startAt, Instant endAt, Status status, BigDecimal totalPrice)
+    public BookingEntity(ListingEntity listing, ProfileEntity renter, LocalDate startAt, LocalDate  endAt, Status status, BigDecimal totalPrice)
     {
         this.listing = listing;
         this.renter = renter;

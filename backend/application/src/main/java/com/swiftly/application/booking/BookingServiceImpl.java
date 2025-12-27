@@ -2,65 +2,64 @@ package com.swiftly.application.booking;
 
 import com.swiftly.application.booking.port.inbound.BookingService;
 import com.swiftly.application.booking.port.outbound.BookingRepository;
+import com.swiftly.application.profile.port.inbound.ProfileService;
 import com.swiftly.domain.Booking;
+import com.swiftly.domain.Profile;
+import com.swiftly.domain.User;
+import com.swiftly.domain.enums.booking.Status;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository repository;
+    private final ProfileService profileService;
 
+    @Transactional
     public Booking create(Booking booking)
     {
-        if(bookingAlreadyExists(booking.getListing().getId(), booking.getStartAt(), booking.getEndAt()))
+        if(bookingAlreadyExists(booking.getListing().getId(), booking.getEndAt(), booking.getStartAt()))
         {
             throw new IllegalArgumentException("Booking already exists");
         }
 
-        calculateTotalPrice(booking);
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Profile renter = profileService.getById(loggedUser.getId());
+        booking.setRenter(renter);
+
+        booking.setStatus(Status.REQUESTED);
 
         return repository.save(booking);
     }
 
+    @Transactional
     public Booking getById(Integer id) {
         return repository.findById(id);
     }
 
-    public Booking getByListingId(Integer listingId) {
-        return repository.findByListingId(listingId);
-    }
-
-    public Booking getByRenterId(Integer renterId) {
-        return repository.findByRenterId(renterId);
-    }
-
-    public List<Booking> getAll() {
-        return repository.findAll();
-    }
-
+    @Transactional
     public List<Booking> getAllByRenterId(Integer renterId) {
         return repository.findAllByRenterId(renterId);
     }
 
+    @Transactional
     public List<Booking> getAllByListingId(Integer listingId) {
         return repository.findAllByListingId(listingId);
     }
 
-    public Boolean bookingAlreadyExists(Integer listingId, Instant end, Instant start) {
-        return repository.existsByListingIdAndStartDateLessThanAndEndDateGreaterThan(listingId, start, end);
+    public Boolean bookingAlreadyExists(Integer listingId, LocalDate endAt, LocalDate  startAt) {
+        return repository.existsByListingIdAndStartAtLessThanEqualAndEndAtGreaterThanEqual(listingId, endAt, startAt);
     }
 
-    public void calculateTotalPrice(Booking booking) {
-        long days = ChronoUnit.DAYS.between(booking.getStartAt(), booking.getEndAt());
-
-        BigDecimal totalPrice = new BigDecimal(days).multiply(new BigDecimal(days));
-
-        booking.setTotalPrice(totalPrice);
+    @Transactional
+    public List<Booking> getAllByListingVehicleOwnerId(Integer ownerId)
+    {
+        return repository.findAllByListingVehicleOwnerId(ownerId);
     }
 }
