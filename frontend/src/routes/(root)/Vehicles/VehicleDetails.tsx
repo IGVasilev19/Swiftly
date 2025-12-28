@@ -11,7 +11,7 @@ export function VehicleDetails() {
   const navigate = useNavigate();
   const { selectedVehicleId } = useVehicleContext();
   const { data, isLoading, error } = useVehicle({
-    vehicleId: selectedVehicleId,
+    id: selectedVehicleId,
   });
   const vehicle: Vehicle | null = data && !Array.isArray(data) ? data : null;
 

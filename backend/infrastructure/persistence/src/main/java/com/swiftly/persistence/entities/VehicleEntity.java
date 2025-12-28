@@ -4,6 +4,8 @@ import com.swiftly.domain.enums.vehicle.FuelType;
 import com.swiftly.domain.enums.vehicle.VehicleType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -49,7 +51,7 @@ public class VehicleEntity {
     @Column(nullable = false)
     private Double fuelConsumption;
 
-    @org.hibernate.annotations.Fetch(org.hibernate.annotations.FetchMode.SUBSELECT)
+    @Fetch(FetchMode.SUBSELECT)
     @ElementCollection(targetClass = Feature.class, fetch = FetchType.LAZY)
     @CollectionTable(
             name = "vehicle_features",
@@ -74,7 +76,7 @@ public class VehicleEntity {
     @Column(length = 100)
     private Instant locationTimeStamp;
 
-    @org.hibernate.annotations.Fetch(org.hibernate.annotations.FetchMode.SUBSELECT)
+    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<VehicleImageEntity> images = new ArrayList<>();
 

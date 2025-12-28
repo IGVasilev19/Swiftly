@@ -17,8 +17,6 @@ public interface JpaBookingRepository extends JpaRepository<BookingEntity, Integ
     LEFT JOIN FETCH b.listing l
     LEFT JOIN FETCH l.vehicle v
     LEFT JOIN FETCH v.owner 
-    LEFT JOIN FETCH v.images
-    LEFT JOIN FETCH v.features
     WHERE b.id = :id
     """)
     Optional<BookingEntity> findById(@Param("id") Integer id);
@@ -26,23 +24,20 @@ public interface JpaBookingRepository extends JpaRepository<BookingEntity, Integ
     @Query("""
     SELECT DISTINCT b
     FROM BookingEntity b 
+    LEFT JOIN FETCH b.renter r
     LEFT JOIN FETCH b.listing l
     LEFT JOIN FETCH l.vehicle v
     LEFT JOIN FETCH v.owner 
-    LEFT JOIN FETCH v.images
-    LEFT JOIN FETCH v.features
-    WHERE b.renter = :id
+    WHERE r.id = :renterId
     """)
-    List<BookingEntity> findAllByRenterId(Integer renterId);
+    List<BookingEntity> findAllByRenterId(@Param("renterId")Integer renterId);
 
     @Query("""
     SELECT DISTINCT b
-    FROM BookingEntity b 
+    FROM BookingEntity b
     LEFT JOIN FETCH b.listing l
     LEFT JOIN FETCH l.vehicle v
-    LEFT JOIN FETCH v.owner 
-    LEFT JOIN FETCH v.images
-    LEFT JOIN FETCH v.features
+    LEFT JOIN FETCH v.owner
     WHERE l.id = :listingId
     ORDER BY b.creationDate
     """)
@@ -55,8 +50,6 @@ public interface JpaBookingRepository extends JpaRepository<BookingEntity, Integ
     JOIN FETCH b.listing l
     JOIN FETCH l.vehicle v
     JOIN FETCH v.owner 
-    LEFT JOIN FETCH v.images
-    LEFT JOIN FETCH v.features
     WHERE v.owner.id = :ownerId
     ORDER BY b.creationDate
     """)

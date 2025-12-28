@@ -2,8 +2,6 @@ package com.swiftly.application.booking.port.inbound;
 
 import com.swiftly.domain.Booking;
 
-import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 

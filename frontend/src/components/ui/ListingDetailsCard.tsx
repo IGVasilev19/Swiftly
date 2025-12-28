@@ -15,6 +15,7 @@ import type { Booking } from "@/types/booking";
 import { useAddBooking } from "@/hooks/useAddBooking";
 import { AddBookingForm } from "../booking/AddBookingForm";
 import { differenceInCalendarDays } from "date-fns/differenceInCalendarDays";
+import { format } from "date-fns/format";
 
 const formatEnumLabel = (value: string): string => {
   return value
@@ -50,8 +51,8 @@ export function ListingDetailsCard({ listing }: { listing: Listing }) {
 
     const booking: Booking = {
       listing: listing,
-      startAt: data.dateRange.from,
-      endAt: data.dateRange.to,
+      startAt: format(data.dateRange.from, "yyyy-MM-dd"),
+      endAt: format(data.dateRange.to, "yyyy-MM-dd"),
       totalPrice: totalPrice,
     };
 

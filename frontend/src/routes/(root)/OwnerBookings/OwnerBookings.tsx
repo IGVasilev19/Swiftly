@@ -4,8 +4,8 @@ import { useBooking } from "@/hooks/useBooking";
 import { BookingTable } from "@/components/booking/BookingTable";
 import type { Booking } from "@/types/booking";
 
-export function Bookings() {
-  const { data, isLoading, error } = useBooking({ role: "RENTER" });
+export function OwnerBookings() {
+  const { data, isLoading, error } = useBooking({ role: "OWNER" });
   const bookings: Booking[] = Array.isArray(data) ? data : [];
 
   if (isLoading) {
@@ -40,3 +40,4 @@ export function Bookings() {
     </Layout>
   );
 }
+

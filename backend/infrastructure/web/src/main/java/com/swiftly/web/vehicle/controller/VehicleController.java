@@ -87,7 +87,6 @@ public class VehicleController {
 
             return ResponseEntity.status(HttpStatus.OK).body(ownedVehicles);
         }catch(Exception e){
-            e.printStackTrace(); // TODO: Replace with proper logging
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,
                     "message", e.getMessage()));
         }

@@ -121,11 +121,17 @@ public class BookingController {
     }
 
     @GetMapping("/listing/{listingId}")
-    public ResponseEntity<?> getBookingsByListingId(@PathVariable("id") Integer id)
+    public ResponseEntity<?> getBookingsByListingId(@PathVariable("listingId") Integer listingId)
     {
         try
         {
-            BookingResponse response = BookingMapper.toResponse(bookingService.getById(id));
+            List<Booking> bookings = bookingService.getAllByListingId(listingId);
+            List<BookingResponse> response = new ArrayList<>();
+
+            for (Booking booking : bookings)
+            {
+                response.add(BookingMapper.toResponse(booking));
+            }
 
             return ResponseEntity
                     .status(HttpStatus.OK)

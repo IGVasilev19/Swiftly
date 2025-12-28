@@ -33,7 +33,14 @@ public class BookingServiceImpl implements BookingService {
         Profile renter = profileService.getById(loggedUser.getId());
         booking.setRenter(renter);
 
-        booking.setStatus(Status.REQUESTED);
+        if(booking.getListing().getInstantBook())
+        {
+            booking.setStatus(Status.APPROVED);
+        }
+        else
+        {
+            booking.setStatus(Status.REQUESTED);
+        }
 
         return repository.save(booking);
     }
@@ -44,7 +51,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Transactional
-    public List<Booking> getAllByRenterId(Integer renterId) {
+    public List<Booking> getAllByRenterId(Integer renterId)
+    {
         return repository.findAllByRenterId(renterId);
     }
 
@@ -62,4 +70,5 @@ public class BookingServiceImpl implements BookingService {
     {
         return repository.findAllByListingVehicleOwnerId(ownerId);
     }
+
 }

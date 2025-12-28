@@ -13,9 +13,7 @@ public interface JpaListingRepository extends JpaRepository<ListingEntity, Integ
     @Query("""
         SELECT DISTINCT l 
         FROM ListingEntity l 
-        LEFT JOIN FETCH l.vehicle v 
-        LEFT JOIN FETCH v.owner 
-        LEFT JOIN FETCH v.images
+        LEFT JOIN FETCH l.vehicle v
         WHERE v.id = :vehicleId
         """)
     ListingEntity findByVehicleId(@Param("vehicleId") Integer vehicleId);
@@ -24,8 +22,6 @@ public interface JpaListingRepository extends JpaRepository<ListingEntity, Integ
         SELECT DISTINCT l 
         FROM ListingEntity l 
         LEFT JOIN FETCH l.vehicle v 
-        LEFT JOIN FETCH v.owner 
-        LEFT JOIN FETCH v.images
         WHERE l.id = :id
         """)
     Optional<ListingEntity> findById(@Param("id") Integer id);
@@ -34,8 +30,6 @@ public interface JpaListingRepository extends JpaRepository<ListingEntity, Integ
         SELECT DISTINCT l 
         FROM ListingEntity l 
         LEFT JOIN FETCH l.vehicle v 
-        LEFT JOIN FETCH v.owner 
-        LEFT JOIN FETCH v.images
         ORDER BY l.creationDate
         """)
     List<ListingEntity> findAllWithVehicle();

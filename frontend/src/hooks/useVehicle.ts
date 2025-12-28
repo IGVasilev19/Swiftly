@@ -1,15 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import api from "@/hooks/api";
-import type {
-  UseVehicleReturn,
-  UseVehiclesOptions,
-  Vehicle,
-} from "@/types/vehicle";
+import type { Vehicle } from "@/types/vehicle";
+import type { UseByIdOptions, UseQueryReturn } from "@/types/types";
 
 export function useVehicle(
-  options?: UseVehiclesOptions
-): UseVehicleReturn<Vehicle | Vehicle[]> {
-  const { vehicleId } = options ?? {};
+  options?: UseByIdOptions
+): UseQueryReturn<Vehicle | Vehicle[]> {
+  const { id: vehicleId } = options ?? {};
   const [data, setData] = useState<Vehicle[] | Vehicle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);

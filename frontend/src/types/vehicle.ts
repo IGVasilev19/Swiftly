@@ -49,14 +49,3 @@ export interface VehicleTableProps {
   maxHeight?: string;
   itemsPerPage?: number;
 }
-
-export type UseVehicleReturn<T> = {
-  data: T | null;
-  isLoading: boolean;
-  error: Error | null;
-  refetch: () => void;
-};
-
-export type UseVehiclesOptions = {
-  vehicleId?: number | null;
-};

@@ -12,7 +12,7 @@ export function ListingDetails() {
   const navigate = useNavigate();
   const { selectedListingId } = useListingContext();
   const { data, isLoading, error } = useListing({
-    listingId: selectedListingId,
+    id: selectedListingId,
   });
   const listing: Listing | null = data && !Array.isArray(data) ? data : null;
 

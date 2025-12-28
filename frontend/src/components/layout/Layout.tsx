@@ -34,16 +34,30 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="h-screen w-screen flex hide-scrollbar">
       <div className="h-full w-[200px] flex flex-col items-center bg-[#F8FAFC]">
-        <button
-          className="hover:cursor-pointer"
-          onClick={() => navigate("/app/dashboard")}
-        >
-          <img
-            src="/images/Logo-nobg.webp"
-            alt="Logo"
-            className="h-[50px] w-[150px] m-4 rounded-lg object-contain select-none"
-          />
-        </button>
+        {isOwner && (
+          <button
+            className="hover:cursor-pointer"
+            onClick={() => navigate("/app/dashboard")}
+          >
+            <img
+              src="/images/Logo-nobg.webp"
+              alt="Logo"
+              className="h-[50px] w-[150px] m-4 rounded-lg object-contain select-none"
+            />
+          </button>
+        )}
+        {isRenter && (
+          <button
+            className="hover:cursor-pointer"
+            onClick={() => navigate("/app/catalogue")}
+          >
+            <img
+              src="/images/Logo-nobg.webp"
+              alt="Logo"
+              className="h-[50px] w-[150px] m-4 rounded-lg object-contain select-none"
+            />
+          </button>
+        )}
         <div className="h-full w-full flex flex-col items-center mt-20">
           {isOwner && <OwnerSidebarItems />}
           {!isOwner && isRenter && <RenterSidebarItems />}

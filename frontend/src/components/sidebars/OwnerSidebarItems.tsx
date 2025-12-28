@@ -16,6 +16,12 @@ export function OwnerSidebarItems() {
         imgSrc="/images/car-side-nobg-gray.webp"
         imgSrcActive="/images/car-side-nobg.webp"
       />
+      <SidebarItem
+        label="Bookings"
+        path="/app/owner/bookings"
+        imgSrc="/images/notebook-pen-gray.webp"
+        imgSrcActive="/images/notebook-pen.webp"
+      />
     </>
   );
 }

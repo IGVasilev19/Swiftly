@@ -7,8 +7,8 @@ export interface Booking {
   id?: number;
   listing: Listing;
   renter?: Profile;
-  startAt: Date;
-  endAt: Date;
+  startAt: string;
+  endAt: string;
   createdAt?: Date;
   status?: string;
   totalPrice?: number;
@@ -21,16 +21,10 @@ export interface AddBookingFormProps {
   isPending: boolean;
 }
 
-export interface UseGetBookingsReturn {
-  bookings: Booking[];
-  isLoading: boolean;
-  error: Error | null;
-  refetch: () => void;
-}
+export type BookingQueryRole = "RENTER" | "OWNER";
 
-export interface UseGetBookingReturn {
-  booking: Booking | null;
-  isLoading: boolean;
-  error: Error | null;
-  refetch: () => void;
-}
+export type UseBookingOptions = {
+  id?: number | null;
+  listingId?: number | null;
+  role?: BookingQueryRole;
+};

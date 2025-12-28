@@ -1,15 +1,12 @@
-import type {
-  Listing,
-  UseListingOptions,
-  UseListingReturn,
-} from "@/types/listing";
+import type { Listing } from "@/types/listing";
 import { useCallback, useEffect, useState } from "react";
 import api from "./api";
+import type { UseByIdOptions, UseQueryReturn } from "@/types/types";
 
 export function useListing(
-  options?: UseListingOptions
-): UseListingReturn<Listing | Listing[]> {
-  const { listingId } = options ?? {};
+  options?: UseByIdOptions
+): UseQueryReturn<Listing | Listing[]> {
+  const { id: listingId } = options ?? {};
   const [data, setData] = useState<Listing[] | Listing | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -26,9 +23,9 @@ export function useListing(
       setData(response.data);
     } catch (err) {
       setError(
-        err instanceof Error ? err : new Error("Failed to fetch listings")
+        err instanceof Error ? err : new Error("Failed to fetch listing/s")
       );
-      console.error("Error fetching listings:", err);
+      console.error("Error fetching listing/s:", err);
     } finally {
       setIsLoading(false);
     }

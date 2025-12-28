@@ -16,7 +16,7 @@ public class ListingServiceImpl implements ListingService {
 
     @Transactional
     public Listing create(Listing listing) {
-        if(getByVehicleId(listing.getVehicle().getId()) != null)
+        if(checkExistsByVehicleId(listing.getVehicle().getId()))
         {
             throw new IllegalArgumentException("Listing already exists for this vehicle");
         }

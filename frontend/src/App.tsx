@@ -13,6 +13,7 @@ import { RequireOwner } from "./guards/RequireOwner";
 import { RequireRenter } from "./guards/RequireRenter";
 import { Catalogue } from "./routes/(root)/Catalogue/Catalogue";
 import { Bookings } from "./routes/(root)/Bookings/Bookings";
+import { OwnerBookings } from "./routes/(root)/OwnerBookings/OwnerBookings";
 import { Unauthorized } from "./routes/(root)/Unauthorized/Unauthorized";
 import { ListingDetails } from "./routes/(root)/Catalogue/ListingDetails";
 import { ListingLayout } from "./guards/ListingLayout";
@@ -57,6 +58,14 @@ const App = () => {
                   element={
                     <RequireOwner>
                       <VehicleDetails />
+                    </RequireOwner>
+                  }
+                />
+                <Route
+                  path="owner/bookings"
+                  element={
+                    <RequireOwner>
+                      <OwnerBookings />
                     </RequireOwner>
                   }
                 />

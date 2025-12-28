@@ -3,7 +3,7 @@ import type {
   LoginSchemaType,
   RegisterSchemaType,
 } from "@/schemas/auth/auth.schema";
-import { Card } from "@/components/ui/card";
+import type { DateRange } from "react-day-picker/dist/cjs/types/shared";
 
 export interface LoginFormProps {
   loginForm: UseFormReturn<LoginSchemaType>;
@@ -26,3 +26,19 @@ export interface DecodedToken {
   role?: string;
   [key: string]: unknown;
 }
+
+export type UseByIdOptions = {
+  id?: number | null;
+};
+
+export type UseQueryReturn<T> = {
+  data: T | null;
+  isLoading: boolean;
+  error: Error | null;
+  refetch: () => void;
+};
+
+export type Calendar05Props = {
+  value?: DateRange;
+  onChange: (range: DateRange | undefined) => void;
+};
