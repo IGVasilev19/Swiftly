@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useOutsideClick } from "@/hooks/use-outside-click";
 import type { Listing } from "@/types/listing";
 import type { VehicleImage } from "@/types/vehicle";
-import { useGetListings } from "@/hooks/useGetListings";
+import { useListing } from "@/hooks/useListing";
 import Loading from "@/components/ui/Loading";
 import { VehicleImageGallery } from "./VehicleImageGallery";
 import { Button } from "./button";
@@ -17,7 +17,8 @@ export default function CatalogueGrid() {
   const [active, setActive] = useState<Listing | null>(null);
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
-  const { listings, isLoading, error } = useGetListings();
+  const { data, isLoading, error } = useListing();
+  const listings: Listing[] = Array.isArray(data) ? data : [];
   const { setSelectedListingId } = useListingContext();
   const navigate = useNavigate();
 

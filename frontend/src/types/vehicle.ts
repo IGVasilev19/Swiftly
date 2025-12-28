@@ -50,16 +50,13 @@ export interface VehicleTableProps {
   itemsPerPage?: number;
 }
 
-export interface UseGetVehiclesReturn {
-  vehicles: Vehicle[];
+export type UseVehicleReturn<T> = {
+  data: T | null;
   isLoading: boolean;
   error: Error | null;
   refetch: () => void;
-}
+};
 
-export interface UseGetVehicleReturn {
-  vehicle: Vehicle | null;
-  isLoading: boolean;
-  error: Error | null;
-  refetch: () => void;
-}
+export type UseVehiclesOptions = {
+  vehicleId?: number | null;
+};

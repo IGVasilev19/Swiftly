@@ -18,16 +18,13 @@ export interface AddListingFromProps {
   isPending: boolean;
 }
 
-export interface UseGetListingsReturn {
-  listings: Listing[];
+export type UseListingReturn<T> = {
+  data: T | null;
   isLoading: boolean;
   error: Error | null;
   refetch: () => void;
-}
+};
 
-export interface UseGetListingReturn {
-  listing: Listing | null;
-  isLoading: boolean;
-  error: Error | null;
-  refetch: () => void;
-}
+export type UseListingOptions = {
+  listingId?: number | null;
+};

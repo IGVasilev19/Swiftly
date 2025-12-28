@@ -3,13 +3,15 @@ import { Layout } from "@/components/layout/Layout";
 import Loading from "@/components/ui/Loading";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useGetVehicles } from "@/hooks/useGetVehicles";
+import { useVehicle } from "@/hooks/useVehicle";
 import { VehicleTable } from "@/components/vehicle/VehicleTable";
 import { useVehicleContext } from "@/contexts/VehicleContext";
+import type { Vehicle } from "@/types/vehicle";
 
 export function Vehicles() {
   const navigate = useNavigate();
-  const { vehicles, isLoading, error } = useGetVehicles();
+  const { data, isLoading, error } = useVehicle();
+  const vehicles: Vehicle[] = Array.isArray(data) ? data : [];
   const { setSelectedVehicleId } = useVehicleContext();
 
   const handleRowClick = (vehicle: { id?: number }) => {

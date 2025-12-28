@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { ListingDetailsCard } from "@/components/ui/ListingDetailsCard";
 import Loading from "@/components/ui/Loading";
 import { useListingContext } from "@/contexts/ListingContext";
-import { useGetListing } from "@/hooks/useGetLisitng";
+import { useListing } from "@/hooks/useListing";
+import type { Listing } from "@/types/listing";
 import { Layout } from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +11,10 @@ import { useNavigate } from "react-router-dom";
 export function ListingDetails() {
   const navigate = useNavigate();
   const { selectedListingId } = useListingContext();
-  const { listing, isLoading, error } = useGetListing(selectedListingId);
+  const { data, isLoading, error } = useListing({
+    listingId: selectedListingId,
+  });
+  const listing: Listing | null = data && !Array.isArray(data) ? data : null;
 
   useEffect(() => {
     document.body.style.overflow = "auto";

@@ -3,13 +3,17 @@ import Loading from "@/components/ui/Loading";
 import { VehicleDetailsCard } from "@/components/ui/VehicleDetailsCard";
 import { Button } from "@/components/ui/button";
 import { useVehicleContext } from "@/contexts/VehicleContext";
-import { useGetVehicle } from "@/hooks/useGetVehicle";
+import { useVehicle } from "@/hooks/useVehicle";
+import type { Vehicle } from "@/types/vehicle";
 import { useNavigate } from "react-router-dom";
 
 export function VehicleDetails() {
   const navigate = useNavigate();
   const { selectedVehicleId } = useVehicleContext();
-  const { vehicle, isLoading, error } = useGetVehicle(selectedVehicleId);
+  const { data, isLoading, error } = useVehicle({
+    vehicleId: selectedVehicleId,
+  });
+  const vehicle: Vehicle | null = data && !Array.isArray(data) ? data : null;
 
   if (isLoading) {
     return (
