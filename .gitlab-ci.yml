@@ -2,6 +2,8 @@ stages:
   - test
   - build
   - push
+  - sonar
+  - deploy
 #---
 variables:
   GRADLE_HOME_DIR: "D:/gcache/${CI_PROJECT_ID}/${CI_CONCURRENT_ID}"
@@ -28,7 +30,7 @@ tests:
       }'
 
     - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
-    - '& "$gradleExe" test --no-daemon "-Dspring.profiles.active=unit" -x integrationTest'
+    - '& "$gradleExe" test jacocoRootReport --no-daemon "-Dspring.profiles.active=unit" -x integrationTest'
 
   artifacts:
     when: always
@@ -37,6 +39,7 @@ tests:
         - "backend/boot/build/test-results/test/*.xml"
     paths:
       - "backend/**/build/test-results/test/*.xml"
+      - "backend/build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
 
 build_images:
   stage: build
@@ -71,5 +74,62 @@ push_images:
     - docker push "$env:DOCKERHUB_USERNAME/swiftly-frontend:latest"
   needs:
     - build_images
+  only:
+    - main
+
+sonarqube:
+  stage: sonar
+  script:
+    - "$ErrorActionPreference = 'Stop'"
+
+    - "Set-Location $env:CI_PROJECT_DIR"
+    - "$distDir = Join-Path $env:GRADLE_HOME_DIR 'dist'"
+    - '$gradleHome = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION)'
+    - '$gradleExe = Join-Path $gradleHome ''bin\gradle.bat'''
+
+    - 'if (-not (Test-Path $gradleExe)) {
+      New-Item -ItemType Directory -Force -Path $distDir | Out-Null;
+      $zipUrl = "https://services.gradle.org/distributions/gradle-$($env:GRADLE_VERSION)-bin.zip";
+      $zipPath = Join-Path $distDir ("gradle-" + $env:GRADLE_VERSION + ".zip");
+      Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath;
+      Expand-Archive -Path $zipPath -DestinationPath $distDir -Force;
+      Remove-Item $zipPath -Force;
+      }'
+
+    - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
+    - '& "$gradleExe" test jacocoRootReport --no-daemon "-Dspring.profiles.active=unit" -x integrationTest'
+    - '& "$gradleExe" sonar --no-daemon "-Dsonar.login=$env:SONAR_TOKEN" "-Dsonar.host.url=$env:SONAR_HOST_URL"'
+  needs:
+    - tests
+  only:
+    - main
+  allow_failure: true
+
+deploy_local:
+  stage: deploy
+  script:
+    - "$ErrorActionPreference = 'Stop'"
+
+    - docker login -u $env:DOCKERHUB_USERNAME -p $env:DOCKERHUB_PASSWORD
+
+    - Write-Host "Stopping existing containers..."
+    - docker stop swiftly-backend swiftly-frontend 2>$null
+    - docker rm swiftly-backend swiftly-frontend 2>$null
+
+    - Write-Host "Pulling latest images..."
+    - docker pull "$env:DOCKERHUB_USERNAME/swiftly-backend:latest"
+    - docker pull "$env:DOCKERHUB_USERNAME/swiftly-frontend:latest"
+
+    - Write-Host "Starting backend container..."
+    - docker run -d --name swiftly-backend -p 8080:8080 --restart unless-stopped "$env:DOCKERHUB_USERNAME/swiftly-backend:latest"
+
+    - Write-Host "Starting frontend container..."
+    - docker run -d --name swiftly-frontend -p 3000:3000 --restart unless-stopped "$env:DOCKERHUB_USERNAME/swiftly-frontend:latest"
+
+    - Write-Host "Deployment completed successfully"
+    - Write-Host "Backend available at: http://localhost:8080"
+    - Write-Host "Frontend available at: http://localhost:3000"
+  needs:
+    - push_images
   only:
     - main
