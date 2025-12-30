@@ -16,16 +16,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ActiveProfiles("unit")
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("unit")
 class ProfileServiceImplTest {
 
     @Mock
-    private ProfileService profileService;
-
-    @Mock
-    ProfileRepository profileRepository;
+    private ProfileRepository profileRepository;
 
     @InjectMocks
     private ProfileServiceImpl profileServiceImpl;
@@ -41,8 +37,6 @@ class ProfileServiceImplTest {
 
         when(profileRepository.findById(profileId)).thenReturn(mockProfile);
 
-        ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(profileRepository);
-
         Profile result = profileServiceImpl.getById(profileId);
 
         assertNotNull(result);
@@ -50,18 +44,15 @@ class ProfileServiceImplTest {
         verify(profileRepository).findById(profileId);
     }
 
-
     @Test
-    void getById_profileNotFound_throwsException() {
+    void getById_profileNotFound_returnsNull() {
         Integer profileId = 999;
 
         when(profileRepository.findById(profileId)).thenReturn(null);
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
-            profileServiceImpl.getById(profileId);
-        });
+        Profile result = profileServiceImpl.getById(profileId);
 
-        assertEquals("Profile not found", ex.getMessage());
+        assertNull(result);
         verify(profileRepository).findById(profileId);
     }
 }

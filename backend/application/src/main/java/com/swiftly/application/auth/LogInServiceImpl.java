@@ -23,7 +23,6 @@ public class LogInServiceImpl implements LogInService {
     public User login(User requestedUser)
     {
         User userToLogIn = userService.getByEmail(requestedUser.getEmail());
-        System.out.println("ROLES: " + userToLogIn.getRoles());
 
         if(PasswordHasher.checkPassword(requestedUser.getPasswordHash(), userToLogIn.getPasswordHash()))
         {

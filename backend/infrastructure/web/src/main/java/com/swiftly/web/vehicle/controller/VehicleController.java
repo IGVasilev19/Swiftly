@@ -19,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.validation.Valid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class VehicleController {
 
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> addVehicle(@RequestPart("vehicleData") VehicleRequest newVehicle, @RequestPart("images") List<MultipartFile> images)
+    public ResponseEntity<?> addVehicle(@RequestPart("vehicleData") @Valid VehicleRequest newVehicle, @RequestPart("images") List<MultipartFile> images)
     {
         try
         {

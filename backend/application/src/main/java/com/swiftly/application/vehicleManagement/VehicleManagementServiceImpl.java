@@ -46,7 +46,7 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
                                 LocalDateTime.now()
                         );
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        throw new IllegalArgumentException("Could not load vehicle image file");
                     }
                 })
                 .toList();

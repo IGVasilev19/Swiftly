@@ -10,7 +10,6 @@ import com.swiftly.web.auth.dto.LogInRequest;
 import com.swiftly.web.auth.dto.RegisterRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
@@ -30,15 +29,20 @@ class EnumControllerIT extends Containers {
     @LocalServerPort
     int port;
 
-    @Autowired
-    WebTestClient webTestClientBase;
-
     WebTestClient webTestClient;
+
+    @BeforeEach
+    void setupClient() {
+        this.webTestClient = WebTestClient
+                .bindToServer()
+                .baseUrl("http://localhost:" + port)
+                .build();
+    }
 
     private String registerAndLogin() {
         String uniqueEmail = "user" + UUID.randomUUID() + "@gmail.com";
-        List<Role> roles = List.of(Role.RENTER);
-        RegisterRequest registerPayload = new RegisterRequest(uniqueEmail, "@MockPassword123", "Test User", "+123456789012", roles);
+        List<Role> roles = List.of(Role.OWNER);
+        RegisterRequest registerPayload = new RegisterRequest(uniqueEmail, "@MockPassword123", "User Name", "+123456789012", roles);
         
         webTestClient.post()
                 .uri("/api/v1/auth/register")
@@ -62,18 +66,9 @@ class EnumControllerIT extends Containers {
         return accessTokenHolder[0];
     }
 
-    @BeforeEach
-    void setupClient() {
-        this.webTestClient = WebTestClient
-                .bindToServer()
-                .baseUrl("http://localhost:" + port)
-                .build();
-    }
-
     @Test
     void vehicleTypes_ShouldReturnAllVehicleTypes() {
         String accessToken = registerAndLogin();
-
         webTestClient.get()
                 .uri("/api/v1/enums/vehicle-types")
                 .header("Authorization", "Bearer " + accessToken)
@@ -97,7 +92,6 @@ class EnumControllerIT extends Containers {
     @Test
     void fuelTypes_ShouldReturnAllFuelTypes() {
         String accessToken = registerAndLogin();
-
         webTestClient.get()
                 .uri("/api/v1/enums/fuel-types")
                 .header("Authorization", "Bearer " + accessToken)
@@ -121,7 +115,6 @@ class EnumControllerIT extends Containers {
     @Test
     void features_ShouldReturnAllFeatures() {
         String accessToken = registerAndLogin();
-
         webTestClient.get()
                 .uri("/api/v1/enums/features")
                 .header("Authorization", "Bearer " + accessToken)

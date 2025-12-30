@@ -135,23 +135,64 @@ class VehicleManagementServiceImplTest {
         Vehicle vehicleToCreate = new Vehicle();
         vehicleToCreate.setVin("VIN123456789");
 
+        Vehicle savedVehicle = new Vehicle();
+        savedVehicle.setId(1);
+        savedVehicle.setOwner(new com.swiftly.domain.Profile(1, testOwner, "Name", "123", "url"));
+        when(vehicleService.create(any(Vehicle.class))).thenReturn(savedVehicle);
+
         MultipartFile faultyFile = mock(MultipartFile.class);
         when(faultyFile.getBytes()).thenThrow(new IOException("File read error"));
 
-        assertThrows(RuntimeException.class, 
+        assertThrows(IllegalArgumentException.class, 
                 () -> vehicleManagementService.addVehicle(vehicleToCreate, List.of(faultyFile)));
     }
 
-    /*
     @Test
-    void getFullVehicleById_WithImages_ShouldReturnVehicleWithImages() {
-       // Method not implemented in service currently
+    void addImage_ShouldCallRepository() {
+        Vehicle vehicle = new Vehicle();
+        vehicle.setId(1);
+        VehicleImage image = new VehicleImage();
+        image.setId(1);
+
+        vehicleManagementService.addImage(vehicle, image);
+
+        verify(vehicleRepository).addNewImage(vehicle, image);
     }
 
     @Test
-    void getFullVehicleById_NoImages_ShouldReturnVehicleWithEmptyImages() {
-       // Method not implemented in service currently
+    void deleteImage_ShouldCallRepository() {
+        VehicleImage image = new VehicleImage();
+        image.setId(1);
+        Vehicle vehicle = new Vehicle();
+        vehicle.setId(1);
+        image.setVehicle(vehicle);
+
+        vehicleManagementService.deleteImage(image);
+
+        verify(vehicleRepository).removeImage(image);
     }
-    */
+
+    @Test
+    void addVehicle_WithEmptyImages_ShouldCreateVehicleWithoutImages() {
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(testOwner);
+        when(profileService.getById(1)).thenReturn(new com.swiftly.domain.Profile(1, testOwner, "Name", "123", "url"));
+
+        Vehicle vehicleToCreate = new Vehicle();
+        vehicleToCreate.setVin("VIN123456789");
+
+        Vehicle savedVehicle = new Vehicle();
+        savedVehicle.setId(1);
+        savedVehicle.setOwner(new com.swiftly.domain.Profile(1, testOwner, "Name", "123", "url"));
+
+        when(vehicleService.create(any(Vehicle.class))).thenReturn(savedVehicle);
+
+        Vehicle result = vehicleManagementService.addVehicle(vehicleToCreate, List.of());
+
+        assertNotNull(result);
+        verify(vehicleService).create(any(Vehicle.class));
+        verify(vehicleRepository, never()).addNewImage(any(Vehicle.class), any(VehicleImage.class));
+    }
 }
 

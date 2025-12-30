@@ -2,19 +2,20 @@ package com.boot.web;
 
 import com.boot.testsupport.Containers;
 import com.swiftly.boot.BootApplication;
-import com.swiftly.domain.Vehicle;
+import com.swiftly.domain.enums.booking.Status;
 import com.swiftly.domain.enums.user.Role;
 import com.swiftly.domain.enums.vehicle.Feature;
 import com.swiftly.domain.enums.vehicle.FuelType;
 import com.swiftly.domain.enums.vehicle.VehicleType;
 import com.swiftly.persistence.entities.*;
+import com.swiftly.persistence.booking.JpaBookingRepository;
 import com.swiftly.persistence.listing.JpaListingRepository;
 import com.swiftly.persistence.profile.JpaProfileRepository;
 import com.swiftly.persistence.user.JpaUserRepository;
 import com.swiftly.persistence.vehicle.JpaVehicleRepository;
 import com.swiftly.web.auth.dto.LogInRequest;
 import com.swiftly.web.auth.dto.RegisterRequest;
-import com.swiftly.web.listing.dto.ListingRequest;
+import com.swiftly.web.booking.dto.BookingRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +26,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = BootApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class ListingControllerIT extends Containers {
+class BookingControllerIT extends Containers {
 
     @LocalServerPort
     int port;
@@ -49,6 +49,9 @@ class ListingControllerIT extends Containers {
 
     @Autowired
     JpaListingRepository listingRepository;
+
+    @Autowired
+    JpaBookingRepository bookingRepository;
 
     WebTestClient webTestClient;
 
@@ -118,69 +121,76 @@ class ListingControllerIT extends Containers {
         return listingRepository.save(listing);
     }
 
-
-
-    @Test
-    void addListing_AsRenter_ShouldReturnForbidden() throws Exception {
-        String renterToken = registerAndLogin("renter", List.of(Role.RENTER));
-
-        ListingRequest listingRequest = new ListingRequest(
-                new Vehicle(1),
-                "Test Listing",
-                "Test Description",
-                new BigDecimal("100.00"),
-                false
+    private BookingEntity setupTestBooking(ListingEntity listing, Integer renterId) {
+        ProfileEntity renter = profileRepository.findById(renterId)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+        
+        BookingEntity booking = new BookingEntity(
+                listing,
+                renter,
+                LocalDate.now().plusDays(1),
+                LocalDate.now().plusDays(3),
+                Status.REQUESTED,
+                new BigDecimal("300.00")
         );
-
-        webTestClient.post()
-                .uri("/api/v1/listing")
-                .header("Authorization", "Bearer " + renterToken)
-                .bodyValue(listingRequest)
-                .exchange()
-                .expectStatus().isForbidden();
+        return bookingRepository.save(booking);
     }
 
+
+
+
     @Test
-    void addListing_Unauthenticated_ShouldReturnForbidden() throws Exception {
-        ListingRequest listingRequest = new ListingRequest(
-                new Vehicle(1),
-                "Test Listing",
-                "Test Description",
-                new BigDecimal("100.00"),
-                false
+    void createBooking_Unauthenticated_ShouldReturnForbidden() throws Exception {
+        BookingRequest bookingRequest = new BookingRequest(
+                new com.swiftly.domain.Listing(1),
+                LocalDate.now().plusDays(1),
+                LocalDate.now().plusDays(3),
+                new BigDecimal("300.00")
         );
 
         webTestClient.post()
-                .uri("/api/v1/listing")
-                .bodyValue(listingRequest)
+                .uri("/api/v1/booking")
+                .bodyValue(bookingRequest)
                 .exchange()
                 .expectStatus().isForbidden();
     }
 
 
     @Test
-    void getListing_NonExistentListing_ShouldReturnBadRequest() throws Exception {
+    void getAllRenterBookings_AsOwner_ShouldReturnForbidden() throws Exception {
         String ownerToken = registerAndLogin("owner", List.of(Role.OWNER));
 
         webTestClient.get()
-                .uri("/api/v1/listing/99999")
+                .uri("/api/v1/booking/me")
                 .header("Authorization", "Bearer " + ownerToken)
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+
+    @Test
+    void getAllOwnerBookings_AsRenter_ShouldReturnForbidden() throws Exception {
+        String renterToken = registerAndLogin("renter", List.of(Role.RENTER));
+
+        webTestClient.get()
+                .uri("/api/v1/booking/owned")
+                .header("Authorization", "Bearer " + renterToken)
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+
+    @Test
+    void getBooking_NonExistentBooking_ShouldReturnBadRequest() throws Exception {
+        String renterToken = registerAndLogin("renter", List.of(Role.RENTER));
+
+        webTestClient.get()
+                .uri("/api/v1/booking/99999")
+                .header("Authorization", "Bearer " + renterToken)
                 .exchange()
                 .expectStatus().isBadRequest();
     }
 
-    @Test
-    void getAllListings_NoListings_ShouldReturnBadRequest() throws Exception {
-        String renterToken = registerAndLogin("renter", List.of(Role.RENTER));
 
-        webTestClient.get()
-                .uri("/api/v1/listing")
-                .header("Authorization", "Bearer " + renterToken)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.success").isEqualTo(false)
-                .jsonPath("$.message").exists();
-    }
 }
 

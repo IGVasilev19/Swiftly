@@ -103,31 +103,31 @@ class VehicleServiceImplTest {
     }
 
     @Test
-    void getAllByOwnerId_ShouldReturnOwnerVehicles() {
+    void getAllByOwner_ShouldReturnOwnerVehicles() {
         Vehicle vehicle2 = new Vehicle();
         vehicle2.setId(2);
         vehicle2.setVin("VIN987654321");
         vehicle2.setOwner(testOwner);
         
         List<Vehicle> ownerVehicles = Arrays.asList(testVehicle, vehicle2);
-        when(repository.findAllByOwnerId(1)).thenReturn(ownerVehicles);
+        when(repository.findAllByOwner(testOwner)).thenReturn(ownerVehicles);
 
-        List<Vehicle> result = vehicleService.getAllByOwnerId(1);
+        List<Vehicle> result = vehicleService.getAllByOwner(testOwner);
 
         assertNotNull(result);
         assertEquals(2, result.size());
-        verify(repository).findAllByOwnerId(1);
+        verify(repository).findAllByOwner(testOwner);
     }
 
     @Test
-    void getAllByOwnerId_NoVehicles_ShouldReturnEmptyList() {
-        when(repository.findAllByOwnerId(1)).thenReturn(List.of());
+    void getAllByOwner_NoVehicles_ShouldReturnEmptyList() {
+        when(repository.findAllByOwner(testOwner)).thenReturn(List.of());
 
-        List<Vehicle> result = vehicleService.getAllByOwnerId(1);
+        List<Vehicle> result = vehicleService.getAllByOwner(testOwner);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
-        verify(repository).findAllByOwnerId(1);
+        verify(repository).findAllByOwner(testOwner);
     }
 
     @Test

@@ -13,7 +13,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import wiremock.com.google.common.net.HttpHeaders;
+import org.springframework.http.HttpHeaders;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,9 +28,6 @@ class AuthControllerIT extends Containers {
 
     @LocalServerPort
     int port;
-
-    @Autowired
-    WebTestClient webTestClientBase;
 
     WebTestClient webTestClient;
 
@@ -189,6 +186,31 @@ class AuthControllerIT extends Containers {
                 .expectStatus().isUnauthorized()
                 .expectBody()
                 .jsonPath("$.error").exists();
+    }
+
+    @Test
+    void refresh_ShouldReturnUnauthorizedWhenInvalidToken() {
+        webTestClient.post()
+                .uri("/api/v1/auth/refresh")
+                .cookie("refresh_token", "invalid-token")
+                .exchange()
+                .expectStatus().isUnauthorized()
+                .expectBody()
+                .jsonPath("$.error").exists();
+    }
+
+    @Test
+    void login_ShouldReturnBadRequestWhenUserNotFound() {
+        LogInRequest loginPayload = new LogInRequest("nonexistent@example.com", "password123");
+
+        webTestClient.post()
+                .uri("/api/v1/auth/login")
+                .bodyValue(loginPayload)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(false)
+                .jsonPath("$.message").isEqualTo("User not found");
     }
 
     @Test

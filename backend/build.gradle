@@ -3,6 +3,32 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.6'
     id "io.freefair.lombok" version "8.10"
     id "org.springframework.boot" version "3.3.4" apply false
+    id "org.sonarqube" version "7.2.0.6526"
+    id "jacoco"
+}
+
+sonar {
+    properties {
+        property "sonar.projectKey", "vehicle-rental-backend"
+        property "sonar.projectName", "vehicle rental backend"
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.sources", "src/main/java"
+        property "sonar.tests", "src/test/java"
+        property "sonar.java.coveragePlugin", "jacoco"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+        property "sonar.exclusions", [
+            "**/domain/**",
+            "**/dto/**",
+            "**/mapper/**",
+            "**/entities/**",
+            "**/config/**",
+            "**/BootApplication.java"
+        ].join(",")
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.14"
 }
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
@@ -15,6 +41,7 @@ subprojects { Project p ->
     apply plugin: "java"
     apply plugin: 'io.spring.dependency-management'
     apply plugin: "io.freefair.lombok"
+    apply plugin: "jacoco"
 
     group = "com.swiftly"
     version = "0.0.1-SNAPSHOT"
@@ -70,7 +97,38 @@ subprojects { Project p ->
 
     tasks.withType(Test).configureEach {
         useJUnitPlatform()
+        finalizedBy jacocoTestReport
     }
+
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            xml.required = true
+            html.required = true
+            csv.required = false
+        }
+    }
+}
+
+task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
+    dependsOn subprojects.test
+    dependsOn subprojects.jacocoTestReport
+    
+    additionalSourceDirs.setFrom(subprojects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories.setFrom(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories.setFrom(subprojects.sourceSets.main.output)
+    
+    executionData.setFrom(subprojects.jacocoTestReport.executionData)
+
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+tasks.named("sonar") {
+    dependsOn jacocoRootReport
 }
 
 
