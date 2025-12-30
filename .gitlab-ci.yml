@@ -100,10 +100,10 @@ deploy_local:
     - "$ErrorActionPreference = 'Stop'"
     - docker login -u $env:DOCKERHUB_USERNAME -p $env:DOCKERHUB_PASSWORD
     - Write-Host "Stopping existing containers..."
-    - docker stop swiftly-backend 2>$null
-    - docker stop swiftly-frontend 2>$null
-    - docker rm swiftly-backend 2>$null
-    - docker rm swiftly-frontend 2>$null
+    - "try { docker stop swiftly-backend } catch { }"
+    - "try { docker stop swiftly-frontend } catch { }"
+    - "try { docker rm swiftly-backend } catch { }"
+    - "try { docker rm swiftly-frontend } catch { }"
     - Write-Host "Pulling latest images..."
     - docker pull "$env:DOCKERHUB_USERNAME/swiftly-backend:latest"
     - docker pull "$env:DOCKERHUB_USERNAME/swiftly-frontend:latest"
