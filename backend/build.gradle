@@ -1,10 +1,18 @@
 plugins {
     id "java"
-    id 'io.spring.dependency-management' version '1.1.6'
+    id "io.spring.dependency-management" version "1.1.6"
     id "io.freefair.lombok" version "8.10"
     id "org.springframework.boot" version "3.3.4" apply false
     id "org.sonarqube" version "7.2.0.6526"
     id "jacoco"
+}
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+
+repositories { mavenCentral() }
+
+jacoco {
+    toolVersion = "0.8.14"
 }
 
 sonar {
@@ -12,43 +20,32 @@ sonar {
         property "sonar.projectKey", "vehicle-rental-backend"
         property "sonar.projectName", "vehicle rental backend"
         property "sonar.host.url", System.getenv("SONAR_HOST_URL")
-        property "sonar.sources", "src/main/java"
-        property "sonar.tests", "src/test/java"
-        property "sonar.java.coveragePlugin", "jacoco"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+
+        property "sonar.coverage.jacoco.xmlReportPaths",
+                "${rootProject.buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+
         property "sonar.exclusions", [
-            "**/domain/**",
-            "**/dto/**",
-            "**/mapper/**",
-            "**/entities/**",
-            "**/config/**",
-            "**/BootApplication.java"
+                "**/domain/**",
+                "**/dto/**",
+                "**/mapper/**",
+                "**/entities/**",
+                "**/config/**",
+                "**/*Application.java",
+                "**/BootApplication.java"
         ].join(",")
     }
 }
 
-jacoco {
-    toolVersion = "0.8.14"
-}
-
-java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
-
-repositories {
-    mavenCentral()
-}
-
 subprojects { Project p ->
     apply plugin: "java"
-    apply plugin: 'io.spring.dependency-management'
+    apply plugin: "io.spring.dependency-management"
     apply plugin: "io.freefair.lombok"
     apply plugin: "jacoco"
 
     group = "com.swiftly"
     version = "0.0.1-SNAPSHOT"
 
-    repositories {
-        mavenCentral()
-    }
+    repositories { mavenCentral() }
 
     dependencyManagement {
         imports {
@@ -91,34 +88,78 @@ subprojects { Project p ->
         testImplementation("org.wiremock:wiremock-standalone:3.9.1")
     }
 
-    lombok {
-        version = '1.18.42'
-    }
+    lombok { version = "1.18.42" }
 
     tasks.withType(Test).configureEach {
         useJUnitPlatform()
-        finalizedBy jacocoTestReport
     }
 
-    jacocoTestReport {
-        dependsOn test
+    tasks.named("test", Test) {
+        exclude "**/*IT*"
+        finalizedBy tasks.named("jacocoTestReport")
+    }
+
+    tasks.named("jacocoTestReport", JacocoReport) {
+        dependsOn tasks.named("test")
         reports {
             xml.required = true
             html.required = true
             csv.required = false
         }
     }
+
+    sourceSets {
+        integrationTest {
+            java.srcDir file("src/integrationTest/java")
+            resources.srcDir file("src/integrationTest/resources")
+            compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+            runtimeClasspath += output + compileClasspath
+        }
+    }
+
+    configurations {
+        integrationTestImplementation.extendsFrom testImplementation
+        integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    }
+
+    tasks.register("integrationTest", Test) {
+        description = "Runs integration tests."
+        group = "verification"
+        testClassesDirs = sourceSets.integrationTest.output.classesDirs
+        classpath = sourceSets.integrationTest.runtimeClasspath
+        useJUnitPlatform()
+        shouldRunAfter tasks.named("test")
+        finalizedBy tasks.named("jacocoIntegrationTestReport")
+    }
+
+    tasks.register("jacocoIntegrationTestReport", JacocoReport) {
+        dependsOn tasks.named("integrationTest")
+        executionData tasks.named("integrationTest")
+        sourceSets sourceSets.main
+        reports {
+            xml.required = true
+            html.required = true
+            csv.required = false
+        }
+    }
+
+    tasks.named("check") {
+        dependsOn tasks.named("integrationTest")
+    }
 }
 
-task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
-    dependsOn subprojects.test
-    dependsOn subprojects.jacocoTestReport
-    
-    additionalSourceDirs.setFrom(subprojects.sourceSets.main.allSource.srcDirs)
-    sourceDirectories.setFrom(subprojects.sourceSets.main.allSource.srcDirs)
-    classDirectories.setFrom(subprojects.sourceSets.main.output)
-    
-    executionData.setFrom(subprojects.jacocoTestReport.executionData)
+tasks.register("jacocoRootReport", JacocoReport) {
+    dependsOn subprojects.collect { it.tasks.named("test") }
+    dependsOn subprojects.collect { it.tasks.named("integrationTest") }
+
+    executionData.from fileTree(rootDir) {
+        include "**/build/jacoco/test.exec"
+        include "**/build/jacoco/integrationTest.exec"
+    }
+
+    additionalSourceDirs.from files(subprojects.collect { it.sourceSets.main.allSource.srcDirs })
+    sourceDirectories.from files(subprojects.collect { it.sourceSets.main.allSource.srcDirs })
+    classDirectories.from files(subprojects.collect { it.sourceSets.main.output })
 
     reports {
         xml.required = true
@@ -128,17 +169,13 @@ task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
 }
 
 tasks.named("sonar") {
-    dependsOn jacocoRootReport
+    dependsOn tasks.named("jacocoRootReport")
 }
 
-
-project(":domain") {
-    apply plugin: "java-library"
-}
+project(":domain") { apply plugin: "java-library" }
 
 project(":application") {
     apply plugin: "java-library"
-    
     dependencies {
         api project(":domain")
         implementation "org.springframework.boot:spring-boot-starter-validation"
@@ -147,7 +184,6 @@ project(":application") {
 
 project(":infrastructure:web") {
     apply plugin: "java-library"
-    
     dependencies {
         implementation project(":application")
         implementation project(":domain")
@@ -156,7 +192,6 @@ project(":infrastructure:web") {
 
 project(":infrastructure:persistence") {
     apply plugin: "java-library"
-    
     dependencies {
         implementation project(":domain")
         implementation project(":application")
@@ -165,12 +200,11 @@ project(":infrastructure:persistence") {
 
 project(":boot") {
     apply plugin: "org.springframework.boot"
-    
     dependencies {
         implementation project(":infrastructure:web")
         implementation project(":infrastructure:persistence")
         implementation project(":application")
-        implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+        implementation "me.paulschwarz:spring-dotenv:4.0.0"
     }
 }
 
@@ -178,39 +212,4 @@ allprojects {
     if (tasks.findByName("prepareKotlinBuildScriptModel") == null) {
         tasks.register("prepareKotlinBuildScriptModel") {}
     }
-}
-
-sourceSets {
-    integrationTest {
-        java.srcDir file("src/integrationTest/java")
-        resources.srcDir file("src/integrationTest/resources")
-
-        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
-        runtimeClasspath += output + compileClasspath
-    }
-}
-
-configurations {
-    integrationTestImplementation.extendsFrom testImplementation
-    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
-}
-
-tasks.register("integrationTest", Test) {
-    description = "Runs integration tests"
-    group = "verification"
-
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-
-    useJUnitPlatform()
-
-    systemProperty "spring.profiles.active", "test"
-}
-
-tasks.named("check") {
-    dependsOn(tasks.named("integrationTest"))
-}
-
-tasks.test {
-    exclude '**/*IT*'
 }

@@ -35,7 +35,7 @@ tests:
       }
 
     - 'Set-Location "$env:CI_PROJECT_DIR\backend"'
-    - '& "$gradleExe" clean test jacocoRootReport --no-daemon "-Dspring.profiles.active=unit" -x integrationTest'
+    - '& "$gradleExe" clean test integrationTest jacocoRootReport --no-daemon'
 
   artifacts:
     when: always
@@ -108,10 +108,10 @@ deploy_local:
     - docker login -u $env:DOCKERHUB_USERNAME -p $env:DOCKERHUB_PASSWORD
 
     - Write-Host "Stopping existing containers..."
-    - docker stop swiftly-backend 2>$null
-    - docker stop swiftly-frontend 2>$null
-    - docker rm swiftly-backend 2>$null
-    - docker rm swiftly-frontend 2>$null
+    - docker stop swiftly-backend 2>$null || $true
+    - docker stop swiftly-frontend 2>$null || $true
+    - docker rm swiftly-backend 2>$null || $true
+    - docker rm swiftly-frontend 2>$null || $true
 
     - Write-Host "Pulling latest images..."
     - docker pull "$env:DOCKERHUB_USERNAME/swiftly-backend:latest"
