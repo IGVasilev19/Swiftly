@@ -3,7 +3,7 @@ import Loading from "@/components/ui/Loading";
 import { useBooking } from "@/hooks/useBooking";
 import { BookingTable } from "@/components/booking/BookingTable";
 import type { Booking } from "@/types/booking";
-//booking
+
 export function Bookings() {
   const { data, isLoading, error } = useBooking({ role: "RENTER" });
   const bookings: Booking[] = Array.isArray(data) ? data : [];
