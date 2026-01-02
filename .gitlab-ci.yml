@@ -11,9 +11,6 @@ variables:
   GRADLE_VERSION: "8.10.2"
   GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
 
-# -------------------------------------------------
-# TEST + COVERAGE (SINGLE SOURCE OF TRUTH)
-# -------------------------------------------------
 tests:
   stage: test
   script:
@@ -42,9 +39,6 @@ tests:
     paths:
       - backend/**/build
 
-# -------------------------------------------------
-# SONARQUBE (READ-ONLY ANALYSIS)
-# -------------------------------------------------
 sonarqube:
   stage: sonar
   script:
@@ -57,9 +51,6 @@ sonarqube:
     - main
   allow_failure: true
 
-# -------------------------------------------------
-# DOCKER BUILD
-# -------------------------------------------------
 build_images:
   stage: build
   script:
@@ -77,9 +68,6 @@ build_images:
   only:
     - main
 
-# -------------------------------------------------
-# DOCKER PUSH
-# -------------------------------------------------
 push_images:
   stage: push
   script:
@@ -98,9 +86,6 @@ push_images:
   only:
     - main
 
-# -------------------------------------------------
-# DEPLOY
-# -------------------------------------------------
 deploy_local:
   stage: deploy
   script:
@@ -108,10 +93,18 @@ deploy_local:
     - docker login -u $env:DOCKERHUB_USERNAME -p $env:DOCKERHUB_PASSWORD
 
     - Write-Host "Stopping existing containers..."
-    - docker stop swiftly-backend -ErrorAction SilentlyContinue
-    - docker stop swiftly-frontend -ErrorAction SilentlyContinue
-    - docker rm swiftly-backend -ErrorAction SilentlyContinue
-    - docker rm swiftly-frontend -ErrorAction SilentlyContinue
+
+    - |
+      if (docker ps -aq -f "name=^swiftly-backend$") {
+          docker stop swiftly-backend
+          docker rm swiftly-backend
+      }
+
+    - |
+      if (docker ps -aq -f "name=^swiftly-frontend$") {
+          docker stop swiftly-frontend
+          docker rm swiftly-frontend
+      }
 
     - Write-Host "Pulling latest images..."
     - docker pull "$env:DOCKERHUB_USERNAME/swiftly-backend:latest"
@@ -124,6 +117,7 @@ deploy_local:
     - docker run -d --name swiftly-frontend -p 3000:3000 --restart unless-stopped "$env:DOCKERHUB_USERNAME/swiftly-frontend:latest"
 
     - Write-Host "Deployment completed successfully"
+
   needs:
     - push_images
   only:
