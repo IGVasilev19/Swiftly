@@ -9,7 +9,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import type { AddListingFromProps } from "@/types/listing";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
 import { LoaderCircle } from "lucide-react";
 import {
   InputGroup,

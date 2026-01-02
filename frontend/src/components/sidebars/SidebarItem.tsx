@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
 import type { SidebarItemProps } from "@/schemas/component/sidebar.schema";
 
 export const SidebarItem = ({

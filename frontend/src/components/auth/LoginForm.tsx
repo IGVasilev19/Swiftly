@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Card, CardAction, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import type { LoginFormProps } from "@/types/types";

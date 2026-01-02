@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "./table";
-import { Button } from "./button";
+import { Button } from "./Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export interface Column<T> {
@@ -146,4 +146,3 @@ export function DataTable<T>({
     </div>
   );
 }
-

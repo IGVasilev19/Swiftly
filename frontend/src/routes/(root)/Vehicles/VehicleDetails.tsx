@@ -1,7 +1,7 @@
 import { Layout } from "@/components/layout/Layout";
 import Loading from "@/components/ui/Loading";
 import { VehicleDetailsCard } from "@/components/ui/VehicleDetailsCard";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useVehicleContext } from "@/contexts/VehicleContext";
 import { useVehicle } from "@/hooks/useVehicle";
 import type { Vehicle } from "@/types/vehicle";

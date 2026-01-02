@@ -1,6 +1,6 @@
 import type { VehicleImage } from "@/types/vehicle";
 import { ArrowLeft } from "lucide-react";
-import { Button } from "./button";
+import { Button } from "./Button";
 import { VehicleDetailPlaceholder } from "./VehicleDetailPlaceholder";
 import { VehicleImageGallery } from "./VehicleImageGallery";
 import { useNavigate } from "react-router-dom";

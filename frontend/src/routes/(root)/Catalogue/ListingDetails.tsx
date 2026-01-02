@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { ListingDetailsCard } from "@/components/ui/ListingDetailsCard";
 import Loading from "@/components/ui/Loading";
 import { useListingContext } from "@/contexts/ListingContext";

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { LoaderCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import CountrySelector from "@/components/ui/CountrySelector";

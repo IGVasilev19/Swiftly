@@ -7,7 +7,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
 import { LoaderCircle } from "lucide-react";
 import type { AddBookingFormProps } from "@/types/booking";
 import { Calendar05 } from "../ui/calendar-05";

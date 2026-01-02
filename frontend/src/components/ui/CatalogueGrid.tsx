@@ -8,7 +8,7 @@ import type { VehicleImage } from "@/types/vehicle";
 import { useListing } from "@/hooks/useListing";
 import Loading from "@/components/ui/Loading";
 import { VehicleImageGallery } from "./VehicleImageGallery";
-import { Button } from "./button";
+import { Button } from "./Button";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { useNavigate } from "react-router-dom";
 import { useListingContext } from "@/contexts/ListingContext";
