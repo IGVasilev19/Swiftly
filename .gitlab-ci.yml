@@ -108,10 +108,10 @@ deploy_local:
     - docker login -u $env:DOCKERHUB_USERNAME -p $env:DOCKERHUB_PASSWORD
 
     - Write-Host "Stopping existing containers..."
-    - "try { docker stop swiftly-backend } catch { }"
-    - "try { docker stop swiftly-frontend } catch { }"
-    - "try { docker rm swiftly-backend } catch { }"
-    - "try { docker rm swiftly-frontend } catch { }"
+    - docker stop swiftly-backend 2>$null
+    - docker stop swiftly-frontend 2>$null
+    - docker rm swiftly-backend 2>$null
+    - docker rm swiftly-frontend 2>$null
 
     - Write-Host "Pulling latest images..."
     - docker pull "$env:DOCKERHUB_USERNAME/swiftly-backend:latest"
