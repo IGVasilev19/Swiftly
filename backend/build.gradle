@@ -11,7 +11,7 @@ sonar {
     properties {
         property "sonar.projectKey", "vehicle-rental-backend"
         property "sonar.projectName", "vehicle rental backend"
-        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.host.url", System.getenv("SONAR_HOST_URL")
         property "sonar.sources", "src/main/java"
         property "sonar.tests", "src/test/java"
         property "sonar.java.coveragePlugin", "jacoco"
