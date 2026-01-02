@@ -149,13 +149,22 @@ subprojects { Project p ->
 }
 
 tasks.register("jacocoRootReport", JacocoReport) {
-    dependsOn subprojects.collect { it.tasks.named("test") }
-    dependsOn subprojects.collect { it.tasks.named("integrationTest") }
 
-    executionData.from fileTree(rootDir) {
-        include "**/build/jacoco/test.exec"
-        include "**/build/jacoco/integrationTest.exec"
-    }
+    dependsOn(
+            subprojects.collectMany { p ->
+                p.tasks.withType(JacocoReport).matching {
+                    it.name in ["jacocoTestReport", "jacocoIntegrationTestReport"]
+                }
+            }
+    )
+
+    executionData.from(
+            subprojects.collectMany { p ->
+                p.tasks.withType(JacocoReport).matching {
+                    it.name in ["jacocoTestReport", "jacocoIntegrationTestReport"]
+                }.collect { it.executionData }
+            }
+    )
 
     additionalSourceDirs.from files(subprojects.collect { it.sourceSets.main.allSource.srcDirs })
     sourceDirectories.from files(subprojects.collect { it.sourceSets.main.allSource.srcDirs })
