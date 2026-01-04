@@ -20,7 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -30,13 +30,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-@SpringBootTest(classes = BootApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = BootApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class BookingControllerIT extends Containers {
 
-    @LocalServerPort
-    int port;
+    @Autowired
+    ApplicationContext applicationContext;
 
     @Autowired
     JpaUserRepository userRepository;
@@ -58,8 +58,7 @@ class BookingControllerIT extends Containers {
     @BeforeEach
     void setupClient() {
         this.webTestClient = WebTestClient
-                .bindToServer()
-                .baseUrl("http://localhost:" + port)
+                .bindToApplicationContext(applicationContext)
                 .build();
     }
 

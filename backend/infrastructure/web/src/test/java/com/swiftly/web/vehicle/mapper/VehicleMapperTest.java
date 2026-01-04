@@ -2,7 +2,6 @@ package com.swiftly.web.vehicle.mapper;
 
 import com.swiftly.domain.Profile;
 import com.swiftly.domain.Vehicle;
-import com.swiftly.domain.VehicleImage;
 import com.swiftly.domain.enums.vehicle.Feature;
 import com.swiftly.domain.enums.vehicle.FuelType;
 import com.swiftly.domain.enums.vehicle.VehicleType;

@@ -1,7 +1,6 @@
 package com.boot.web;
 
 import com.boot.testsupport.Containers;
-import com.jayway.jsonpath.JsonPath;
 import com.swiftly.boot.BootApplication;
 import com.swiftly.domain.enums.user.Role;
 import com.swiftly.domain.enums.vehicle.Feature;
@@ -15,7 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.annotation.DirtiesContext;
@@ -28,13 +27,13 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = BootApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = BootApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class VehicleControllerIT extends Containers {
 
-    @LocalServerPort
-    int port;
+    @Autowired
+    ApplicationContext applicationContext;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -44,8 +43,7 @@ class VehicleControllerIT extends Containers {
     @BeforeEach
     void setupClient() {
         this.webTestClient = WebTestClient
-                .bindToServer()
-                .baseUrl("http://localhost:" + port)
+                .bindToApplicationContext(applicationContext)
                 .build();
     }
 
