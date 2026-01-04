@@ -146,6 +146,12 @@ subprojects { Project p ->
     tasks.named("check") {
         dependsOn tasks.named("integrationTest")
     }
+
+    tasks.matching { it.name == "integrationTest" }.configureEach {
+        jacoco {
+            enabled = true
+        }
+    }
 }
 
 tasks.register("jacocoRootReport", JacocoReport) {

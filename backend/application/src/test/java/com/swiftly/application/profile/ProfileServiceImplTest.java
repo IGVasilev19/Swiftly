@@ -1,10 +1,8 @@
 package com.swiftly.application.profile;
 
-import com.swiftly.application.profile.port.inbound.ProfileService;
 import com.swiftly.application.profile.port.outbound.ProfileRepository;
 import com.swiftly.domain.Profile;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
