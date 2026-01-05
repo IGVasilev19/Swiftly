@@ -118,7 +118,7 @@ subprojects { Project p ->
             java.srcDir file("src/test/java")
             resources.srcDir file("src/test/resources")
             compileClasspath += sourceSets.main.output + sourceSets.test.output + configurations.testRuntimeClasspath
-            runtimeClasspath += sourceSets.main.output + sourceSets.test.output + sourceSets.integrationTest.output + compileClasspath + configurations.testRuntimeClasspath
+            runtimeClasspath += output + compileClasspath
         }
     }
 
@@ -127,14 +127,9 @@ subprojects { Project p ->
         integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
     }
 
-    tasks.named("compileIntegrationTestJava") {
-        dependsOn tasks.named("classes")
-    }
-    
     tasks.register("integrationTest", Test) {
         description = "Runs integration tests."
         group = "verification"
-        dependsOn tasks.named("integrationTestClasses")
         testClassesDirs = sourceSets.integrationTest.output.classesDirs
         classpath = sourceSets.integrationTest.runtimeClasspath
         include "**/*IT.class"
@@ -144,8 +139,6 @@ subprojects { Project p ->
         jacoco {
             enabled = true
         }
-        // Ensure Spring can find all classes
-        systemProperty "spring.profiles.active", "test"
     }
 
     tasks.register("jacocoIntegrationTestReport", JacocoReport) {
@@ -232,14 +225,6 @@ project(":boot") {
         implementation project(":infrastructure:persistence")
         implementation project(":application")
         implementation "me.paulschwarz:spring-dotenv:4.0.0"
-    }
-    
-    // Ensure integration tests can find the Spring Boot application
-    afterEvaluate {
-        tasks.named("integrationTest", Test) {
-            // Ensure the boot jar is on the classpath so Spring can find BootApplication
-            classpath = sourceSets.integrationTest.runtimeClasspath + files(tasks.named("bootJar").map { it.outputs.files })
-        }
     }
 }
 
