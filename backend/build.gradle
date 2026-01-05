@@ -99,16 +99,8 @@ subprojects { Project p ->
         finalizedBy tasks.named("jacocoTestReport")
     }
 
-    tasks.named("test", Test).configureEach {
-        jacoco {
-            enabled = true
-        }
-    }
-
     tasks.named("jacocoTestReport", JacocoReport) {
         dependsOn tasks.named("test")
-        executionData.from(tasks.named("test").map { it.extensions.getByType(JacocoTaskExtension).destinationFile })
-        sourceSets sourceSets.main
         reports {
             xml.required = true
             html.required = true
@@ -118,9 +110,9 @@ subprojects { Project p ->
 
     sourceSets {
         integrationTest {
-            java.srcDir file("src/test/java")
-            resources.srcDir file("src/test/resources")
-            compileClasspath += sourceSets.main.output + sourceSets.test.output + configurations.testRuntimeClasspath
+            java.srcDir file("src/integrationTest/java")
+            resources.srcDir file("src/integrationTest/resources")
+            compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
             runtimeClasspath += output + compileClasspath
         }
     }
@@ -135,21 +127,14 @@ subprojects { Project p ->
         group = "verification"
         testClassesDirs = sourceSets.integrationTest.output.classesDirs
         classpath = sourceSets.integrationTest.runtimeClasspath
-        include "**/*IT.class"
         useJUnitPlatform()
         shouldRunAfter tasks.named("test")
         finalizedBy tasks.named("jacocoIntegrationTestReport")
     }
 
-    tasks.named("integrationTest", Test).configureEach {
-        jacoco {
-            enabled = true
-        }
-    }
-
     tasks.register("jacocoIntegrationTestReport", JacocoReport) {
         dependsOn tasks.named("integrationTest")
-        executionData.from(tasks.named("integrationTest").map { it.extensions.getByType(JacocoTaskExtension).destinationFile })
+        executionData tasks.named("integrationTest")
         sourceSets sourceSets.main
         reports {
             xml.required = true
@@ -160,6 +145,12 @@ subprojects { Project p ->
 
     tasks.named("check") {
         dependsOn tasks.named("integrationTest")
+    }
+
+    tasks.matching { it.name == "integrationTest" }.configureEach {
+        jacoco {
+            enabled = true
+        }
     }
 }
 
@@ -177,9 +168,7 @@ tasks.register("jacocoRootReport", JacocoReport) {
             subprojects.collectMany { p ->
                 p.tasks.withType(JacocoReport).matching {
                     it.name in ["jacocoTestReport", "jacocoIntegrationTestReport"]
-                }.collectMany { report ->
-                    report.executionData.files
-                }
+                }.collect { it.executionData }
             }
     )
 
