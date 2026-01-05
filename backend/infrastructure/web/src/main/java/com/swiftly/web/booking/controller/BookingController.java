@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +30,7 @@ public class BookingController {
 
     @PreAuthorize("hasRole('RENTER')")
     @PostMapping
-    public ResponseEntity<?> createBooking(@RequestBody @Valid BookingRequest request)
+    public ResponseEntity<?> createBooking(@RequestBody BookingRequest request)
     {
         try
         {

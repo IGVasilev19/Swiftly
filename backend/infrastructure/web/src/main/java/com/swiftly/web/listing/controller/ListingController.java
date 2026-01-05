@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,7 @@ public class ListingController {
 
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping
-    public ResponseEntity<?> addListing(@RequestBody @Valid ListingRequest request)
+    public ResponseEntity<?> addListing(@RequestBody ListingRequest request)
     {
         try
         {

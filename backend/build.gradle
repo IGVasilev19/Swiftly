@@ -97,6 +97,9 @@ subprojects { Project p ->
     tasks.named("test", Test) {
         exclude "**/*IT*"
         finalizedBy tasks.named("jacocoTestReport")
+    }
+
+    tasks.named("test", Test).configureEach {
         jacoco {
             enabled = true
         }
@@ -136,6 +139,9 @@ subprojects { Project p ->
         useJUnitPlatform()
         shouldRunAfter tasks.named("test")
         finalizedBy tasks.named("jacocoIntegrationTestReport")
+    }
+
+    tasks.named("integrationTest", Test).configureEach {
         jacoco {
             enabled = true
         }
