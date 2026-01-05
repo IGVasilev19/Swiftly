@@ -29,7 +29,7 @@ export function Bookings() {
       </Layout>
     );
   }
-
+  //test
   return (
     <Layout>
       <div className="w-full h-full flex flex-col pt-4 pl-4 pr-4 gap-5">
