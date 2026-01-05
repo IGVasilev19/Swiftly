@@ -99,12 +99,13 @@ subprojects { Project p ->
         finalizedBy tasks.named("jacocoTestReport")
         jacoco {
             enabled = true
+            destinationFile = layout.buildDirectory.file("jacoco/test.exec").get().asFile
         }
     }
 
     tasks.named("jacocoTestReport", JacocoReport) {
         dependsOn tasks.named("test")
-        executionData.from(tasks.named("test").map { it.extensions.getByType(JacocoTaskExtension).destinationFile })
+        executionData.from(layout.buildDirectory.file("jacoco/test.exec"))
         sourceSets sourceSets.main
         reports {
             xml.required = true
@@ -113,44 +114,27 @@ subprojects { Project p ->
         }
     }
 
-    sourceSets {
-        integrationTest {
-            java.srcDir file("src/test/java")
-            resources.srcDir file("src/test/resources")
-            compileClasspath += sourceSets.main.output + sourceSets.test.output + configurations.testRuntimeClasspath
-            runtimeClasspath += sourceSets.main.output + sourceSets.test.output + sourceSets.integrationTest.output + compileClasspath + configurations.testRuntimeClasspath
-        }
-    }
-
-    configurations {
-        integrationTestImplementation.extendsFrom testImplementation
-        integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
-    }
-
-    tasks.named("compileIntegrationTestJava") {
-        dependsOn tasks.named("classes")
-    }
-    
+    // Use the same test source set for integration tests, just run them separately
     tasks.register("integrationTest", Test) {
         description = "Runs integration tests."
         group = "verification"
-        dependsOn tasks.named("integrationTestClasses")
-        testClassesDirs = sourceSets.integrationTest.output.classesDirs
-        classpath = sourceSets.integrationTest.runtimeClasspath
+        dependsOn tasks.named("testClasses")
+        testClassesDirs = sourceSets.test.output.classesDirs
+        classpath = sourceSets.test.runtimeClasspath
         include "**/*IT.class"
+        exclude "**/*Test.class"
         useJUnitPlatform()
         shouldRunAfter tasks.named("test")
         finalizedBy tasks.named("jacocoIntegrationTestReport")
         jacoco {
             enabled = true
+            destinationFile = layout.buildDirectory.file("jacoco/integrationTest.exec").get().asFile
         }
-        // Ensure Spring can find all classes
-        systemProperty "spring.profiles.active", "test"
     }
 
     tasks.register("jacocoIntegrationTestReport", JacocoReport) {
         dependsOn tasks.named("integrationTest")
-        executionData.from(tasks.named("integrationTest").map { it.extensions.getByType(JacocoTaskExtension).destinationFile })
+        executionData.from(layout.buildDirectory.file("jacoco/integrationTest.exec"))
         sourceSets sourceSets.main
         reports {
             xml.required = true
@@ -176,11 +160,10 @@ tasks.register("jacocoRootReport", JacocoReport) {
 
     executionData.from(
             subprojects.collectMany { p ->
-                p.tasks.withType(JacocoReport).matching {
-                    it.name in ["jacocoTestReport", "jacocoIntegrationTestReport"]
-                }.collectMany { report ->
-                    report.executionData.files
-                }
+                [
+                    p.layout.buildDirectory.file("jacoco/test.exec"),
+                    p.layout.buildDirectory.file("jacoco/integrationTest.exec")
+                ].findAll { it.isPresent() }
             }
     )
 
@@ -232,14 +215,6 @@ project(":boot") {
         implementation project(":infrastructure:persistence")
         implementation project(":application")
         implementation "me.paulschwarz:spring-dotenv:4.0.0"
-    }
-    
-    // Ensure integration tests can find the Spring Boot application
-    afterEvaluate {
-        tasks.named("integrationTest", Test) {
-            // Ensure the boot jar is on the classpath so Spring can find BootApplication
-            classpath = sourceSets.integrationTest.runtimeClasspath + files(tasks.named("bootJar").map { it.outputs.files })
-        }
     }
 }
 
