@@ -1,3 +1,5 @@
 package com.swiftly.web.auth.dto;
 
-public record LogInRequest (String email, String password){ }
+import jakarta.validation.constraints.NotBlank;
+
+public record LogInRequest (@NotBlank String email, @NotBlank String password) { }

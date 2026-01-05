@@ -81,7 +81,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LogInRequest logInRequest, HttpServletRequest request)
+    public ResponseEntity<?> login(@RequestBody @Valid LogInRequest logInRequest, HttpServletRequest request)
     {
         try {
             LogInResponse response = LogInMapper.toLogInResponse(logInService.login(LogInMapper.toUser(logInRequest)));
