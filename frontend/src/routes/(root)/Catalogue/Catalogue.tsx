@@ -5,7 +5,7 @@ import CatalogueGrid from "@/components/ui/CatalogueGrid";
 export function Catalogue() {
   return (
     <Layout>
-      <div className="w-full h-full p-4">
+      <div className="w-full h-full p-4 overflow-auto hide-scrollbar">
         <CatalogueGrid />
       </div>
     </Layout>
