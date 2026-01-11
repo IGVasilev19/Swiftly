@@ -2,6 +2,7 @@ package com.swiftly.application.vehicle.port.inbound;
 
 import com.swiftly.domain.Profile;
 import com.swiftly.domain.Vehicle;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -12,4 +13,5 @@ public interface VehicleService {
     List<Vehicle> getAllByOwner(Profile owner);
     void deleteById(Integer id);
     Vehicle getByVin(String vin);
+    void updateVehicle(Vehicle vehicle);
 }

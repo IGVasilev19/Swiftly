@@ -5,6 +5,7 @@ import com.swiftly.domain.Vehicle;
 import com.swiftly.web.profile.mapper.ProfileMapper;
 import com.swiftly.web.vehicle.dto.VehicleRequest;
 import com.swiftly.web.vehicle.dto.VehicleResponse;
+import com.swiftly.web.vehicle.dto.VehicleUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -20,5 +21,10 @@ public class VehicleMapper {
     public static VehicleResponse toVehicleResponse(Vehicle vehicle)
     {
         return new VehicleResponse(vehicle.getId(), ProfileMapper.toResponse(vehicle.getOwner()), vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity(), vehicle.getImages(), false);
+    }
+
+    public static Vehicle toUpdateVehicle(VehicleUpdateRequest vehicleRequest)
+    {
+        return new Vehicle(vehicleRequest.vin(), vehicleRequest.make(), vehicleRequest.model(), vehicleRequest.color(), vehicleRequest.year(), vehicleRequest.type(), vehicleRequest.fuelType(), vehicleRequest.fuelConsumption(), vehicleRequest.features(), vehicleRequest.country(), vehicleRequest.city());
     }
 }

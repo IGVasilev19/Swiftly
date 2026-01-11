@@ -9,6 +9,7 @@ import com.swiftly.domain.User;
 import com.swiftly.domain.Vehicle;
 import com.swiftly.web.vehicle.dto.VehicleRequest;
 import com.swiftly.web.vehicle.dto.VehicleResponse;
+import com.swiftly.web.vehicle.dto.VehicleUpdateRequest;
 import com.swiftly.web.vehicle.mapper.VehicleMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -110,6 +111,40 @@ public class VehicleController {
             {
                 return ResponseEntity.status(HttpStatus.OK).body(vehicle);
             }
+
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,
+                    "message", e.getMessage()));
+        }
+    }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteVehicle(@PathVariable("id") Integer id)
+    {
+        try
+        {
+            vehicleService.deleteById(id);
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", true,
+                    "message", "Vehicle deleted successfully"));
+
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,
+                    "message", e.getMessage()));
+        }
+    }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateVehicle(@PathVariable("id") Integer id, @RequestBody @Valid VehicleUpdateRequest vehicle, @RequestParam(required = false) List<MultipartFile> images)
+    {
+        try
+        {
+            service.updateVehicle(id, VehicleMapper.toUpdateVehicle(vehicle), images);
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", true,
+                    "message", "Vehicle updated successfully"));
 
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,

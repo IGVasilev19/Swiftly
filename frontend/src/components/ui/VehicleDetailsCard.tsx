@@ -81,9 +81,20 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
                 {state === 0 ? "List Vehicle +" : "Cancel 𐌗"}
               </Button>
             ) : (
-              <Button variant="default" className="bg-red-700 hover:bg-red-800">
-                Remove Listing
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="default"
+                  className="bg-[#0F172A] hover:bg-[#0f172adc]"
+                >
+                  Edit Vehicle
+                </Button>
+                <Button
+                  variant="default"
+                  className="bg-[#0F172A] hover:bg-[#0f172adc]"
+                >
+                  Edit Listing
+                </Button>
+              </div>
             )}
           </div>
         </div>

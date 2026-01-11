@@ -54,4 +54,9 @@ public class VehicleServiceImpl implements VehicleService {
     {
        return repository.findByVin(vin);
     }
+
+    public void updateVehicle(Vehicle vehicle)
+    {
+        repository.save(vehicle);
+    }
 }

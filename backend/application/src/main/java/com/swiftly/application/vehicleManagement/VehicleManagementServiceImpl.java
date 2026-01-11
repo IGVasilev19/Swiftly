@@ -73,4 +73,32 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     {
         vehicleRepository.removeImage(vehicleImage);
     }
+
+    @Transactional
+    public void updateVehicle(Integer id, Vehicle vehicle, List<MultipartFile> images) {
+        Vehicle vehicleToUpdate = vehicleRepository.findById(id);
+
+        if (images != null)
+        {
+            vehicleToUpdate.getImages().clear();
+
+            for (MultipartFile image : images) {
+                try {
+                    VehicleImage vehicleImage = new VehicleImage(
+                            null,
+                            vehicleToUpdate,
+                            image.getBytes(),
+                            image.getContentType(),
+                            image.getOriginalFilename(),
+                            LocalDateTime.now()
+                    );
+                    addImage(vehicleToUpdate, vehicleImage);
+                } catch (IOException e) {
+                    throw new IllegalArgumentException("Could not load vehicle image file", e);
+                }
+            }
+        }
+
+        vehicleService.updateVehicle(vehicleToUpdate);
+    }
 }
