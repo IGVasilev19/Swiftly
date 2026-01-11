@@ -70,6 +70,7 @@ public class ListingController {
             }
     }
 
+    @PreAuthorize("hasAnyRole('OWNER', 'RENTER')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getListing(@PathVariable("id") Integer id)
     {

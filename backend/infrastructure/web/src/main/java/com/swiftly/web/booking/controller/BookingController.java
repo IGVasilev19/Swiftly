@@ -103,6 +103,7 @@ public class BookingController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('OWNER', 'RENTER')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getBooking(@PathVariable("id") Integer id)
     {
@@ -120,6 +121,7 @@ public class BookingController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('OWNER', 'RENTER')")
     @GetMapping("/listing/{listingId}")
     public ResponseEntity<?> getBookingsByListingId(@PathVariable("listingId") Integer listingId)
     {

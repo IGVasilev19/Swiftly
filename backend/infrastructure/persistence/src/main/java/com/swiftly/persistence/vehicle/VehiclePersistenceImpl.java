@@ -29,7 +29,27 @@ public class VehiclePersistenceImpl implements VehicleRepository {
     {
         ProfileEntity profileEntity = profileRepository.findById(vehicle.getOwner().getId()).orElseThrow(() -> new IllegalArgumentException("Profile not found for id " + vehicle.getOwner().getId()));
 
-        VehicleEntity vehicleEntity = new VehicleEntity(profileEntity, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity());
+        VehicleEntity vehicleEntity;
+        
+        if (vehicle.getId() != null) {
+            vehicleEntity = repository.findById(vehicle.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Vehicle not found for id " + vehicle.getId()));
+            
+            vehicleEntity.setOwner(profileEntity);
+            vehicleEntity.setVin(vehicle.getVin());
+            vehicleEntity.setMake(vehicle.getMake());
+            vehicleEntity.setModel(vehicle.getModel());
+            vehicleEntity.setColor(vehicle.getColor());
+            vehicleEntity.setYear(vehicle.getYear());
+            vehicleEntity.setType(vehicle.getType());
+            vehicleEntity.setFuelType(vehicle.getFuelType());
+            vehicleEntity.setFuelConsumption(vehicle.getFuelConsumption());
+            vehicleEntity.setFeatures(vehicle.getFeatures());
+            vehicleEntity.setCountry(vehicle.getCountry());
+            vehicleEntity.setCity(vehicle.getCity());
+        } else {
+            vehicleEntity = new VehicleEntity(profileEntity, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity());
+        }
 
         VehicleEntity saved = repository.save(vehicleEntity);
 

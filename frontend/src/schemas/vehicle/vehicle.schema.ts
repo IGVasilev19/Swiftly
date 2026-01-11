@@ -44,7 +44,12 @@ export const vehicleSchema = z.object({
   images: z.array(z.instanceof(File)).min(1, "At least one image is required"),
 });
 
+export const vehicleUpdateSchema = vehicleSchema.extend({
+  images: z.array(z.instanceof(File)).optional(),
+});
+
 export type VehicleSchemaType = z.infer<typeof vehicleSchema>;
+export type VehicleUpdateSchemaType = z.infer<typeof vehicleUpdateSchema>;
 
 export type VehicleType = string;
 export type FuelType = string;

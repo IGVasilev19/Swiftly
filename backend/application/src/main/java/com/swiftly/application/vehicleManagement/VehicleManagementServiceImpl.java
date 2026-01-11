@@ -78,10 +78,28 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     public void updateVehicle(Integer id, Vehicle vehicle, List<MultipartFile> images) {
         Vehicle vehicleToUpdate = vehicleRepository.findById(id);
 
-        if (images != null)
-        {
-            vehicleToUpdate.getImages().clear();
+        vehicleToUpdate.setVin(vehicle.getVin());
+        vehicleToUpdate.setMake(vehicle.getMake());
+        vehicleToUpdate.setModel(vehicle.getModel());
+        vehicleToUpdate.setColor(vehicle.getColor());
+        vehicleToUpdate.setYear(vehicle.getYear());
+        vehicleToUpdate.setType(vehicle.getType());
+        vehicleToUpdate.setFuelType(vehicle.getFuelType());
+        vehicleToUpdate.setFuelConsumption(vehicle.getFuelConsumption());
+        vehicleToUpdate.setFeatures(vehicle.getFeatures());
+        vehicleToUpdate.setCountry(vehicle.getCountry());
+        vehicleToUpdate.setCity(vehicle.getCity());
 
+        if (images != null && !images.isEmpty())
+        {
+
+            List<VehicleImage> existingImages = vehicleToUpdate.getImages();
+            if (existingImages != null && !existingImages.isEmpty()) {
+                List<VehicleImage> imagesToDelete = new ArrayList<>(existingImages);
+                for (VehicleImage existingImage : imagesToDelete) {
+                    deleteImage(existingImage);
+                }
+            }
             for (MultipartFile image : images) {
                 try {
                     VehicleImage vehicleImage = new VehicleImage(

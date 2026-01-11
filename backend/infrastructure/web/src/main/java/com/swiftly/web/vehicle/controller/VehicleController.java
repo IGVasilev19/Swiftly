@@ -12,6 +12,7 @@ import com.swiftly.web.vehicle.dto.VehicleResponse;
 import com.swiftly.web.vehicle.dto.VehicleUpdateRequest;
 import com.swiftly.web.vehicle.mapper.VehicleMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -126,7 +127,7 @@ public class VehicleController {
         {
             vehicleService.deleteById(id);
 
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", true,
+            return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", true,
                     "message", "Vehicle deleted successfully"));
 
         }catch(Exception e){
@@ -136,14 +137,14 @@ public class VehicleController {
     }
 
     @PreAuthorize("hasRole('OWNER')")
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateVehicle(@PathVariable("id") Integer id, @RequestBody @Valid VehicleUpdateRequest vehicle, @RequestParam(required = false) List<MultipartFile> images)
+    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateVehicle(@PathVariable("id") Integer id, @RequestPart("vehicleData") @Valid VehicleUpdateRequest vehicle, @Nullable @RequestPart("images") List<MultipartFile> images)
     {
         try
         {
             service.updateVehicle(id, VehicleMapper.toUpdateVehicle(vehicle), images);
 
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", true,
+            return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", true,
                     "message", "Vehicle updated successfully"));
 
         }catch(Exception e){

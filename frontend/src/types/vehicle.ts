@@ -1,11 +1,14 @@
 import type { SelectMenuOption } from "@/lib/types";
-import type { VehicleSchemaType } from "@/schemas/vehicle/vehicle.schema";
+import type {
+  VehicleSchemaType,
+  VehicleUpdateSchemaType,
+} from "@/schemas/vehicle/vehicle.schema";
 import type { UseFormReturn } from "react-hook-form/dist/types/form";
 import type { Profile } from "./profile";
 
 export interface AddVehicleFormProps {
-  addVehicleForm: UseFormReturn<VehicleSchemaType>;
-  handleSubmit: (data: VehicleSchemaType) => void;
+  addVehicleForm: UseFormReturn<VehicleSchemaType | VehicleUpdateSchemaType>;
+  handleSubmit: (data: VehicleSchemaType | VehicleUpdateSchemaType) => void;
   isPending: boolean;
   vehicleTypesOptions: { value: string; label: string }[];
   fuelTypesOptions: { value: string; label: string }[];
@@ -13,6 +16,8 @@ export interface AddVehicleFormProps {
   countryOpen: boolean;
   setCountryOpen: (open: boolean) => void;
   selectedCountry: SelectMenuOption | null;
+  onDelete?: () => void;
+  isDeleting?: boolean;
 }
 
 export interface VehicleImage {

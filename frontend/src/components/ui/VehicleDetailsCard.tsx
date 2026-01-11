@@ -1,6 +1,6 @@
 import type { Vehicle, VehicleImage } from "@/types/vehicle";
 import { ArrowLeft } from "lucide-react";
-import React, { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "./Button";
 import { VehicleDetailPlaceholder } from "./VehicleDetailPlaceholder";
 import { VehicleImageGallery } from "./VehicleImageGallery";
@@ -14,6 +14,16 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Listing } from "@/types/listing";
+import { AddVehicleForm } from "../vehicle/AddVehicleForm";
+import { useUpdateVehicle } from "@/hooks/useUpdateVehicle";
+import { useDeleteVehicle } from "@/hooks/useDeleteVehicle";
+import { useVehicleEnums } from "@/hooks/useVehicleEnums";
+import { COUNTRIES } from "@/lib/countries";
+import {
+  vehicleUpdateSchema,
+  type VehicleUpdateSchemaType,
+} from "@/schemas/vehicle/vehicle.schema";
+import Loading from "./Loading";
 
 const formatEnumLabel = (value: string): string => {
   return value
@@ -26,7 +36,7 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
   const vehicleImages: VehicleImage[] =
     vehicle?.images && Array.isArray(vehicle.images) ? vehicle.images : [];
 
-  const form = useForm<ListingSchemaType>({
+  const listingForm = useForm<ListingSchemaType>({
     resolver: zodResolver(listingSchema),
     defaultValues: {
       title: "",
@@ -36,9 +46,112 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
     },
   });
 
+  const {
+    vehicleTypes,
+    fuelTypes,
+    features,
+    isLoading: enumsLoading,
+    error: enumsError,
+  } = useVehicleEnums();
+
+  const { updateVehicle, isPending: isUpdating } = useUpdateVehicle();
+  const { deleteVehicle, isPending: isDeleting } = useDeleteVehicle();
+  const [countryOpen, setCountryOpen] = useState(false);
+
+  const vehicleTypesOptions = useMemo(
+    () =>
+      vehicleTypes.map((value) => ({
+        value,
+        label: formatEnumLabel(value),
+      })),
+    [vehicleTypes]
+  );
+
+  const fuelTypesOptions = useMemo(
+    () =>
+      fuelTypes.map((value) => ({
+        value,
+        label: formatEnumLabel(value),
+      })),
+    [fuelTypes]
+  );
+
+  const featuresOptions = useMemo(
+    () =>
+      features.map((value) => ({
+        value,
+        label: formatEnumLabel(value),
+      })),
+    [features]
+  );
+
+  const vehicleForm = useForm<VehicleUpdateSchemaType>({
+    resolver: zodResolver(vehicleUpdateSchema),
+    defaultValues: {
+      vin: vehicle.vin || "",
+      make: vehicle.make || "",
+      model: vehicle.model || "",
+      color: vehicle.color || "",
+      year: vehicle.year || new Date().getFullYear(),
+      type: vehicle.type || "",
+      fuelType: vehicle.fuelType || "",
+      fuelConsumption: vehicle.fuelConsumption,
+      features: vehicle.features || [],
+      country: vehicle.country || "NL",
+      city: vehicle.city || "",
+      images: [],
+    },
+  });
+
+  useEffect(() => {
+    if (vehicle) {
+      vehicleForm.reset({
+        vin: vehicle.vin || "",
+        make: vehicle.make || "",
+        model: vehicle.model || "",
+        color: vehicle.color || "",
+        year: vehicle.year || new Date().getFullYear(),
+        type: vehicle.type || "",
+        fuelType: vehicle.fuelType || "",
+        fuelConsumption: vehicle.fuelConsumption,
+        features: vehicle.features || [],
+        country: vehicle.country || "NL",
+        city: vehicle.city || "",
+        images: [],
+      });
+    }
+  }, [vehicle, vehicleForm]);
+
+  useEffect(() => {
+    if (vehicleTypes.length > 0 && fuelTypes.length > 0) {
+      vehicleForm.reset({
+        ...vehicleForm.getValues(),
+        type: vehicle.type || vehicleTypes[0],
+        fuelType: vehicle.fuelType || fuelTypes[0],
+        images: [],
+      });
+    }
+  }, [vehicleTypes, fuelTypes, vehicle, vehicleForm]);
+
+  const selectedCountry =
+    COUNTRIES.find((c) => c.value === vehicleForm.watch("country")) ||
+    COUNTRIES.find((c) => c.value === "NL");
+
   const [state, setState] = useState(0);
   const navigate = useNavigate();
-  const { addListing, isPending } = useAddListing();
+  const { addListing, isPending: isListingPending } = useAddListing();
+
+  const handleVehicleUpdate = (data: VehicleUpdateSchemaType) => {
+    if (vehicle.id) {
+      updateVehicle(vehicle.id, data);
+    }
+  };
+
+  const handleVehicleDelete = () => {
+    if (vehicle.id) {
+      deleteVehicle(vehicle.id);
+    }
+  };
 
   const handleListingSubmit = (data: ListingSchemaType) => {
     const listing: Listing = {
@@ -68,34 +181,42 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
             <h1 className="text-3xl font-bold text-[#0F172A]">
               {state === 0 ? "Vehicle Details" : "Listing Details"}
             </h1>
-            {!vehicle.listed ? (
-              <Button
-                variant="default"
-                className={
-                  state === 0
-                    ? "bg-[#0F172A] hover:bg-[#0f172adc]"
-                    : "bg-red-700 hover:bg-red-800"
-                }
-                onClick={() => setState(state === 0 ? 1 : 0)}
-              >
-                {state === 0 ? "List Vehicle +" : "Cancel 𐌗"}
-              </Button>
-            ) : (
-              <div className="flex gap-2">
+            <div className="flex gap-2">
+              {state !== 1 && (
                 <Button
                   variant="default"
-                  className="bg-[#0F172A] hover:bg-[#0f172adc]"
+                  className={
+                    state === 2
+                      ? "bg-red-700 hover:bg-red-800"
+                      : "bg-[#0F172A] hover:bg-[#0f172adc]"
+                  }
+                  onClick={() => setState(state === 2 ? 0 : 2)}
                 >
-                  Edit Vehicle
+                  {state === 2 ? "Cancel" : "Edit Vehicle"}
                 </Button>
+              )}
+              {!vehicle.listed && state !== 2 && (
+                <Button
+                  variant="default"
+                  className={
+                    state === 0
+                      ? "bg-[#0F172A] hover:bg-[#0f172adc]"
+                      : "bg-red-700 hover:bg-red-800"
+                  }
+                  onClick={() => setState(state === 0 ? 1 : 0)}
+                >
+                  {state === 0 ? "List Vehicle +" : "Cancel 𐌗"}
+                </Button>
+              )}
+              {vehicle.listed && state !== 2 && state !== 1 && (
                 <Button
                   variant="default"
                   className="bg-[#0F172A] hover:bg-[#0f172adc]"
                 >
                   Edit Listing
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
         {state === 0 ? (
@@ -170,13 +291,40 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
               )}
             </div>
           </div>
-        ) : (
+        ) : state === 1 ? (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <AddListingForm
-              addListingFrom={form}
+              addListingFrom={listingForm}
               handleSubmit={handleListingSubmit}
-              isPending={isPending}
+              isPending={isListingPending}
             />
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            {enumsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loading />
+              </div>
+            ) : enumsError ? (
+              <div className="text-center text-red-500 py-8">
+                Failed to load vehicle options: {enumsError.message}
+              </div>
+            ) : (
+              <AddVehicleForm
+                addVehicleForm={vehicleForm}
+                handleSubmit={handleVehicleUpdate}
+                isPending={isUpdating}
+                vehicleTypesOptions={vehicleTypesOptions}
+                fuelTypesOptions={fuelTypesOptions}
+                featuresOptions={featuresOptions}
+                countryOpen={countryOpen}
+                setCountryOpen={setCountryOpen}
+                selectedCountry={selectedCountry}
+                mode="update"
+                onDelete={handleVehicleDelete}
+                isDeleting={isDeleting}
+              />
+            )}
           </div>
         )}
       </div>

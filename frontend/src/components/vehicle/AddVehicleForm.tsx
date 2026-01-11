@@ -24,7 +24,10 @@ export function AddVehicleForm({
   countryOpen,
   setCountryOpen,
   selectedCountry,
-}: AddVehicleFormProps) {
+  mode = "add",
+  onDelete,
+  isDeleting = false,
+}: AddVehicleFormProps & { mode?: "add" | "update" }) {
   return (
     <Form {...addVehicleForm}>
       <form
@@ -44,7 +47,7 @@ export function AddVehicleForm({
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder="Enter VIN"
+                    placeholder={mode === "update" ? field.value || "Enter VIN" : "Enter VIN"}
                     className="text-[#0F172A] border-[#0f172a1a] caret-[#0F172A] h-10"
                   />
                 </FormControl>
@@ -64,7 +67,7 @@ export function AddVehicleForm({
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder="e.g., Toyota"
+                    placeholder={mode === "update" ? field.value || "e.g., Toyota" : "e.g., Toyota"}
                     className="text-[#0F172A] border-[#0f172a1a] caret-[#0F172A] h-10"
                   />
                 </FormControl>
@@ -84,7 +87,7 @@ export function AddVehicleForm({
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder="e.g., Camry"
+                    placeholder={mode === "update" ? field.value || "e.g., Camry" : "e.g., Camry"}
                     className="text-[#0F172A] border-[#0f172a1a] caret-[#0F172A] h-10"
                   />
                 </FormControl>
@@ -104,7 +107,7 @@ export function AddVehicleForm({
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder="e.g., Red"
+                    placeholder={mode === "update" ? field.value || "e.g., Red" : "e.g., Red"}
                     className="text-[#0F172A] border-[#0f172a1a] caret-[#0F172A] h-10"
                   />
                 </FormControl>
@@ -128,7 +131,7 @@ export function AddVehicleForm({
                     onChange={(e) =>
                       field.onChange(parseInt(e.target.value) || 0)
                     }
-                    placeholder="e.g., 2024"
+                    placeholder={mode === "update" ? String(field.value || "e.g., 2024") : "e.g., 2024"}
                     className="text-[#0F172A] border-[#0f172a1a] caret-[#0F172A] h-10"
                   />
                 </FormControl>
@@ -205,7 +208,7 @@ export function AddVehicleForm({
                         e.target.value ? parseFloat(e.target.value) : undefined
                       )
                     }
-                    placeholder="e.g., 7.5"
+                    placeholder={mode === "update" ? String(field.value || "e.g., 7.5") : "e.g., 7.5"}
                     className="text-[#0F172A] border-[#0f172a1a] caret-[#0F172A] h-10"
                   />
                 </FormControl>
@@ -252,7 +255,7 @@ export function AddVehicleForm({
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder="e.g., Amsterdam"
+                    placeholder={mode === "update" ? field.value || "e.g., Amsterdam" : "e.g., Amsterdam"}
                     className="text-[#0F172A] border-[#0f172a1a] caret-[#0F172A] h-10"
                   />
                 </FormControl>
@@ -321,19 +324,30 @@ export function AddVehicleForm({
           )}
         />
 
-        <div className="flex pt-4 justify-center items-center">
+        <div className={`flex pt-4 items-center ${mode === "update" && onDelete ? "justify-between gap-4" : "justify-center"}`}>
+          {mode === "update" && onDelete && (
+            <Button
+              disabled={isDeleting}
+              type="button"
+              variant="destructive"
+              onClick={onDelete}
+              className="w-1/2 h-full bg-red-700 hover:bg-red-800"
+            >
+              {isDeleting ? "Deleting..." : "Delete Vehicle"}
+            </Button>
+          )}
           <Button
             disabled={isPending}
             type="submit"
-            className="w-1/2 h-full bg-[#0F172A] hover:bg-[#16213b]"
+            className={mode === "update" && onDelete ? "w-1/2 h-full bg-[#0F172A] hover:bg-[#16213b]" : "w-1/2 h-full bg-[#0F172A] hover:bg-[#16213b]"}
           >
             {isPending ? (
               <div className="flex items-center justify-center gap-2">
                 <LoaderCircle className="animate-spin" />
-                <p>Adding vehicle...</p>
+                <p>{mode === "update" ? "Updating vehicle..." : "Adding vehicle..."}</p>
               </div>
             ) : (
-              "Add Vehicle"
+              mode === "update" ? "Update Vehicle" : "Add Vehicle"
             )}
           </Button>
         </div>
