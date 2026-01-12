@@ -97,7 +97,10 @@ public class ListingController {
     {
         try
         {
-            service.updateListing(id, ListingMapper.toUpdateListing(request));
+            Listing listing = ListingMapper.toUpdateListing(request);
+            listing.setId(id);
+
+            service.updateListing(listing);
 
             return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", true,
                     "message", "Listing updated successfully"));

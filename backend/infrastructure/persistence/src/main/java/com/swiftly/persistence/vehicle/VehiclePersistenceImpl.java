@@ -31,7 +31,8 @@ public class VehiclePersistenceImpl implements VehicleRepository {
 
         VehicleEntity vehicleEntity;
         
-        if (vehicle.getId() != null) {
+        if (vehicle.getId() != null && vehicle.getIsRemoved() == false)
+        {
             vehicleEntity = repository.findById(vehicle.getId())
                     .orElseThrow(() -> new IllegalArgumentException("Vehicle not found for id " + vehicle.getId()));
             
@@ -47,7 +48,13 @@ public class VehiclePersistenceImpl implements VehicleRepository {
             vehicleEntity.setFeatures(vehicle.getFeatures());
             vehicleEntity.setCountry(vehicle.getCountry());
             vehicleEntity.setCity(vehicle.getCity());
-        } else {
+
+        } else if(vehicle.getId() != null) {
+            vehicleEntity = repository.findById(vehicle.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Vehicle not found for id " + vehicle.getId()));
+
+            vehicleEntity.setIsRemoved(true);
+        }else {
             vehicleEntity = new VehicleEntity(profileEntity, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity());
         }
 

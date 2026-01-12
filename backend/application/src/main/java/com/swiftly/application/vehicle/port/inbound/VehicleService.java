@@ -12,6 +12,7 @@ public interface VehicleService {
     List<Vehicle> getAll();
     List<Vehicle> getAllByOwner(Profile owner);
     void deleteById(Integer id);
+    void removeById(Integer id);
     Vehicle getByVin(String vin);
     void updateVehicle(Vehicle vehicle);
 }

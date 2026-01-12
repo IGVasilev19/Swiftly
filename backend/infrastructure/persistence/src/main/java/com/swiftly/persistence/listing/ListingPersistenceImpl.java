@@ -26,7 +26,7 @@ public class ListingPersistenceImpl implements ListingRepository {
 
         ListingEntity listingEntity;
 
-        if(listing.getBasePricePerDay() != null)
+        if(listing.getId() != null && listing.getIsRemoved() == false)
         {
             listingEntity = repository.findById(listing.getId())
                     .orElseThrow(() -> new IllegalArgumentException("Listing not found for id " + listing.getId()));
@@ -35,6 +35,12 @@ public class ListingPersistenceImpl implements ListingRepository {
             listingEntity.setDescription(listing.getDescription());
             listingEntity.setBasePricePerDay(listing.getBasePricePerDay());
             listingEntity.setInstantBook(listing.getInstantBook());
+        }
+        else if(listing.getId() != null) {
+            listingEntity = repository.findById(listing.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Listing not found for id " + listing.getId()));
+
+            listingEntity.setIsRemoved(true);
         }
         else {
             listingEntity = new ListingEntity(vehicleEntity, listing.getTitle(), listing.getDescription(), listing.getBasePricePerDay(), listing.getInstantBook());

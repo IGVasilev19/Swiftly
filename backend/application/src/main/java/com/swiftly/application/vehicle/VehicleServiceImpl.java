@@ -1,5 +1,7 @@
 package com.swiftly.application.vehicle;
 
+import com.swiftly.application.listing.inbound.ListingService;
+import com.swiftly.application.profile.port.inbound.ProfileService;
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicle.port.outbound.VehicleRepository;
 import com.swiftly.domain.Profile;
@@ -45,9 +47,18 @@ public class VehicleServiceImpl implements VehicleService {
         return repository.findAllByOwner(owner);
     }
 
+    public void removeById(Integer id)
+    {
+        Vehicle vehicle = repository.findById(id);
+
+        vehicle.setIsRemoved(true);
+
+        updateVehicle(vehicle);
+    }
+
     public void deleteById(Integer id)
     {
-        repository.deleteById(id);
+            repository.deleteById(id);
     }
 
     public Vehicle getByVin(String vin)

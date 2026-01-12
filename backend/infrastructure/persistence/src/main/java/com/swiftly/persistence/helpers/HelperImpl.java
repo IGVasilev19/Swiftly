@@ -18,7 +18,7 @@ public class HelperImpl implements Helper {
 
         List<Feature> features = new ArrayList<>(vehicle.getFeatures());
 
-        return new Vehicle(vehicle.getId(), profile, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), features, vehicle.getCountry(), vehicle.getCity(), images);
+        return new Vehicle(vehicle.getId(), profile, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), features, vehicle.getCountry(), vehicle.getCity(), images, vehicle.getIsRemoved());
     }
 
     public Profile mapToProfile(ProfileEntity entity)
@@ -44,7 +44,7 @@ public class HelperImpl implements Helper {
     {
         Vehicle vehicle = mapToVehicle(entity.getVehicle());
 
-        return new Listing(entity.getId(), vehicle, entity.getTitle(), entity.getDescription(), entity.getCreationDate(), entity.getBasePricePerDay(), entity.getInstantBook());
+        return new Listing(entity.getId(), vehicle, entity.getTitle(), entity.getDescription(), entity.getCreationDate(), entity.getBasePricePerDay(), entity.getInstantBook(), entity.getIsRemoved());
     }
 
     public Booking mapToBooking(BookingEntity entity)

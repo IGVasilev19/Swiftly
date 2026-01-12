@@ -4,6 +4,7 @@ import com.swiftly.application.listing.inbound.ListingService;
 import com.swiftly.application.profile.port.inbound.ProfileService;
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicleManagement.port.inbound.VehicleManagementService;
+import com.swiftly.domain.Listing;
 import com.swiftly.domain.Profile;
 import com.swiftly.domain.User;
 import com.swiftly.domain.Vehicle;
@@ -125,7 +126,14 @@ public class VehicleController {
     {
         try
         {
-            vehicleService.deleteById(id);
+            if (listingService.checkExistsByVehicleId(id) == false)
+            {
+                vehicleService.deleteById(id);
+            }
+            else
+            {
+                service.deleteListedVehicle(id);
+            }
 
             return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", true,
                     "message", "Vehicle deleted successfully"));

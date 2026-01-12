@@ -24,6 +24,8 @@ public class Listing {
 
     private Boolean instantBook = false;
 
+    private Boolean isRemoved = false;
+
     public Listing(Integer id)
     {
         this.id = id;
@@ -44,5 +46,14 @@ public class Listing {
         this.description = description;
         this.basePricePerDay = basePricePerDay;
         this.instantBook = instantBook;
+    }
+
+    public Listing(String  title, String description, BigDecimal basePricePerDay, Boolean instantBook, Boolean isRemoved)
+    {
+        this.title = title;
+        this.description = description;
+        this.basePricePerDay = basePricePerDay;
+        this.instantBook = instantBook;
+        this.isRemoved = isRemoved;
     }
 }

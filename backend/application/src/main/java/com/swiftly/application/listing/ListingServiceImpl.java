@@ -3,6 +3,7 @@ package com.swiftly.application.listing;
 import com.swiftly.application.listing.inbound.ListingService;
 import com.swiftly.application.listing.outbound.ListingRepository;
 import com.swiftly.domain.Listing;
+import com.swiftly.domain.Vehicle;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,17 +46,18 @@ public class ListingServiceImpl implements ListingService {
         return repository.existsByVehicleId(id);
     }
 
-    @Transactional
-    public void updateListing(Integer id, Listing listing)
+    public void updateListing(Listing listing)
     {
-        Listing existingListing = getById(id);
+        repository.save(listing);
+    }
 
-        existingListing.setTitle(listing.getTitle());
-        existingListing.setDescription(listing.getDescription());
-        existingListing.setBasePricePerDay(listing.getBasePricePerDay());
-        existingListing.setInstantBook(listing.getInstantBook());
+    public void removeById(Integer id)
+    {
+        Listing listing = repository.findById(id);
 
-        repository.save(existingListing);
+        listing.setIsRemoved(true);
+
+        updateListing(listing);
     }
 
     public void deleteById(Integer id) {}

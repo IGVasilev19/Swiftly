@@ -1,13 +1,11 @@
 package com.swiftly.application.vehicleManagement;
 
+import com.swiftly.application.listing.inbound.ListingService;
 import com.swiftly.application.profile.port.inbound.ProfileService;
 import com.swiftly.application.vehicle.port.inbound.VehicleService;
 import com.swiftly.application.vehicle.port.outbound.VehicleRepository;
 import com.swiftly.application.vehicleManagement.port.inbound.VehicleManagementService;
-import com.swiftly.domain.Profile;
-import com.swiftly.domain.User;
-import com.swiftly.domain.Vehicle;
-import com.swiftly.domain.VehicleImage;
+import com.swiftly.domain.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +24,7 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     private final VehicleService vehicleService;
     private final ProfileService profileService;
     private final VehicleRepository vehicleRepository;
+    private final ListingService listingService;
 
     public Vehicle addVehicle(Vehicle vehicle, List<MultipartFile> images) {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -76,24 +75,15 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
 
     @Transactional
     public void updateVehicle(Integer id, Vehicle vehicle, List<MultipartFile> images) {
-        Vehicle vehicleToUpdate = vehicleService.getById(id);
-
-        vehicleToUpdate.setVin(vehicle.getVin());
-        vehicleToUpdate.setMake(vehicle.getMake());
-        vehicleToUpdate.setModel(vehicle.getModel());
-        vehicleToUpdate.setColor(vehicle.getColor());
-        vehicleToUpdate.setYear(vehicle.getYear());
-        vehicleToUpdate.setType(vehicle.getType());
-        vehicleToUpdate.setFuelType(vehicle.getFuelType());
-        vehicleToUpdate.setFuelConsumption(vehicle.getFuelConsumption());
-        vehicleToUpdate.setFeatures(vehicle.getFeatures());
-        vehicleToUpdate.setCountry(vehicle.getCountry());
-        vehicleToUpdate.setCity(vehicle.getCity());
+        Vehicle vehicleForImages = vehicleService.getById(id);
+        vehicle.setId(id);
+        vehicle.setOwner(vehicleForImages.getOwner());
+        vehicle.setIsRemoved(vehicleForImages.getIsRemoved());
 
         if (images != null && !images.isEmpty())
         {
 
-            List<VehicleImage> existingImages = vehicleToUpdate.getImages();
+            List<VehicleImage> existingImages = vehicleForImages.getImages();
             if (existingImages != null && !existingImages.isEmpty()) {
                 List<VehicleImage> imagesToDelete = new ArrayList<>(existingImages);
                 for (VehicleImage existingImage : imagesToDelete) {
@@ -104,19 +94,28 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
                 try {
                     VehicleImage vehicleImage = new VehicleImage(
                             null,
-                            vehicleToUpdate,
+                            vehicleForImages,
                             image.getBytes(),
                             image.getContentType(),
                             image.getOriginalFilename(),
                             LocalDateTime.now()
                     );
-                    addImage(vehicleToUpdate, vehicleImage);
+                    addImage(vehicleForImages, vehicleImage);
                 } catch (IOException e) {
                     throw new IllegalArgumentException("Could not load vehicle image file", e);
                 }
             }
         }
 
-        vehicleService.updateVehicle(vehicleToUpdate);
+        vehicleService.updateVehicle(vehicle);
+    }
+
+    @Transactional
+    public void deleteListedVehicle(Integer id)
+    {
+        vehicleService.removeById(id);
+
+        Listing listing = listingService.getByVehicleId(id);
+        listingService.removeById(listing.getId());
     }
 }

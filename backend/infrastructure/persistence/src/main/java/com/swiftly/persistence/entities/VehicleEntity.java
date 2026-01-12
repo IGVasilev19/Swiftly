@@ -4,6 +4,7 @@ import com.swiftly.domain.enums.vehicle.FuelType;
 import com.swiftly.domain.enums.vehicle.VehicleType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -79,6 +80,10 @@ public class VehicleEntity {
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<VehicleImageEntity> images = new ArrayList<>();
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private Boolean isRemoved = false;
 
     public void addImage(VehicleImageEntity image) {
         if (images == null) {

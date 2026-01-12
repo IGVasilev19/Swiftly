@@ -51,6 +51,8 @@ public class Vehicle {
 
     private List<VehicleImage> images;
 
+    private Boolean isRemoved;
+
 
     public Vehicle(Integer id)
     {
@@ -138,5 +140,40 @@ public class Vehicle {
         this.country = country;
         this.city = city;
         this.images = images;
+    }
+
+    public Vehicle (String vin, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city, Boolean isRemoved)
+    {
+        this.vin = vin;
+        this.make = make;
+        this.model = model;
+        this.color = color;
+        this.year = year;
+        this.type = type;
+        this.fuelType = fuelType;
+        this.fuelConsumption = fuelConsumption;
+        this.features = features;
+        this.country = country;
+        this.city = city;
+        this.isRemoved = isRemoved;
+    }
+
+    public Vehicle(Integer id, Profile profile, String vin, String make, String model, String color, Integer year, VehicleType type, FuelType fuelType, Double fuelConsumption, List<Feature> features, String country, String city, List<VehicleImage> images, Boolean isRemoved)
+    {
+        this.id = id;
+        this.owner = profile;
+        this.vin = vin;
+        this.make = make;
+        this.model = model;
+        this.color = color;
+        this.year = year;
+        this.type = type;
+        this.fuelType = fuelType;
+        this.fuelConsumption = fuelConsumption;
+        this.features = features;
+        this.country = country;
+        this.city = city;
+        this.images = images;
+        this.isRemoved = isRemoved;
     }
 }

@@ -10,6 +10,7 @@ public interface ListingService {
     Listing getById(Integer id);
     Listing getByVehicleId(Integer id);
     Boolean checkExistsByVehicleId(Integer id);
-    void updateListing(Integer id,Listing listing);
+    void updateListing(Listing listing);
     void deleteById(Integer id);
+    void removeById(Integer id);
 }

@@ -40,6 +40,9 @@ public class ListingEntity {
     @ColumnDefault("false")
     private Boolean instantBook = false;
 
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private Boolean isRemoved = false;
 
     @PrePersist
     void onCreate() {

@@ -11,4 +11,5 @@ public interface VehicleManagementService {
     void addImage(Vehicle vehicle, VehicleImage image);
     void deleteImage(VehicleImage vehicleImage);
     void updateVehicle(Integer id,Vehicle vehicle, List<MultipartFile> images);
+    void deleteListedVehicle(Integer id);
 }
