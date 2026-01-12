@@ -24,9 +24,25 @@ public class ListingPersistenceImpl implements ListingRepository {
         VehicleEntity vehicleEntity = vehicleRepository.findById(listing.getVehicle().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
 
-        ListingEntity listingEntity = new ListingEntity(vehicleEntity, listing.getTitle(), listing.getDescription(), listing.getBasePricePerDay(), listing.getInstantBook());
+        ListingEntity listingEntity;
 
-        return helper.mapToListing(repository.save(listingEntity));
+        if(listing.getBasePricePerDay() != null)
+        {
+            listingEntity = repository.findById(listing.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Listing not found for id " + listing.getId()));
+
+            listingEntity.setTitle(listing.getTitle());
+            listingEntity.setDescription(listing.getDescription());
+            listingEntity.setBasePricePerDay(listing.getBasePricePerDay());
+            listingEntity.setInstantBook(listing.getInstantBook());
+        }
+        else {
+            listingEntity = new ListingEntity(vehicleEntity, listing.getTitle(), listing.getDescription(), listing.getBasePricePerDay(), listing.getInstantBook());
+        }
+
+        ListingEntity saved = repository.save(listingEntity);
+
+        return helper.mapToListing(saved);
     }
 
     public List<Listing> findAll() {

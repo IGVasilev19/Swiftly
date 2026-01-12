@@ -44,4 +44,19 @@ public class ListingServiceImpl implements ListingService {
     {
         return repository.existsByVehicleId(id);
     }
+
+    @Transactional
+    public void updateListing(Integer id, Listing listing)
+    {
+        Listing existingListing = getById(id);
+
+        existingListing.setTitle(listing.getTitle());
+        existingListing.setDescription(listing.getDescription());
+        existingListing.setBasePricePerDay(listing.getBasePricePerDay());
+        existingListing.setInstantBook(listing.getInstantBook());
+
+        repository.save(existingListing);
+    }
+
+    public void deleteById(Integer id) {}
 }

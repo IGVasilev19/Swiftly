@@ -4,7 +4,10 @@ import com.swiftly.application.listing.inbound.ListingService;
 import com.swiftly.domain.Listing;
 import com.swiftly.web.listing.dto.ListingRequest;
 import com.swiftly.web.listing.dto.ListingResponse;
+import com.swiftly.web.listing.dto.ListingUpdateRequest;
 import com.swiftly.web.listing.mapper.ListingMapper;
+import com.swiftly.web.vehicle.dto.VehicleUpdateRequest;
+import com.swiftly.web.vehicle.mapper.VehicleMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -83,6 +86,23 @@ public class ListingController {
                     .body(response);
         }catch (Exception e)
         {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,
+                    "message", e.getMessage()));
+        }
+    }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateListing(@PathVariable("id") Integer id, @RequestBody ListingUpdateRequest request)
+    {
+        try
+        {
+            service.updateListing(id, ListingMapper.toUpdateListing(request));
+
+            return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", true,
+                    "message", "Listing updated successfully"));
+
+        }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false,
                     "message", e.getMessage()));
         }

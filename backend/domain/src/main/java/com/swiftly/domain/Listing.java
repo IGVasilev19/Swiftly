@@ -37,4 +37,12 @@ public class Listing {
         this.basePricePerDay = basePricePerDay;
         this.instantBook = instantBook;
     }
+
+    public Listing(String  title, String description, BigDecimal basePricePerDay, Boolean instantBook)
+    {
+        this.title = title;
+        this.description = description;
+        this.basePricePerDay = basePricePerDay;
+        this.instantBook = instantBook;
+    }
 }

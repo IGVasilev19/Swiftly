@@ -76,7 +76,7 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
 
     @Transactional
     public void updateVehicle(Integer id, Vehicle vehicle, List<MultipartFile> images) {
-        Vehicle vehicleToUpdate = vehicleRepository.findById(id);
+        Vehicle vehicleToUpdate = vehicleService.getById(id);
 
         vehicleToUpdate.setVin(vehicle.getVin());
         vehicleToUpdate.setMake(vehicle.getMake());
