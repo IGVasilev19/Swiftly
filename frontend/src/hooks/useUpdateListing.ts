@@ -38,16 +38,26 @@ export function useUpdateListing() {
     try {
       setIsPending(true);
 
-      const response = await api.patch(`/listing/${listingId}/reactivate`);
+      const response = await api.patch(`/listing/${listingId}`);
 
-      toast.success(response.data?.message || "Listing reactivated successfully");
+      toast.success(
+        response.data?.message || "Listing reactivated successfully"
+      );
       navigate("/app/vehicles");
     } catch (error: unknown) {
       if (error && typeof error === "object" && "response" in error) {
-        const axiosError = error as AxiosError<{ success?: boolean; message?: string }>;
+        const axiosError = error as AxiosError<{
+          success?: boolean;
+          message?: string;
+        }>;
 
-        if (axiosError.response?.status === 400 && axiosError.response?.data?.success === true) {
-          const message = axiosError.response.data.message || "Listing reactivated successfully";
+        if (
+          axiosError.response?.status === 400 &&
+          axiosError.response?.data?.success === true
+        ) {
+          const message =
+            axiosError.response.data.message ||
+            "Listing reactivated successfully";
           toast.success(message);
           navigate("/app/vehicles");
         } else {

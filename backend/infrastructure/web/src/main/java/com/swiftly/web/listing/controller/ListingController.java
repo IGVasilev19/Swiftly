@@ -129,7 +129,7 @@ public class ListingController {
     }
 
     @PreAuthorize("hasRole('OWNER')")
-    @PatchMapping("/{id}/reactivate")
+    @PatchMapping("/{id}")
     public ResponseEntity<?> reactivateListing(@PathVariable("id") Integer id)
     {
         try

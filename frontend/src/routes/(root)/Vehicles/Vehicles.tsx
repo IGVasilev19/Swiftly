@@ -55,10 +55,7 @@ export function Vehicles() {
           </Button>
         </div>
         <div className="h-full w-full flex">
-          <VehicleTable
-            vehicles={vehicles}
-            onRowClick={handleRowClick}
-          />
+          <VehicleTable vehicles={vehicles} onRowClick={handleRowClick} />
         </div>
       </div>
     </Layout>
