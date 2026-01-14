@@ -38,7 +38,13 @@ public class ListingServiceImpl implements ListingService {
     @Transactional
     public Listing getByVehicleId(Integer id)
     {
-        return repository.findByVehicleId(id);
+        Listing listing = repository.findByVehicleId(id);
+
+        if (listing == null) {
+            throw new IllegalArgumentException("Listing not found for vehicle with id " + id);
+        }
+
+        return listing;
     }
 
     public Boolean checkExistsByVehicleId(Integer id)
@@ -46,11 +52,13 @@ public class ListingServiceImpl implements ListingService {
         return repository.existsByVehicleId(id);
     }
 
+    @Transactional
     public void updateListing(Listing listing)
     {
         repository.save(listing);
     }
 
+    @Transactional
     public void removeById(Integer id)
     {
         Listing listing = repository.findById(id);
@@ -60,5 +68,25 @@ public class ListingServiceImpl implements ListingService {
         updateListing(listing);
     }
 
-    public void deleteById(Integer id) {}
+    public void deleteById(Integer id)
+    {
+        repository.deleteById(id);
+    }
+
+    @Transactional
+    public void reactivateById(Integer id)
+    {
+        Listing listing = repository.findById(id);
+        
+        if (listing == null) {
+            throw new IllegalArgumentException("Listing not found for id " + id);
+        }
+        
+        if (!listing.getIsRemoved()) {
+            throw new IllegalArgumentException("Listing is already active");
+        }
+        
+        listing.setIsRemoved(false);
+        updateListing(listing);
+    }
 }

@@ -77,15 +77,17 @@ public class VehicleController {
 
             for(Vehicle vehicle : vehicles)
             {
-                if(listingService.checkExistsByVehicleId(vehicle.getId()))
-                {
-                  VehicleResponse response = VehicleMapper.toVehicleResponse(vehicle);
-                  VehicleResponse listedVehicle =  response.withListed(true);
-                  ownedVehicles.add(listedVehicle);
-                }
-                else
-                {
-                    ownedVehicles.add(VehicleMapper.toVehicleResponse(vehicle));
+                VehicleResponse response = VehicleMapper.toVehicleResponse(vehicle);
+                try {
+                    Listing listing = listingService.getByVehicleId(vehicle.getId());
+                    if (listing != null && !listing.getIsRemoved()) {
+                        VehicleResponse listedVehicle = response.withListed(true);
+                        ownedVehicles.add(listedVehicle);
+                    } else {
+                        ownedVehicles.add(response);
+                    }
+                } catch (IllegalArgumentException e) {
+                    ownedVehicles.add(response);
                 }
             }
 
@@ -103,14 +105,15 @@ public class VehicleController {
         {
            VehicleResponse vehicle = VehicleMapper.toVehicleResponse(vehicleService.getById(id));
 
-            if(listingService.checkExistsByVehicleId(vehicle.id()))
-            {
-                VehicleResponse listedvehicle = vehicle.withListed(true);
-
-                return ResponseEntity.status(HttpStatus.OK).body(listedvehicle);
-            }
-            else
-            {
+            try {
+                Listing listing = listingService.getByVehicleId(vehicle.id());
+                if (listing != null && !listing.getIsRemoved()) {
+                    VehicleResponse listedvehicle = vehicle.withListed(true);
+                    return ResponseEntity.status(HttpStatus.OK).body(listedvehicle);
+                } else {
+                    return ResponseEntity.status(HttpStatus.OK).body(vehicle);
+                }
+            } catch (IllegalArgumentException e) {
                 return ResponseEntity.status(HttpStatus.OK).body(vehicle);
             }
 

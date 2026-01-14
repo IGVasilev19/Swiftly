@@ -21,8 +21,6 @@ public class ListingPersistenceImpl implements ListingRepository {
     private final Helper helper;
 
     public Listing save(Listing listing) {
-        VehicleEntity vehicleEntity = vehicleRepository.findById(listing.getVehicle().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
 
         ListingEntity listingEntity;
 
@@ -35,6 +33,7 @@ public class ListingPersistenceImpl implements ListingRepository {
             listingEntity.setDescription(listing.getDescription());
             listingEntity.setBasePricePerDay(listing.getBasePricePerDay());
             listingEntity.setInstantBook(listing.getInstantBook());
+            listingEntity.setIsRemoved(false);
         }
         else if(listing.getId() != null) {
             listingEntity = repository.findById(listing.getId())
@@ -43,6 +42,9 @@ public class ListingPersistenceImpl implements ListingRepository {
             listingEntity.setIsRemoved(true);
         }
         else {
+            VehicleEntity vehicleEntity = vehicleRepository.findById(listing.getVehicle().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
+
             listingEntity = new ListingEntity(vehicleEntity, listing.getTitle(), listing.getDescription(), listing.getBasePricePerDay(), listing.getInstantBook());
         }
 
@@ -87,11 +89,20 @@ public class ListingPersistenceImpl implements ListingRepository {
     {
         ListingEntity existingListing = repository.findByVehicleId(vehicleId);
 
+        if (existingListing == null) {
+            return null;
+        }
+
         return helper.mapToListing(existingListing);
     }
 
     public Boolean existsByVehicleId(Integer vehicleId)
     {
         return repository.existsByVehicleId(vehicleId);
+    }
+
+    public void deleteById(Integer id)
+    {
+       repository.deleteById(id);
     }
 }

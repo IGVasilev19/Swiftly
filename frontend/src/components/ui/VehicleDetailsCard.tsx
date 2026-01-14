@@ -7,9 +7,15 @@ import { VehicleImageGallery } from "./VehicleImageGallery";
 import { useNavigate } from "react-router-dom";
 import { AddListingForm } from "../listing/AddListingForm";
 import { useAddListing } from "@/hooks/useAddListing";
+import { useUpdateListing } from "@/hooks/useUpdateListing";
+import { useDeleteListing } from "@/hooks/useDeleteListing";
+import { useListing } from "@/hooks/useListing";
+import { useAuthContext } from "@/contexts/AuthContext";
 import {
   listingSchema,
+  listingUpdateSchema,
   type ListingSchemaType,
+  type ListingUpdateSchemaType,
 } from "@/schemas/listing/listing.schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,6 +52,47 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
     },
   });
 
+  const listingUpdateForm = useForm<ListingUpdateSchemaType>({
+    resolver: zodResolver(listingUpdateSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      basePricePerDay: 0,
+      instantBook: true,
+    },
+  });
+
+  const { roles } = useAuthContext();
+  const isOwner =
+    roles &&
+    Array.isArray(roles) &&
+    roles.some((role) => String(role).toUpperCase() === "OWNER");
+
+  const { data: listingData } = useListing({
+    vehicleId: vehicle.id ?? null,
+    role: isOwner ? "OWNER" : undefined,
+  });
+
+  const currentListing =
+    listingData && !Array.isArray(listingData) ? listingData : null;
+
+  const isVehicleListed = useMemo(() => {
+    if (!vehicle.listed) return false;
+    if (currentListing && currentListing.isRemoved) return false;
+    return true;
+  }, [vehicle.listed, currentListing]);
+
+  useEffect(() => {
+    if (currentListing) {
+      listingUpdateForm.reset({
+        title: currentListing.title || "",
+        description: currentListing.description || "",
+        basePricePerDay: currentListing.basePricePerDay || 0,
+        instantBook: currentListing.instantBook ?? true,
+      });
+    }
+  }, [currentListing, listingUpdateForm]);
+
   const {
     vehicleTypes,
     fuelTypes,
@@ -56,6 +103,12 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
 
   const { updateVehicle, isPending: isUpdating } = useUpdateVehicle();
   const { deleteVehicle, isPending: isDeleting } = useDeleteVehicle();
+  const {
+    updateListing,
+    reactivateListing,
+    isPending: isUpdatingListing,
+  } = useUpdateListing();
+  const { deleteListing, isPending: isDeletingListing } = useDeleteListing();
   const [countryOpen, setCountryOpen] = useState(false);
 
   const vehicleTypesOptions = useMemo(
@@ -165,6 +218,26 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
     addListing(listing);
   };
 
+  const handleListVehicleClick = () => {
+    if (currentListing && currentListing.isRemoved && currentListing.id) {
+      reactivateListing(currentListing.id);
+    } else {
+      setState(state === 0 ? 1 : 0);
+    }
+  };
+
+  const handleListingUpdate = (data: ListingUpdateSchemaType) => {
+    if (currentListing?.id) {
+      updateListing(currentListing.id, data);
+    }
+  };
+
+  const handleListingDelete = () => {
+    if (currentListing?.id) {
+      deleteListing(currentListing.id);
+    }
+  };
+
   return (
     <div className="flex-1 overflow-y-auto hide-scrollbar min-h-0">
       <div className="max-w-4xl mx-auto p-6 pb-8">
@@ -179,10 +252,16 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
           </Button>
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-[#0F172A]">
-              {state === 0 ? "Vehicle Details" : "Listing Details"}
+              {state === 0
+                ? "Vehicle Details"
+                : state === 1
+                ? "Listing Details"
+                : state === 2
+                ? "Edit Vehicle"
+                : "Edit Listing"}
             </h1>
             <div className="flex gap-2">
-              {state !== 1 && (
+              {state !== 1 && state !== 3 && (
                 <Button
                   variant="default"
                   className={
@@ -195,7 +274,7 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
                   {state === 2 ? "Cancel" : "Edit Vehicle"}
                 </Button>
               )}
-              {!vehicle.listed && state !== 2 && (
+              {!isVehicleListed && state !== 2 && (
                 <Button
                   variant="default"
                   className={
@@ -203,17 +282,27 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
                       ? "bg-[#0F172A] hover:bg-[#0f172adc]"
                       : "bg-red-700 hover:bg-red-800"
                   }
-                  onClick={() => setState(state === 0 ? 1 : 0)}
+                  onClick={handleListVehicleClick}
+                  disabled={isListingPending}
                 >
-                  {state === 0 ? "List Vehicle +" : "Cancel 𐌗"}
+                  {state === 0
+                    ? isListingPending
+                      ? "Listing..."
+                      : "List Vehicle +"
+                    : "Cancel"}
                 </Button>
               )}
-              {vehicle.listed && state !== 2 && state !== 1 && (
+              {isVehicleListed && state !== 2 && state !== 1 && (
                 <Button
                   variant="default"
-                  className="bg-[#0F172A] hover:bg-[#0f172adc]"
+                  className={
+                    state === 3
+                      ? "bg-red-700 hover:bg-red-800"
+                      : "bg-[#0F172A] hover:bg-[#0f172adc]"
+                  }
+                  onClick={() => setState(state === 3 ? 0 : 3)}
                 >
-                  Edit Listing
+                  {state === 3 ? "Cancel" : "Edit Listing"}
                 </Button>
               )}
             </div>
@@ -262,12 +351,12 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
                 <VehicleDetailPlaceholder label="Status">
                   <span
                     className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                      vehicle.listed
+                      isVehicleListed
                         ? "bg-green-100 text-green-800"
                         : "bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {vehicle.listed ? "Listed" : "Not Listed"}
+                    {isVehicleListed ? "Listed" : "Not Listed"}
                   </span>
                 </VehicleDetailPlaceholder>
               </div>
@@ -299,7 +388,7 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
               isPending={isListingPending}
             />
           </div>
-        ) : (
+        ) : state === 2 ? (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             {enumsLoading ? (
               <div className="flex items-center justify-center py-8">
@@ -324,6 +413,23 @@ export function VehicleDetailsCard({ vehicle }: { vehicle: Vehicle }) {
                 onDelete={handleVehicleDelete}
                 isDeleting={isDeleting}
               />
+            )}
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            {currentListing ? (
+              <AddListingForm
+                addListingFrom={listingUpdateForm}
+                handleSubmit={handleListingUpdate}
+                isPending={isUpdatingListing}
+                mode="update"
+                onDelete={handleListingDelete}
+                isDeleting={isDeletingListing}
+              />
+            ) : (
+              <div className="text-center text-red-500 py-8">
+                Listing not found
+              </div>
             )}
           </div>
         )}

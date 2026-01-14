@@ -22,6 +22,9 @@ export function AddListingForm({
   addListingFrom,
   handleSubmit,
   isPending,
+  mode = "add",
+  onDelete,
+  isDeleting,
 }: AddListingFromProps) {
   return (
     <Form {...addListingFrom}>
@@ -122,19 +125,30 @@ export function AddListingForm({
           />
         </div>
 
-        <div className="flex pt-4 justify-center items-center">
+        <div className={`flex pt-4 justify-center items-center ${mode === "update" && onDelete ? "gap-4" : ""}`}>
+          {mode === "update" && onDelete && (
+            <Button
+              disabled={isDeleting}
+              type="button"
+              variant="destructive"
+              onClick={onDelete}
+              className="w-1/2 h-full bg-red-700 hover:bg-red-800"
+            >
+              {isDeleting ? "Deleting..." : "Delete Listing"}
+            </Button>
+          )}
           <Button
             disabled={isPending}
             type="submit"
-            className="w-1/2 h-full bg-[#0F172A] hover:bg-[#16213b]"
+            className={mode === "update" && onDelete ? "w-1/2 h-full bg-[#0F172A] hover:bg-[#16213b]" : "w-1/2 h-full bg-[#0F172A] hover:bg-[#16213b]"}
           >
             {isPending ? (
               <div className="flex items-center justify-center gap-2">
                 <LoaderCircle className="animate-spin" />
-                <p>Creating listing...</p>
+                <p>{mode === "update" ? "Updating listing..." : "Creating listing..."}</p>
               </div>
             ) : (
-              "Create Listing"
+              mode === "update" ? "Update Listing" : "Create Listing"
             )}
           </Button>
         </div>

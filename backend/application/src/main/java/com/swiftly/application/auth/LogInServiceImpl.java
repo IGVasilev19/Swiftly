@@ -19,7 +19,7 @@ public class LogInServiceImpl implements LogInService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
 
-
+    @Transactional
     public User login(User requestedUser)
     {
         User userToLogIn = userService.getByEmail(requestedUser.getEmail());
@@ -42,6 +42,7 @@ public class LogInServiceImpl implements LogInService {
         }
     }
 
+    @Transactional
     public User refreshToken(String token)
     {
         RefreshToken refreshToken = refreshTokenService.getByToken(token);

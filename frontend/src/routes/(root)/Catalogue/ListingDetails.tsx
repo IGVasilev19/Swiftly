@@ -7,12 +7,20 @@ import type { Listing } from "@/types/listing";
 import { Layout } from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 export function ListingDetails() {
   const navigate = useNavigate();
   const { selectedListingId } = useListingContext();
+  const { roles } = useAuthContext();
+  const isRenter =
+    roles &&
+    Array.isArray(roles) &&
+    roles.some((role) => String(role).toUpperCase() === "RENTER");
+
   const { data, isLoading, error } = useListing({
     id: selectedListingId,
+    role: isRenter ? "RENTER" : undefined,
   });
   const listing: Listing | null = data && !Array.isArray(data) ? data : null;
 

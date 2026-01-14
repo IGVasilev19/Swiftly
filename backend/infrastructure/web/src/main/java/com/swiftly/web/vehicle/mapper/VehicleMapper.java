@@ -20,7 +20,7 @@ public class VehicleMapper {
 
     public static VehicleResponse toVehicleResponse(Vehicle vehicle)
     {
-        return new VehicleResponse(vehicle.getId(), ProfileMapper.toResponse(vehicle.getOwner()), vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity(), vehicle.getImages(), false);
+        return new VehicleResponse(vehicle.getId(), ProfileMapper.toResponse(vehicle.getOwner()), vehicle.getVin(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(), vehicle.getYear(), vehicle.getType(), vehicle.getFuelType(), vehicle.getFuelConsumption(), vehicle.getFeatures(), vehicle.getCountry(), vehicle.getCity(), vehicle.getImages(), false, vehicle.getIsRemoved());
     }
 
     public static Vehicle toUpdateVehicle(VehicleUpdateRequest vehicleRequest)

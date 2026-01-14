@@ -1,12 +1,12 @@
-import type { Listing } from "@/types/listing";
+import type { Listing, UseListingOptions } from "@/types/listing";
 import { useCallback, useEffect, useState } from "react";
 import api from "./api";
-import type { UseByIdOptions, UseQueryReturn } from "@/types/types";
+import type { UseQueryReturn } from "@/types/types";
 
 export function useListing(
-  options?: UseByIdOptions
+  options?: UseListingOptions
 ): UseQueryReturn<Listing | Listing[]> {
-  const { id: listingId } = options ?? {};
+  const { id: listingId, vehicleId, role } = options ?? {};
   const [data, setData] = useState<Listing[] | Listing | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -16,7 +16,19 @@ export function useListing(
       setIsLoading(true);
       setError(null);
 
-      const url = listingId ? `/listing/${listingId}` : `/listing`;
+      let url = "/listing";
+
+      if (vehicleId && role === "OWNER") {
+        url = `/listing/${vehicleId}`;
+      } else if (listingId && role === "RENTER") {
+        url = `/listing/${listingId}`;
+      } else if (!vehicleId && !listingId) {
+        url = "/listing";
+      } else {
+        throw new Error(
+          "Invalid listing query: vehicleId requires OWNER role, listingId requires RENTER role"
+        );
+      }
 
       const response = await api.get<Listing[] | Listing>(url);
 
@@ -29,7 +41,7 @@ export function useListing(
     } finally {
       setIsLoading(false);
     }
-  }, [listingId]);
+  }, [listingId, vehicleId, role]);
 
   useEffect(() => {
     fetchListing();

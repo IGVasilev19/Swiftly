@@ -44,6 +44,7 @@ export interface Vehicle {
   country?: string;
   city?: string;
   listed?: boolean;
+  isRemoved?: boolean;
   images?: VehicleImage[];
   [key: string]: unknown;
 }

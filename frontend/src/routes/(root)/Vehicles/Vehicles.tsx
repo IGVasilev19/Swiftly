@@ -11,7 +11,8 @@ import type { Vehicle } from "@/types/vehicle";
 export function Vehicles() {
   const navigate = useNavigate();
   const { data, isLoading, error } = useVehicle();
-  const vehicles: Vehicle[] = Array.isArray(data) ? data : [];
+  const allVehicles: Vehicle[] = Array.isArray(data) ? data : [];
+  const vehicles = allVehicles.filter((vehicle) => !vehicle.isRemoved);
   const { setSelectedVehicleId } = useVehicleContext();
 
   const handleRowClick = (vehicle: { id?: number }) => {
@@ -54,7 +55,10 @@ export function Vehicles() {
           </Button>
         </div>
         <div className="h-full w-full flex">
-          <VehicleTable vehicles={vehicles} onRowClick={handleRowClick} />
+          <VehicleTable
+            vehicles={vehicles}
+            onRowClick={handleRowClick}
+          />
         </div>
       </div>
     </Layout>

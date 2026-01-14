@@ -12,13 +12,23 @@ import { Button } from "./Button";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { useNavigate } from "react-router-dom";
 import { useListingContext } from "@/contexts/ListingContext";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 export default function CatalogueGrid() {
   const [active, setActive] = useState<Listing | null>(null);
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
-  const { data, isLoading, error } = useListing();
-  const listings: Listing[] = Array.isArray(data) ? data : [];
+  const { roles } = useAuthContext();
+  const isRenter =
+    roles &&
+    Array.isArray(roles) &&
+    roles.some((role) => String(role).toUpperCase() === "RENTER");
+
+  const { data, isLoading, error } = useListing({
+    role: isRenter ? "RENTER" : undefined,
+  });
+  const allListings: Listing[] = Array.isArray(data) ? data : [];
+  const listings = allListings.filter((listing) => !listing.isRemoved);
   const { setSelectedListingId } = useListingContext();
   const navigate = useNavigate();
 

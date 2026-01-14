@@ -7,4 +7,7 @@ export const listingSchema = z.object({
   instantBook: z.boolean(),
 });
 
+export const listingUpdateSchema = listingSchema;
+
 export type ListingSchemaType = z.infer<typeof listingSchema>;
+export type ListingUpdateSchemaType = z.infer<typeof listingUpdateSchema>;

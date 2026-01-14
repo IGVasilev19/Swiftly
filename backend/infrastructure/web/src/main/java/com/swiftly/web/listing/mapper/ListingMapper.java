@@ -14,7 +14,7 @@ public class ListingMapper {
 
     public static ListingResponse toResponse(Listing listing)
     {
-        return new ListingResponse(listing.getId(), VehicleMapper.toVehicleResponse(listing.getVehicle()), listing.getTitle(), listing.getDescription(), listing.getCreationDate(), listing.getBasePricePerDay(), listing.getInstantBook());
+        return new ListingResponse(listing.getId(), VehicleMapper.toVehicleResponse(listing.getVehicle()), listing.getTitle(), listing.getDescription(), listing.getCreationDate(), listing.getBasePricePerDay(), listing.getInstantBook(), listing.getIsRemoved());
     }
 
     public static Listing toUpdateListing(ListingUpdateRequest request)

@@ -118,6 +118,9 @@ export function ListingDetailsCard({ listing }: { listing: Listing }) {
               {listing.vehicle.city || "N/A"}
               {listing.vehicle.country && `, ${listing.vehicle.country}`}
             </VehicleDetailPlaceholder>
+            <VehicleDetailPlaceholder label="Price Per Day">
+              €{listing.basePricePerDay.toFixed(2)}
+            </VehicleDetailPlaceholder>
           </div>
 
           {listing.vehicle.features && listing.vehicle.features.length > 0 && (

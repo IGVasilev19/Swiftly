@@ -11,4 +11,5 @@ public interface ListingRepository {
     Listing findByVehicleId(Integer id);
     Boolean existsByVehicleId(Integer id);
     List<Listing> findAllWithVehicle();
+    void deleteById(Integer id);
 }

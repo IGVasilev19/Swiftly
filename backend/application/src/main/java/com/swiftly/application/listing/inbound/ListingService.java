@@ -13,4 +13,5 @@ public interface ListingService {
     void updateListing(Listing listing);
     void deleteById(Integer id);
     void removeById(Integer id);
+    void reactivateById(Integer id);
 }

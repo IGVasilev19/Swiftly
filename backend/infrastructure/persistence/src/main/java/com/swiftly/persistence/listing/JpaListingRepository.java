@@ -35,4 +35,6 @@ public interface JpaListingRepository extends JpaRepository<ListingEntity, Integ
     List<ListingEntity> findAllWithVehicle();
 
     Boolean existsByVehicleId(Integer vehicleId);
+
+    void deleteById(Integer id);
 }
