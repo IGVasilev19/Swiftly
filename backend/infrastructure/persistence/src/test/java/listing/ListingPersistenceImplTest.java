@@ -132,9 +132,10 @@ class ListingPersistenceImplTest {
     }
 
     @Test
-    void findByVehicleId_WhenNoListingExists_ShouldThrowNullPointerException() {
-        assertThatThrownBy(() -> listingRepository.findByVehicleId(vehicle.getId()))
-                .isInstanceOf(NullPointerException.class);
+    void findByVehicleId_WhenNoListingExists_ShouldReturnNull() {
+        Listing found = listingRepository.findByVehicleId(vehicle.getId());
+
+        assertThat(found).isNull();
     }
 
     @Test
