@@ -38,7 +38,7 @@ export function useUpdateListing() {
     try {
       setIsPending(true);
 
-      const response = await api.patch(`/listing/${listingId}`);
+      const response = await api.patch(`/listing/${listingId}/reactivate`);
 
       toast.success(
         response.data?.message || "Listing reactivated successfully"

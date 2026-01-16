@@ -15,6 +15,7 @@ import com.swiftly.persistence.vehicle.JpaVehicleRepository;
 import com.swiftly.web.auth.dto.LogInRequest;
 import com.swiftly.web.auth.dto.RegisterRequest;
 import com.swiftly.web.listing.dto.ListingRequest;
+import com.swiftly.web.listing.dto.ListingUpdateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +86,33 @@ class ListingControllerIT extends Containers {
         return accessTokenHolder[0];
     }
 
+    private String registerAndLoginWithEmail(String prefix, List<Role> roles, String[] emailHolder) {
+        String uniqueEmail = prefix + UUID.randomUUID() + "@gmail.com";
+        emailHolder[0] = uniqueEmail;
+        RegisterRequest registerPayload = new RegisterRequest(uniqueEmail, "@MockPassword123", prefix + " Name", "+123456789012", roles);
+        
+        webTestClient.post()
+                .uri("/api/v1/auth/register")
+                .bodyValue(registerPayload)
+                .exchange()
+                .expectStatus().isCreated();
+
+        LogInRequest loginPayload = new LogInRequest(uniqueEmail, "@MockPassword123");
+        String[] accessTokenHolder = new String[1];
+        
+        webTestClient.post()
+                .uri("/api/v1/auth/login")
+                .bodyValue(loginPayload)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(result -> {
+                    accessTokenHolder[0] = result.getResponseBody();
+                });
+
+        return accessTokenHolder[0];
+    }
+
     private VehicleEntity setupTestVehicle(Integer ownerId) {
         ProfileEntity owner = profileRepository.findById(ownerId)
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
@@ -115,6 +143,12 @@ class ListingControllerIT extends Containers {
                 true
         );
         return listingRepository.save(listing);
+    }
+
+    private Integer getOwnerIdFromEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(user -> user.getProfile().getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
 
@@ -180,6 +214,143 @@ class ListingControllerIT extends Containers {
                 .expectBody()
                 .jsonPath("$.success").isEqualTo(false)
                 .jsonPath("$.message").exists();
+    }
+
+    @Test
+    void addListing_AsOwner_ShouldReturnCreated() throws Exception {
+        String[] emailHolder = new String[1];
+        String ownerToken = registerAndLoginWithEmail("owner", List.of(Role.OWNER), emailHolder);
+        
+        Integer ownerId = getOwnerIdFromEmail(emailHolder[0]);
+        VehicleEntity vehicle = setupTestVehicle(ownerId);
+
+        ListingRequest listingRequest = new ListingRequest(
+                new Vehicle(vehicle.getId()),
+                "Luxury Tesla Rental",
+                "Premium electric vehicle for your comfort",
+                new BigDecimal("200.00"),
+                true
+        );
+
+        webTestClient.post()
+                .uri("/api/v1/listing")
+                .header("Authorization", "Bearer " + ownerToken)
+                .bodyValue(listingRequest)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Listing created successfully")
+                .jsonPath("$.data.title").isEqualTo("Luxury Tesla Rental")
+                .jsonPath("$.data.basePricePerDay").isEqualTo(200.00);
+    }
+
+    @Test
+    void getAllListings_WithListings_ShouldReturnOk() throws Exception {
+        String[] emailHolder = new String[1];
+        String ownerToken = registerAndLoginWithEmail("owner", List.of(Role.OWNER), emailHolder);
+        
+        Integer ownerId = getOwnerIdFromEmail(emailHolder[0]);
+        VehicleEntity vehicle = setupTestVehicle(ownerId);
+        ListingEntity listing = setupTestListing(vehicle);
+
+        String renterToken = registerAndLogin("renter", List.of(Role.RENTER));
+
+        webTestClient.get()
+                .uri("/api/v1/listing")
+                .header("Authorization", "Bearer " + renterToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].id").isEqualTo(listing.getId())
+                .jsonPath("$[0].title").isEqualTo("Beautiful Tesla");
+    }
+
+    @Test
+    void getListing_ExistingListing_ShouldReturnOk() throws Exception {
+        String[] emailHolder = new String[1];
+        String ownerToken = registerAndLoginWithEmail("owner", List.of(Role.OWNER), emailHolder);
+        
+        Integer ownerId = getOwnerIdFromEmail(emailHolder[0]);
+        VehicleEntity vehicle = setupTestVehicle(ownerId);
+        ListingEntity listing = setupTestListing(vehicle);
+
+        webTestClient.get()
+                .uri("/api/v1/listing/" + listing.getId())
+                .header("Authorization", "Bearer " + ownerToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(listing.getId())
+                .jsonPath("$.title").isEqualTo("Beautiful Tesla")
+                .jsonPath("$.description").isEqualTo("Fast and clean");
+    }
+
+    @Test
+    void updateListing_AsOwner_ShouldReturnOk() throws Exception {
+        String[] emailHolder = new String[1];
+        String ownerToken = registerAndLoginWithEmail("owner", List.of(Role.OWNER), emailHolder);
+        
+        Integer ownerId = getOwnerIdFromEmail(emailHolder[0]);
+        VehicleEntity vehicle = setupTestVehicle(ownerId);
+        ListingEntity listing = setupTestListing(vehicle);
+
+        ListingUpdateRequest updateRequest = new ListingUpdateRequest(
+                "Updated Tesla Listing",
+                "Updated description with more details",
+                new BigDecimal("180.00"),
+                false
+        );
+
+        webTestClient.put()
+                .uri("/api/v1/listing/" + listing.getId())
+                .header("Authorization", "Bearer " + ownerToken)
+                .bodyValue(updateRequest)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.message").isEqualTo("Listing updated successfully");
+    }
+
+    @Test
+    void reactivateListing_AsOwner_ShouldReturnOk() throws Exception {
+        String[] emailHolder = new String[1];
+        String ownerToken = registerAndLoginWithEmail("owner", List.of(Role.OWNER), emailHolder);
+        
+        Integer ownerId = getOwnerIdFromEmail(emailHolder[0]);
+        VehicleEntity vehicle = setupTestVehicle(ownerId);
+        ListingEntity listing = setupTestListing(vehicle);
+        
+        listing.setIsRemoved(true);
+        listingRepository.save(listing);
+
+        webTestClient.patch()
+                .uri("/api/v1/listing/" + listing.getId())
+                .header("Authorization", "Bearer " + ownerToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.message").isEqualTo("Listing reactivated successfully");
+    }
+
+    @Test
+    void deleteListing_AsOwner_ShouldReturnOk() throws Exception {
+        String[] emailHolder = new String[1];
+        String ownerToken = registerAndLoginWithEmail("owner", List.of(Role.OWNER), emailHolder);
+        
+        Integer ownerId = getOwnerIdFromEmail(emailHolder[0]);
+        VehicleEntity vehicle = setupTestVehicle(ownerId);
+        ListingEntity listing = setupTestListing(vehicle);
+
+        webTestClient.delete()
+                .uri("/api/v1/listing/" + listing.getId())
+                .header("Authorization", "Bearer " + ownerToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.message").isEqualTo("Listing deleted successfully");
     }
 }
 

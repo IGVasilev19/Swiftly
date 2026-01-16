@@ -135,6 +135,39 @@ class BookingControllerIT extends Containers {
         return bookingRepository.save(booking);
     }
 
+    private String registerAndLoginWithEmail(String prefix, List<Role> roles, String[] emailHolder) {
+        String uniqueEmail = prefix + UUID.randomUUID() + "@gmail.com";
+        emailHolder[0] = uniqueEmail;
+        RegisterRequest registerPayload = new RegisterRequest(uniqueEmail, "@MockPassword123", prefix + " Name", "+123456789012", roles);
+        
+        webTestClient.post()
+                .uri("/api/v1/auth/register")
+                .bodyValue(registerPayload)
+                .exchange()
+                .expectStatus().isCreated();
+
+        LogInRequest loginPayload = new LogInRequest(uniqueEmail, "@MockPassword123");
+        String[] accessTokenHolder = new String[1];
+        
+        webTestClient.post()
+                .uri("/api/v1/auth/login")
+                .bodyValue(loginPayload)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(result -> {
+                    accessTokenHolder[0] = result.getResponseBody();
+                });
+
+        return accessTokenHolder[0];
+    }
+
+    private Integer getUserIdFromEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(user -> user.getProfile().getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
 
 
 
@@ -190,6 +223,126 @@ class BookingControllerIT extends Containers {
                 .expectStatus().isBadRequest();
     }
 
+    @Test
+    void createBooking_AsRenter_ShouldReturnCreated() throws Exception {
+        String[] ownerEmailHolder = new String[1];
+        String ownerToken = registerAndLoginWithEmail("owner", List.of(Role.OWNER), ownerEmailHolder);
+        Integer ownerId = getUserIdFromEmail(ownerEmailHolder[0]);
+        VehicleEntity vehicle = setupTestVehicle(ownerId);
+        ListingEntity listing = setupTestListing(vehicle);
 
+        String renterToken = registerAndLogin("renter", List.of(Role.RENTER));
+
+        BookingRequest bookingRequest = new BookingRequest(
+                new com.swiftly.domain.Listing(listing.getId()),
+                LocalDate.now().plusDays(1),
+                LocalDate.now().plusDays(3),
+                new BigDecimal("300.00")
+        );
+
+        webTestClient.post()
+                .uri("/api/v1/booking")
+                .header("Authorization", "Bearer " + renterToken)
+                .bodyValue(bookingRequest)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Booking created successfully")
+                .jsonPath("$.data.listing.id").isEqualTo(listing.getId())
+                .jsonPath("$.data.totalPrice").isEqualTo(300.00);
+    }
+
+    @Test
+    void getAllRenterBookings_AsRenter_ShouldReturnOk() throws Exception {
+        String[] ownerEmailHolder = new String[1];
+        String ownerToken = registerAndLoginWithEmail("owner", List.of(Role.OWNER), ownerEmailHolder);
+        Integer ownerId = getUserIdFromEmail(ownerEmailHolder[0]);
+        VehicleEntity vehicle = setupTestVehicle(ownerId);
+        ListingEntity listing = setupTestListing(vehicle);
+
+        String[] renterEmailHolder = new String[1];
+        String renterToken = registerAndLoginWithEmail("renter", List.of(Role.RENTER), renterEmailHolder);
+        Integer renterId = getUserIdFromEmail(renterEmailHolder[0]);
+        BookingEntity booking = setupTestBooking(listing, renterId);
+
+        webTestClient.get()
+                .uri("/api/v1/booking/me")
+                .header("Authorization", "Bearer " + renterToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].id").isEqualTo(booking.getId())
+                .jsonPath("$[0].listing.id").isEqualTo(listing.getId());
+    }
+
+    @Test
+    void getAllOwnerBookings_AsOwner_ShouldReturnOk() throws Exception {
+        String[] ownerEmailHolder = new String[1];
+        String ownerToken = registerAndLoginWithEmail("owner", List.of(Role.OWNER), ownerEmailHolder);
+        Integer ownerId = getUserIdFromEmail(ownerEmailHolder[0]);
+        VehicleEntity vehicle = setupTestVehicle(ownerId);
+        ListingEntity listing = setupTestListing(vehicle);
+
+        String[] renterEmailHolder = new String[1];
+        String renterToken = registerAndLoginWithEmail("renter", List.of(Role.RENTER), renterEmailHolder);
+        Integer renterId = getUserIdFromEmail(renterEmailHolder[0]);
+        BookingEntity booking = setupTestBooking(listing, renterId);
+
+        webTestClient.get()
+                .uri("/api/v1/booking/owned")
+                .header("Authorization", "Bearer " + ownerToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].id").isEqualTo(booking.getId())
+                .jsonPath("$[0].listing.id").isEqualTo(listing.getId());
+    }
+
+    @Test
+    void getBooking_ExistingBooking_ShouldReturnOk() throws Exception {
+        String[] ownerEmailHolder = new String[1];
+        String ownerToken = registerAndLoginWithEmail("owner", List.of(Role.OWNER), ownerEmailHolder);
+        Integer ownerId = getUserIdFromEmail(ownerEmailHolder[0]);
+        VehicleEntity vehicle = setupTestVehicle(ownerId);
+        ListingEntity listing = setupTestListing(vehicle);
+
+        String[] renterEmailHolder = new String[1];
+        String renterToken = registerAndLoginWithEmail("renter", List.of(Role.RENTER), renterEmailHolder);
+        Integer renterId = getUserIdFromEmail(renterEmailHolder[0]);
+        BookingEntity booking = setupTestBooking(listing, renterId);
+
+        webTestClient.get()
+                .uri("/api/v1/booking/" + booking.getId())
+                .header("Authorization", "Bearer " + renterToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(booking.getId())
+                .jsonPath("$.listing.id").isEqualTo(listing.getId())
+                .jsonPath("$.status").isEqualTo("REQUESTED");
+    }
+
+    @Test
+    void getBookingsByListingId_AsOwner_ShouldReturnOk() throws Exception {
+        String[] ownerEmailHolder = new String[1];
+        String ownerToken = registerAndLoginWithEmail("owner", List.of(Role.OWNER), ownerEmailHolder);
+        Integer ownerId = getUserIdFromEmail(ownerEmailHolder[0]);
+        VehicleEntity vehicle = setupTestVehicle(ownerId);
+        ListingEntity listing = setupTestListing(vehicle);
+
+        String[] renterEmailHolder = new String[1];
+        String renterToken = registerAndLoginWithEmail("renter", List.of(Role.RENTER), renterEmailHolder);
+        Integer renterId = getUserIdFromEmail(renterEmailHolder[0]);
+        BookingEntity booking = setupTestBooking(listing, renterId);
+
+        webTestClient.get()
+                .uri("/api/v1/booking/listing/" + listing.getId())
+                .header("Authorization", "Bearer " + ownerToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].id").isEqualTo(booking.getId())
+                .jsonPath("$[0].listing.id").isEqualTo(listing.getId());
+    }
 }
 

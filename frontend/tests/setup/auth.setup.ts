@@ -1,29 +1,26 @@
-import { test } from "@playwright/test";
+import { test as setup, expect } from "@playwright/test";
 
-test("authenticate as renter", async ({ page }) => {
+const ownerAuthFile = "playwright/.auth/owner.json";
+const renterAuthFile = "playwright/.auth/renter.json";
+
+setup("authenticate as owner", async ({ page }) => {
   await page.goto("http://localhost:5173/");
-
-  await page.getByLabel("Email").fill("ivanov123@gmail.com");
-  await page.getByLabel("Password").fill("#03102005Ivelin");
-  await page.getByRole("button", { name: "Login" }).click();
-
-  await page.waitForURL("/dashboard");
-
-  await page.context().storageState({
-    path: "playwright/.auth/renter.json",
-  });
+  await page.locator("#email").click();
+  await page.locator("#email").fill("ivelinvasilev4038@gmail.com");
+  await page.locator("#password").click();
+  await page.locator("#password").fill("#03102005Ivelin");
+  await page.getByRole("button", { name: "Sign In" }).click();
+  await page.waitForURL("**/app/**");
+  await page.context().storageState({ path: ownerAuthFile });
 });
 
-test("authenticate as owner", async ({ page }) => {
+setup("authenticate as renter", async ({ page }) => {
   await page.goto("http://localhost:5173/");
-
-  await page.getByLabel("Email").fill("ivelinvasilev4038@gmail.com");
-  await page.getByLabel("Password").fill("#03102005Ivelin");
-  await page.getByRole("button", { name: "Login" }).click();
-
-  await page.waitForURL("/owner");
-
-  await page.context().storageState({
-    path: "playwright/.auth/owner.json",
-  });
+  await page.locator("#email").click();
+  await page.locator("#email").fill("ivelinvasilev4040@gmail.com");
+  await page.locator("#password").click();
+  await page.locator("#password").fill("#03102005Ivelin");
+  await page.getByRole("button", { name: "Sign In" }).click();
+  await page.waitForURL("**/app/**");
+  await page.context().storageState({ path: renterAuthFile });
 });
