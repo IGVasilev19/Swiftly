@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("test", async ({ page }) => {
+test("add vehicle", async ({ page }) => {
   await page.goto("http://localhost:5173/app/vehicles");
   await page.waitForLoadState("networkidle");
   await page.getByRole("button", { name: "Add +" }).click();

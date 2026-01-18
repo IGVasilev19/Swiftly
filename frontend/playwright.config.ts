@@ -22,8 +22,7 @@ export default defineConfig({
         storageState: "playwright/.auth/renter.json",
       },
       dependencies: ["setup"],
-      testMatch: /.*\.e2e\.spec\.ts/,
-      testIgnore: /.*owner actions.*/,
+      testMatch: /.*renter actions.*\.e2e\.spec\.ts/,
     },
     {
       name: "owner",
@@ -31,24 +30,24 @@ export default defineConfig({
         storageState: "playwright/.auth/owner.json",
       },
       dependencies: ["setup"],
-      testMatch: /.*\.e2e\.spec\.ts/,
+      testMatch: /.*owner actions.*\.e2e\.spec\.ts/,
     },
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-      testIgnore: /.*owner actions.*|.*auth.*/,
+      testIgnore: /.*owner actions.*|.*renter actions.*|.*auth.*/,
     },
 
     {
       name: "firefox",
       use: { ...devices["Desktop Firefox"] },
-      testIgnore: /.*owner actions.*|.*auth.*/,
+      testIgnore: /.*owner actions.*|.*renter actions.*|.*auth.*/,
     },
 
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"] },
-      testIgnore: /.*owner actions.*|.*auth.*/,
+      testIgnore: /.*owner actions.*|.*renter actions.*|.*auth.*/,
     },
   ],
 
