@@ -1,7 +1,6 @@
 import { test, expect } from "@playwright/test";
 
 test("update vehicle listing", async ({ page }) => {
-  // Owner is already authenticated via storageState in Playwright config
   const responsePromise = page.waitForResponse(
     (response) =>
       response.url().includes("/listing/") &&
