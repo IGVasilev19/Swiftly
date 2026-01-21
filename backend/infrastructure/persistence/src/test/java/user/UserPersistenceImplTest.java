@@ -94,6 +94,8 @@ class UserPersistenceImplTest {
         UserEntity entity = entityManager.find(UserEntity.class, saved.getId());
         assertThat(entity).isNotNull();
         assertThat(entity.getEmail()).isEqualTo("newuser@example.com");
+        assertThat(entity.getPasswordHash()).isEqualTo("newPasswordHash");
+        assertThat(entity.getRoles()).containsExactly(Role.RENTER);
     }
 
     @Test

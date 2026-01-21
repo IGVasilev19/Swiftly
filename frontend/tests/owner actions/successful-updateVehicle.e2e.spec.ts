@@ -1,6 +1,13 @@
 import { test, expect } from "@playwright/test";
 
 test("update vehicle", async ({ page }) => {
+  // Owner is already authenticated via storageState in Playwright config
+  const responsePromise = page.waitForResponse(
+    (response) =>
+      response.url().includes("/vehicle/") &&
+      response.request().method() === "PUT"
+  );
+
   await page.goto("http://localhost:5173/app/vehicles");
   await page.waitForLoadState("networkidle");
   
@@ -42,4 +49,12 @@ test("update vehicle", async ({ page }) => {
   
   await page.waitForURL(/.*\/app\/vehicles/, { timeout: 15000 });
   await page.waitForLoadState("networkidle");
+
+  const response = await responsePromise;
+  const data = (await response.json()) as { message?: string };
+
+  expect(response.ok()).toBeTruthy();
+  if (data.message) {
+    await expect(page.getByText(data.message)).toBeVisible();
+  }
 });

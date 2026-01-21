@@ -86,6 +86,10 @@ class ListingPersistenceImplTest {
         ListingEntity entity = entityManager.find(ListingEntity.class, saved.getId());
         assertThat(entity).isNotNull();
         assertThat(entity.getVehicle().getId()).isEqualTo(vehicle.getId());
+        assertThat(entity.getTitle()).isEqualTo("Test Listing");
+        assertThat(entity.getDescription()).isEqualTo("Description");
+        assertThat(entity.getBasePricePerDay()).isEqualByComparingTo(new BigDecimal("100.00"));
+        assertThat(entity.getInstantBook()).isTrue();
     }
 
     @Test

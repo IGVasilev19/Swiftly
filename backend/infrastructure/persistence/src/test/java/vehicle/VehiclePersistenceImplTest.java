@@ -73,6 +73,17 @@ class VehiclePersistenceImplTest {
         VehicleEntity entity = entityManager.find(VehicleEntity.class, saved.getId());
         assertThat(entity).isNotNull();
         assertThat(entity.getOwner().getId()).isEqualTo(owner.getId());
+        assertThat(entity.getVin()).isEqualTo("1HGBH41JXMN109186");
+        assertThat(entity.getMake()).isEqualTo("Toyota");
+        assertThat(entity.getModel()).isEqualTo("Camry");
+        assertThat(entity.getColor()).isEqualTo("Blue");
+        assertThat(entity.getYear()).isEqualTo(2020);
+        assertThat(entity.getType()).isEqualTo(VehicleType.CAR);
+        assertThat(entity.getFuelType()).isEqualTo(FuelType.PETROL);
+        assertThat(entity.getFuelConsumption()).isEqualTo(8.5);
+        assertThat(entity.getFeatures()).contains(Feature.AIR_CONDITIONING);
+        assertThat(entity.getCountry()).isEqualTo("Netherlands");
+        assertThat(entity.getCity()).isEqualTo("Amsterdam");
     }
 
     @Test

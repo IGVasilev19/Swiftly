@@ -113,6 +113,9 @@ class RefreshTokenPersistenceImplTest {
         RefreshTokenEntity entity = entityManager.find(RefreshTokenEntity.class, saved.getId());
         assertThat(entity).isNotNull();
         assertThat(entity.getToken()).isEqualTo("new-token-456");
+        assertThat(entity.isRevoked()).isFalse();
+        assertThat(entity.getExpiryDate()).isEqualTo(expiryDate);
+        assertThat(entity.getUser().getId()).isEqualTo(user.getId());
     }
 
     @Test
@@ -126,7 +129,11 @@ class RefreshTokenPersistenceImplTest {
         assertThat(saved.isRevoked()).isTrue();
 
         RefreshTokenEntity entity = entityManager.find(RefreshTokenEntity.class, saved.getId());
+        assertThat(entity).isNotNull();
+        assertThat(entity.getToken()).isEqualTo("revoked-token");
         assertThat(entity.isRevoked()).isTrue();
+        assertThat(entity.getExpiryDate()).isEqualTo(expiryDate);
+        assertThat(entity.getUser().getId()).isEqualTo(user.getId());
     }
 
     @Test

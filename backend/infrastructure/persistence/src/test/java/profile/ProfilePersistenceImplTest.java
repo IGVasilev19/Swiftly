@@ -80,6 +80,9 @@ class ProfilePersistenceImplTest {
         ProfileEntity entity = entityManager.find(ProfileEntity.class, saved.getId());
         assertThat(entity).isNotNull();
         assertThat(entity.getUser().getId()).isEqualTo(newUser.getId());
+        assertThat(entity.getFullName()).isEqualTo("New User");
+        assertThat(entity.getPhone()).isEqualTo("+9876543210");
+        assertThat(entity.getAvatarUrl()).isNull();
     }
 
     @Test

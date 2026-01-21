@@ -107,6 +107,10 @@ class BookingPersistenceImplTest {
         assertThat(entity).isNotNull();
         assertThat(entity.getListing().getId()).isEqualTo(listing.getId());
         assertThat(entity.getRenter().getId()).isEqualTo(renter.getId());
+        assertThat(entity.getStartAt()).isEqualTo(LocalDate.of(2024, 1, 1));
+        assertThat(entity.getEndAt()).isEqualTo(LocalDate.of(2024, 1, 5));
+        assertThat(entity.getStatus()).isEqualTo(Status.REQUESTED);
+        assertThat(entity.getTotalPrice()).isEqualByComparingTo(new BigDecimal("500.00"));
     }
 
     @Test
